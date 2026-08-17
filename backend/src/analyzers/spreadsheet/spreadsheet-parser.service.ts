@@ -1,6 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException, RequestTimeoutException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import * as xlsx from 'xlsx';
+
+const PARSE_TIMEOUT_MS = 60000;
 
 @Injectable()
 export class SpreadsheetParserService {
@@ -12,20 +14,57 @@ export class SpreadsheetParserService {
     buffer: Buffer,
     filename: string,
     batchSize = 5000,
+    timeoutMs = PARSE_TIMEOUT_MS,
+  ) {
+    if (!buffer || buffer.length === 0) {
+      throw new BadRequestException('Uploaded spreadsheet file is empty (0 bytes).');
+    }
+
+    const parsePromise = this.internalProcessSpreadsheet(buffer, filename, batchSize);
+    const timeoutPromise = new Promise<any>((_, reject) => {
+      setTimeout(() => {
+        reject(new RequestTimeoutException(`Spreadsheet parsing timed out after ${timeoutMs / 1000}s`));
+      }, timeoutMs);
+    });
+
+    return Promise.race([parsePromise, timeoutPromise]);
+  }
+
+  private async internalProcessSpreadsheet(
+    buffer: Buffer,
+    filename: string,
+    batchSize = 5000,
   ) {
     const startTime = Date.now();
 
-    // 1. Read workbook
-    const workbook = xlsx.read(buffer, { type: 'buffer', cellDates: true });
+    // 1. Read workbook safely
+    let workbook: xlsx.WorkBook;
+    try {
+      workbook = xlsx.read(buffer, { type: 'buffer', cellDates: true });
+    } catch (err: any) {
+      throw new BadRequestException(`Unable to parse spreadsheet: ${err.message || 'Corrupted workbook format'}`);
+    }
+
+    if (!workbook.SheetNames || workbook.SheetNames.length === 0) {
+      throw new BadRequestException('Spreadsheet contains no readable sheets.');
+    }
+
     const firstSheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[firstSheetName];
+    if (!sheet) {
+      throw new BadRequestException('Primary worksheet is empty.');
+    }
+
     const rawRows: any[] = xlsx.utils.sheet_to_json(sheet, { defval: '' });
 
     if (rawRows.length === 0) {
-      throw new Error('Spreadsheet contains no data rows');
+      throw new BadRequestException('Spreadsheet contains no data rows (empty sheet).');
     }
 
     const columns = Object.keys(rawRows[0]);
+    if (columns.length === 0) {
+      throw new BadRequestException('No column headers detected in spreadsheet.');
+    }
 
     // 2. Auto-detect column data types
     const columnTypes: Record<string, 'date' | 'number' | 'text'> = {};
@@ -62,7 +101,6 @@ export class SpreadsheetParserService {
     }
 
     // 3. Identify gradebook / student performance characteristics
-    const lowerCols = columns.map((c) => c.toLowerCase());
     const actorCol =
       columns.find((c) => /^(name|student|student_name|candidate|user|person|author|employee)$/i.test(c)) ||
       columns.find((c) => columnTypes[c] === 'text') ||
@@ -105,7 +143,6 @@ export class SpreadsheetParserService {
     let totalMessages = 0;
     const actorCounts: Record<string, number> = {};
 
-    // Track gradebook student aggregations
     const studentSubjectScores: Record<string, Record<string, number[]>> = {};
     const columnSums: Record<string, number> = {};
     const columnMins: Record<string, number> = {};
@@ -136,9 +173,6 @@ export class SpreadsheetParserService {
 
       // Format content summary
       const contentParts: string[] = [];
-      let rowScoreSum = 0;
-      let rowScoreCount = 0;
-
       for (const col of columns) {
         const val = row[col];
         if (col === actorCol) continue;
@@ -151,9 +185,6 @@ export class SpreadsheetParserService {
               columnSums[col] += numVal;
               if (numVal < columnMins[col]) columnMins[col] = numVal;
               if (numVal > columnMaxs[col]) columnMaxs[col] = numVal;
-
-              rowScoreSum += numVal;
-              rowScoreCount++;
 
               if (isGradebook) {
                 if (!studentSubjectScores[actor]) studentSubjectScores[actor] = {};
@@ -187,7 +218,6 @@ export class SpreadsheetParserService {
     }
 
     // 6. Generate Metrics & Highlights
-    // Numeric Column Metrics
     for (const numCol of numericCols) {
       const avg = rawRows.length > 0 ? columnSums[numCol] / rawRows.length : 0;
       metricsToInsert.push({
@@ -204,7 +234,6 @@ export class SpreadsheetParserService {
       });
     }
 
-    // Gradebook Specific Analytics: Weak subjects & GPA
     if (isGradebook) {
       for (const [student, subjects] of Object.entries(studentSubjectScores)) {
         let studentTotal = 0;
@@ -215,7 +244,6 @@ export class SpreadsheetParserService {
           studentTotal += avgSubjectScore;
           subjectCount++;
 
-          // Flag weak subjects (score < 70)
           if (avgSubjectScore < 70) {
             highlightsToInsert.push({
               datasetId: dataset.id,
@@ -227,7 +255,6 @@ export class SpreadsheetParserService {
         }
 
         const overallAvg = subjectCount > 0 ? studentTotal / subjectCount : 0;
-        // Convert to standard 4.0 GPA scale: (Percentage / 20) - 1 approximately
         const gpa = Math.max(0, Math.min(4.0, (overallAvg / 20) - 1));
 
         metricsToInsert.push({
@@ -249,7 +276,8 @@ export class SpreadsheetParserService {
     }
 
     const processingTimeMs = Date.now() - startTime;
-    this.logger.log(`Processed spreadsheet ${filename} (${totalMessages} rows) in ${processingTimeMs}ms`);
+    // Strict privacy logging: only row count and duration
+    this.logger.log(`Spreadsheet processed successfully: id=${dataset.id}, rowCount=${totalMessages}, duration=${processingTimeMs}ms`);
 
     return {
       datasetId: dataset.id,

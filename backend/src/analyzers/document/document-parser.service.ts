@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException, RequestTimeoutException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 const pdfParse = require('pdf-parse');
 const mammoth = require('mammoth');
@@ -24,6 +24,8 @@ interface ParsedDoc {
   datesFound: string[];
 }
 
+const PARSE_TIMEOUT_MS = 60000;
+
 @Injectable()
 export class DocumentParserService {
   private readonly logger = new Logger(DocumentParserService.name);
@@ -33,6 +35,25 @@ export class DocumentParserService {
   async processDocuments(
     files: { buffer: Buffer; originalname: string }[],
     datasetName?: string,
+    timeoutMs = PARSE_TIMEOUT_MS,
+  ) {
+    if (!files || files.length === 0) {
+      throw new BadRequestException('No documents provided for ingestion.');
+    }
+
+    const parsePromise = this.internalProcessDocuments(files, datasetName);
+    const timeoutPromise = new Promise<any>((_, reject) => {
+      setTimeout(() => {
+        reject(new RequestTimeoutException(`Document processing timed out after ${timeoutMs / 1000}s`));
+      }, timeoutMs);
+    });
+
+    return Promise.race([parsePromise, timeoutPromise]);
+  }
+
+  private async internalProcessDocuments(
+    files: { buffer: Buffer; originalname: string }[],
+    datasetName?: string,
   ) {
     const startTime = Date.now();
     const parsedDocs: ParsedDoc[] = [];
@@ -40,8 +61,11 @@ export class DocumentParserService {
     let totalWords = 0;
     let totalPages = 0;
 
-    // 1. Extract text from each document
     for (const file of files) {
+      if (!file.buffer || file.buffer.length === 0) {
+        continue;
+      }
+
       const ext = file.originalname.split('.').pop()?.toLowerCase();
       let text = '';
       let pages = 1;
@@ -52,23 +76,21 @@ export class DocumentParserService {
           text = pdfData.text || '';
           pages = pdfData.numpages || 1;
         } catch (e: any) {
-          this.logger.warn(`Failed to parse PDF ${file.originalname}: ${e.message}`);
-          text = file.buffer.toString('utf8');
+          this.logger.warn(`PDF fallback parsing for ${file.originalname}`);
+          text = file.buffer.toString('utf8').replace(/[\x00-\x08\x0B-\x1F]/g, ' ');
         }
       } else if (ext === 'docx') {
         try {
           const docxData = await mammoth.extractRawText({ buffer: file.buffer });
           text = docxData.value || '';
         } catch (e: any) {
-          this.logger.warn(`Failed to parse DOCX ${file.originalname}: ${e.message}`);
-          text = file.buffer.toString('utf8');
+          this.logger.warn(`DOCX fallback parsing for ${file.originalname}`);
+          text = file.buffer.toString('utf8').replace(/[\x00-\x08\x0B-\x1F]/g, ' ');
         }
       } else {
-        // Plain text, markdown, notes
         text = file.buffer.toString('utf8');
       }
 
-      // Extract words / tokens
       const words = text
         .toLowerCase()
         .replace(/[^\w\s]/g, ' ')
@@ -80,15 +102,19 @@ export class DocumentParserService {
       const docInfo: ParsedDoc = {
         filename: file.originalname,
         text,
-        pages,
+        pages: Math.max(1, pages),
         wordCount: words.length,
         tokens: new Set(words),
         datesFound,
       };
 
       totalWords += words.length;
-      totalPages += pages;
+      totalPages += docInfo.pages;
       parsedDocs.push(docInfo);
+    }
+
+    if (parsedDocs.length === 0) {
+      throw new BadRequestException('No readable text could be extracted from the uploaded files.');
     }
 
     const title = datasetName || (files.length === 1 ? files[0].originalname : `Document Collection (${files.length} files)`);
@@ -147,7 +173,7 @@ export class DocumentParserService {
       },
     });
 
-    // 5. Build TimelineEvents (Section / Paragraph granularity)
+    // 5. Build TimelineEvents
     const eventsBatch: any[] = [];
     const actorCounts: Record<string, number> = {};
     let baseDate = new Date('2024-01-01T08:00:00Z');
@@ -157,19 +183,17 @@ export class DocumentParserService {
       const actor = doc.filename;
       actorCounts[actor] = 0;
 
-      // Split text into paragraphs/sections
       const rawParagraphs = doc.text
         .split(/\n\s*\n/)
         .map((p) => p.trim())
         .filter((p) => p.length > 20);
 
-      const paragraphs = rawParagraphs.length > 0 ? rawParagraphs : [doc.text.slice(0, 1000)];
+      const paragraphs = rawParagraphs.length > 0 ? rawParagraphs : [doc.text.slice(0, 1000) || 'Empty document section'];
 
       for (let pIdx = 0; pIdx < paragraphs.length; pIdx++) {
         const paragraph = paragraphs[pIdx];
         actorCounts[actor]++;
 
-        // Check if paragraph contains an extracted date
         let timestamp = new Date(baseDate.getTime() + (docIdx * 86400000) + (pIdx * 600000));
         const matchedDate = paragraph.match(DATE_REGEX);
         if (matchedDate && matchedDate[0]) {
@@ -201,7 +225,6 @@ export class DocumentParserService {
     const highlightsToInsert: any[] = [];
     const metricsToInsert: any[] = [];
 
-    // Document Overview Metrics
     metricsToInsert.push({
       datasetId: dataset.id,
       name: 'total_document_words',
@@ -215,7 +238,6 @@ export class DocumentParserService {
       category: 'document_stats',
     });
 
-    // Top extracted topics as highlights
     if (topTopics.length > 0) {
       highlightsToInsert.push({
         datasetId: dataset.id,
@@ -225,7 +247,6 @@ export class DocumentParserService {
       });
     }
 
-    // Document Similarity Highlights
     if (similarityMatrix.length > 0) {
       const topSimilar = [...similarityMatrix].sort((a, b) => b.similarity - a.similarity)[0];
       if (topSimilar) {
@@ -247,7 +268,8 @@ export class DocumentParserService {
     }
 
     const processingTimeMs = Date.now() - startTime;
-    this.logger.log(`Processed ${files.length} document(s) in ${processingTimeMs}ms`);
+    // Strict privacy logging: only file count, word count, and duration
+    this.logger.log(`Document collection processed successfully: id=${dataset.id}, files=${files.length}, words=${totalWords}, duration=${processingTimeMs}ms`);
 
     return {
       datasetId: dataset.id,

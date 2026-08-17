@@ -13,6 +13,7 @@ import { PeopleView } from '../components/PeopleView';
 import { CompareView } from '../components/CompareView';
 import { OnThisDayView } from '../components/OnThisDayView';
 import { PdfExportModal } from '../components/PdfExportModal';
+import { PinLockModal } from '../components/PinLockModal';
 
 interface DatasetMetadata {
   datasetId: string;
@@ -32,9 +33,11 @@ type AnalyzerType = 'text-chat' | 'spreadsheet' | 'document';
 export default function DashboardPage() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-  // Theme state
+  // Theme & Security states
   const [theme, setTheme] = useState<ThemeMode>('terminal');
   const [hasBooted, setHasBooted] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
+  const [hasPinConfigured, setHasPinConfigured] = useState(false);
 
   // Active dataset state
   const [dataset, setDataset] = useState<DatasetMetadata | null>(null);
@@ -60,7 +63,7 @@ export default function DashboardPage() {
   const [activeWord, setActiveWord] = useState<string | null>(null);
   const [activeActor, setActiveActor] = useState<string | null>(null);
 
-  // Initialize theme from storage or default to terminal
+  // Initialize theme & security from storage
   useEffect(() => {
     const savedTheme = (localStorage.getItem('archive_theme') as ThemeMode) || 'terminal';
     setTheme(savedTheme);
@@ -69,6 +72,13 @@ export default function DashboardPage() {
     const booted = sessionStorage.getItem('archive_booted');
     if (booted || savedTheme !== 'terminal') {
       setHasBooted(true);
+    }
+
+    const pinEnabled = localStorage.getItem('archive_pin_enabled') === 'true';
+    const pinHash = localStorage.getItem('archive_pin_hash');
+    if (pinEnabled && pinHash) {
+      setIsLocked(true);
+      setHasPinConfigured(true);
     }
   }, []);
 
@@ -149,8 +159,15 @@ export default function DashboardPage() {
       {/* Scanline overlay for Terminal theme */}
       <div className="fixed inset-0 terminal-scanline pointer-events-none z-40 opacity-40" />
 
+      {/* Local PIN Security Lock */}
+      <PinLockModal
+        isLocked={isLocked}
+        onUnlock={() => setIsLocked(false)}
+        onPinConfigured={() => setHasPinConfigured(true)}
+      />
+
       {/* Boot sequence animation on first load */}
-      {!hasBooted && theme === 'terminal' && (
+      {!hasBooted && theme === 'terminal' && !isLocked && (
         <BootSequence onComplete={handleBootComplete} />
       )}
 
@@ -195,6 +212,16 @@ export default function DashboardPage() {
 
           <div className="flex items-center gap-3 flex-wrap">
             <ThemeToggle currentTheme={theme} onThemeChange={handleThemeChange} />
+
+            {/* Lock / Security Button */}
+            <button
+              onClick={() => setIsLocked(true)}
+              title={hasPinConfigured ? 'Lock application' : 'Configure security PIN'}
+              className="text-xs bg-theme-raised hover:bg-theme-active text-theme-muted hover:text-theme-text border border-theme-border px-3 py-1.5 rounded-theme transition-colors font-medium flex items-center gap-1.5"
+            >
+              <span>🔒</span>
+              <span>{hasPinConfigured ? 'Lock' : 'PIN Lock'}</span>
+            </button>
 
             {dataset && (
               <>
@@ -307,7 +334,7 @@ export default function DashboardPage() {
             )}
           </div>
         ) : (
-          /* Main Interactive Dashboard & Navigation (Universal for all Analyzers) */
+          /* Main Interactive Dashboard & Navigation */
           <div className="flex flex-col gap-5">
             {/* Tab Bar */}
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 border-b border-theme-border">

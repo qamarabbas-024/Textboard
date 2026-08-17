@@ -1,9 +1,38 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException, RequestTimeoutException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import * as fs from 'fs';
-import * as readline from 'readline';
 import { Readable } from 'stream';
-import { ParsedChatEvent, ChatAnalysisSummary } from './types';
+import * as readline from 'readline';
+
+export interface ParseResult {
+  datasetId: string;
+  name: string;
+  totalMessages: number;
+  dateRange: {
+    start: Date | null;
+    end: Date | null;
+  };
+  actorCounts: Record<string, number>;
+  processingTimeMs: number;
+}
+
+const LINE_PATTERNS = [
+  // 1. [DD/MM/YYYY, HH:MM:SS] Sender: Message
+  /^\[(\d{1,2}\/\d{1,2}\/\d{2,4}),?\s+(\d{1,2}:\d{2}(?::\d{2})?(?:\s*[APap][Mm])?)\]\s+([^:]+):\s+(.*)$/,
+  // 2. DD/MM/YYYY, HH:MM - Sender: Message
+  /^(\d{1,2}\/\d{1,2}\/\d{2,4}),?\s+(\d{1,2}:\d{2}(?::\d{2})?(?:\s*[APap][Mm])?)\s+-\s+([^:]+):\s+(.*)$/,
+  // 3. [YYYY-MM-DD HH:MM:SS] Sender: Message
+  /^\[(\d{4}-\d{1,2}-\d{1,2}\s+\d{1,2}:\d{2}(?::\d{2})?)\]\s+([^:]+):\s+(.*)$/,
+  // 4. YYYY-MM-DD HH:MM - Sender: Message
+  /^(\d{4}-\d{1,2}-\d{1,2}\s+\d{1,2}:\d{2}(?::\d{2})?)\s+-\s+([^:]+):\s+(.*)$/,
+];
+
+const SYSTEM_PATTERNS = [
+  /^\[(\d{1,2}\/\d{1,2}\/\d{2,4}),?\s+(\d{1,2}:\d{2}(?::\d{2})?(?:\s*[APap][Mm])?)\]\s+(.*)$/,
+  /^(\d{1,2}\/\d{1,2}\/\d{2,4}),?\s+(\d{1,2}:\d{2}(?::\d{2})?(?:\s*[APap][Mm])?)\s+-\s+(.*)$/,
+];
+
+const MAX_MESSAGE_LENGTH = 65536; // 64KB max per message
+const PARSE_TIMEOUT_MS = 60000; // 60s timeout
 
 @Injectable()
 export class TextChatParserService {
@@ -11,298 +40,259 @@ export class TextChatParserService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  // Regex patterns to match common chat header formats
-  // Format 1: [DD/MM/YYYY, HH:mm:ss] Author: Message or [MM/DD/YY, HH:mm:ss AM/PM] Author: Message
-  private readonly bracketHeaderRegex = /^\[(\d{1,4}[./-]\d{1,2}[./-]\d{1,4}[,\s]+\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp][Mm])?)\]\s*(?:([^:]+?):\s*)?(.*)$/;
-
-  // Format 2: DD/MM/YYYY, HH:mm - Author: Message or MM/DD/YY, HH:mm - Author: Message
-  private readonly dashHeaderRegex = /^(\d{1,4}[./-]\d{1,2}[./-]\d{1,4}[,\s]+\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp][Mm])?)\s*-\s*(?:([^:]+?):\s*)?(.*)$/;
-
-  // Format 3: YYYY-MM-DD HH:mm:ss Author: Message
-  private readonly standardHeaderRegex = /^(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(?::\d{2})?)\s+(?:([^:]+?):\s*)?(.*)$/;
-
-  /**
-   * Parse a date string into a valid Date object.
-   */
-  private parseDateString(dateStr: string): Date | null {
-    // Normalize spaces (e.g. narrow no-break space before AM/PM)
-    const cleaned = dateStr.replace(/[\u202f\u00a0]/g, ' ').trim();
-
-    // Match components: part1, sep1, part2, sep2, part3, time, ampm
-    const match = cleaned.match(/^(\d{1,4})[./-](\d{1,2})[./-](\d{1,4})[,\s]+(\d{1,2}):(\d{2})(?::(\d{2}))?(?:\s*([AaPp][Mm]))?$/);
-    if (!match) {
-      const fallbackDate = new Date(cleaned);
-      return isNaN(fallbackDate.getTime()) ? null : fallbackDate;
-    }
-
-    const p1 = parseInt(match[1], 10);
-    const p2 = parseInt(match[2], 10);
-    const p3 = parseInt(match[3], 10);
-    let hours = parseInt(match[4], 10);
-    const minutes = parseInt(match[5], 10);
-    const seconds = match[6] ? parseInt(match[6], 10) : 0;
-    const ampm = match[7]?.toUpperCase();
-
-    if (ampm === 'PM' && hours < 12) {
-      hours += 12;
-    } else if (ampm === 'AM' && hours === 12) {
-      hours = 0;
-    }
-
-    let year: number;
-    let month: number; // 0-indexed
-    let day: number;
-
-    if (p1 > 1000) {
-      // YYYY-MM-DD
-      year = p1;
-      month = p2 - 1;
-      day = p3;
-    } else if (p3 > 1000 || p3 < 100) {
-      year = p3 < 100 ? 2000 + p3 : p3;
-      if (p1 > 12) {
-        // DD/MM/YYYY
-        day = p1;
-        month = p2 - 1;
-      } else if (p2 > 12) {
-        // MM/DD/YYYY
-        month = p1 - 1;
-        day = p2;
-      } else {
-        // Default to DD/MM/YYYY
-        day = p1;
-        month = p2 - 1;
-      }
-    } else {
-      year = 2000 + p3;
-      day = p1;
-      month = p2 - 1;
-    }
-
-    const parsed = new Date(Date.UTC(year, month, day, hours, minutes, seconds));
-    return isNaN(parsed.getTime()) ? null : parsed;
-  }
-
-  /**
-   * Try to match a single line as a new message header.
-   */
-  private matchLineHeader(line: string): { timestamp: Date; actor: string | null; content: string } | null {
-    // Strip unicode control characters (LTR, RTL, BOM)
-    const sanitized = line.replace(/[\u200e\u200f\ufeff]/g, '').trim();
-    if (!sanitized) return null;
-
-    // Check bracket format
-    let match = sanitized.match(this.bracketHeaderRegex);
-    if (match) {
-      const date = this.parseDateString(match[1]);
-      if (date) {
-        return {
-          timestamp: date,
-          actor: match[2] ? match[2].trim() : null,
-          content: match[3] || '',
-        };
-      }
-    }
-
-    // Check dash format
-    match = sanitized.match(this.dashHeaderRegex);
-    if (match) {
-      const date = this.parseDateString(match[1]);
-      if (date) {
-        return {
-          timestamp: date,
-          actor: match[2] ? match[2].trim() : null,
-          content: match[3] || '',
-        };
-      }
-    }
-
-    // Check standard YYYY-MM-DD format
-    match = sanitized.match(this.standardHeaderRegex);
-    if (match) {
-      const date = this.parseDateString(match[1]);
-      if (date) {
-        return {
-          timestamp: date,
-          actor: match[2] ? match[2].trim() : null,
-          content: match[3] || '',
-        };
-      }
-    }
-
-    return null;
-  }
-
-  /**
-   * Parse chat export from a file path or readable stream and insert directly into DB in batches.
-   */
-  async processChatExport(
-    input: string | Readable,
-    datasetName: string,
+  async processStream(
+    stream: Readable,
+    filename: string,
     batchSize = 5000,
-  ): Promise<ChatAnalysisSummary> {
+    timeoutMs = PARSE_TIMEOUT_MS,
+  ): Promise<ParseResult> {
+    const parsePromise = this.internalProcessStream(stream, filename, batchSize);
+    const timeoutPromise = new Promise<ParseResult>((_, reject) => {
+      setTimeout(() => {
+        reject(new RequestTimeoutException(`Parsing timed out after ${timeoutMs / 1000}s`));
+      }, timeoutMs);
+    });
+
+    return Promise.race([parsePromise, timeoutPromise]);
+  }
+
+  private async internalProcessStream(
+    stream: Readable,
+    filename: string,
+    batchSize = 5000,
+  ): Promise<ParseResult> {
     const startTime = Date.now();
 
-    // 1. Create Dataset record
+    // Create Dataset row first
     const dataset = await this.prisma.dataset.create({
       data: {
-        name: datasetName,
+        name: filename,
         sourceType: 'text-chat',
         metadata: {
-          originalName: datasetName,
-          startedAt: new Date().toISOString(),
+          originalFilename: filename,
         },
       },
     });
-
-    const stream = typeof input === 'string'
-      ? fs.createReadStream(input, { encoding: 'utf-8' })
-      : input;
 
     const rl = readline.createInterface({
       input: stream,
       crlfDelay: Infinity,
     });
 
-    let currentEvent: ParsedChatEvent | null = null;
-    const batch: any[] = [];
     let totalMessages = 0;
-    let minTimestamp: Date | null = null;
-    let maxTimestamp: Date | null = null;
+    let startDate: Date | null = null;
+    let endDate: Date | null = null;
     const actorCounts: Record<string, number> = {};
 
-    const flushBatch = async () => {
-      if (batch.length === 0) return;
-      await this.prisma.timelineEvent.createMany({
-        data: batch,
-      });
-      batch.length = 0;
-    };
+    let currentEvent: {
+      datasetId: string;
+      timestamp: Date;
+      actor: string | null;
+      content: string;
+      eventType: string;
+    } | null = null;
 
-    const pushEvent = async (event: ParsedChatEvent) => {
-      totalMessages++;
-      const actorKey = event.actor || 'System';
-      actorCounts[actorKey] = (actorCounts[actorKey] || 0) + 1;
-
-      if (!minTimestamp || event.timestamp < minTimestamp) {
-        minTimestamp = event.timestamp;
-      }
-      if (!maxTimestamp || event.timestamp > maxTimestamp) {
-        maxTimestamp = event.timestamp;
-      }
-
-      batch.push({
-        datasetId: dataset.id,
-        timestamp: event.timestamp,
-        actor: event.actor,
-        content: event.content,
-        eventType: event.actor ? 'message' : 'system_event',
-      });
-
-      if (batch.length >= batchSize) {
-        await flushBatch();
-      }
-    };
+    const eventBatch: typeof currentEvent[] = [];
+    let linesProcessed = 0;
+    let binaryByteDetected = false;
 
     for await (const line of rl) {
-      const header = this.matchLineHeader(line);
-      if (header) {
-        if (currentEvent) {
-          await pushEvent(currentEvent);
-        }
-        currentEvent = {
-          timestamp: header.timestamp,
-          actor: header.actor,
-          content: header.content,
-          eventType: header.actor ? 'message' : 'system_event',
-        };
-      } else if (currentEvent) {
-        // Multi-line message continuation
-        currentEvent.content += `\n${line}`;
+      linesProcessed++;
+
+      // Check for corrupted binary bytes
+      if (line.includes('\u0000') || /[\x00-\x08\x0E-\x1F]/.test(line.slice(0, 100))) {
+        binaryByteDetected = true;
+        break;
       }
+
+      if (!line || line.trim().length === 0) {
+        continue;
+      }
+
+      let matched = false;
+
+      // 1. Try standard message patterns
+      for (const pattern of LINE_PATTERNS) {
+        const match = line.match(pattern);
+        if (match) {
+          if (currentEvent) {
+            eventBatch.push(currentEvent);
+            if (eventBatch.length >= batchSize) {
+              await this.flushBatch(eventBatch);
+            }
+          }
+
+          let dateStr: string;
+          let actor: string;
+          let content: string;
+
+          if (match.length === 5) {
+            dateStr = `${match[1]} ${match[2]}`;
+            actor = match[3].trim();
+            content = match[4];
+          } else {
+            dateStr = match[1];
+            actor = match[2].trim();
+            content = match[3];
+          }
+
+          const parsedDate = this.parseDate(dateStr);
+          if (!startDate || parsedDate < startDate) startDate = parsedDate;
+          if (!endDate || parsedDate > endDate) endDate = parsedDate;
+
+          actorCounts[actor] = (actorCounts[actor] || 0) + 1;
+          totalMessages++;
+
+          // Truncate giant messages to prevent memory exhaustion
+          const safeContent = content.length > MAX_MESSAGE_LENGTH
+            ? content.slice(0, MAX_MESSAGE_LENGTH) + ' [TRUNCATED DUE TO SIZE]'
+            : content;
+
+          currentEvent = {
+            datasetId: dataset.id,
+            timestamp: parsedDate,
+            actor,
+            content: safeContent,
+            eventType: 'message',
+          };
+
+          matched = true;
+          break;
+        }
+      }
+
+      if (matched) continue;
+
+      // 2. Try system message pattern
+      for (const pattern of SYSTEM_PATTERNS) {
+        const match = line.match(pattern);
+        if (match) {
+          if (currentEvent) {
+            eventBatch.push(currentEvent);
+            if (eventBatch.length >= batchSize) {
+              await this.flushBatch(eventBatch);
+            }
+          }
+
+          const dateStr = match.length === 4 ? `${match[1]} ${match[2]}` : match[1];
+          const content = match[match.length - 1];
+          const parsedDate = this.parseDate(dateStr);
+
+          if (!startDate || parsedDate < startDate) startDate = parsedDate;
+          if (!endDate || parsedDate > endDate) endDate = parsedDate;
+
+          totalMessages++;
+
+          const safeContent = content.length > MAX_MESSAGE_LENGTH
+            ? content.slice(0, MAX_MESSAGE_LENGTH) + ' [TRUNCATED]'
+            : content;
+
+          currentEvent = {
+            datasetId: dataset.id,
+            timestamp: parsedDate,
+            actor: null,
+            content: safeContent,
+            eventType: 'system_event',
+          };
+
+          matched = true;
+          break;
+        }
+      }
+
+      if (matched) continue;
+
+      // 3. Multi-line continuation of previous message
+      if (currentEvent) {
+        if (currentEvent.content.length < MAX_MESSAGE_LENGTH) {
+          currentEvent.content += '\n' + line.slice(0, MAX_MESSAGE_LENGTH - currentEvent.content.length);
+        }
+      } else {
+        // Fallback for unstructured initial lines
+        const now = new Date();
+        currentEvent = {
+          datasetId: dataset.id,
+          timestamp: now,
+          actor: null,
+          content: line.slice(0, MAX_MESSAGE_LENGTH),
+          eventType: 'unstructured',
+        };
+        totalMessages++;
+      }
+    }
+
+    if (binaryByteDetected) {
+      await this.prisma.dataset.delete({ where: { id: dataset.id } });
+      throw new BadRequestException('File appears to be corrupted or binary content.');
     }
 
     if (currentEvent) {
-      await pushEvent(currentEvent);
+      eventBatch.push(currentEvent);
     }
 
-    // Flush any remaining events
-    await flushBatch();
+    if (eventBatch.length > 0) {
+      await this.flushBatch(eventBatch);
+    }
+
+    if (totalMessages === 0) {
+      await this.prisma.dataset.delete({ where: { id: dataset.id } });
+      throw new BadRequestException('File is empty or contains no parseable text lines.');
+    }
 
     const processingTimeMs = Date.now() - startTime;
 
-    // 2. Persist aggregate metrics
-    const metricsToInsert: any[] = [
-      {
-        datasetId: dataset.id,
-        name: 'total_messages',
-        value: totalMessages,
-        category: 'volume',
-      },
-      {
-        datasetId: dataset.id,
-        name: 'total_actors',
-        value: Object.keys(actorCounts).length,
-        category: 'volume',
-      },
-    ];
-
-    if (minTimestamp && maxTimestamp) {
-      metricsToInsert.push({
-        datasetId: dataset.id,
-        name: 'date_range',
-        jsonValue: {
-          start: minTimestamp.toISOString(),
-          end: maxTimestamp.toISOString(),
-        },
-        category: 'timeline',
-      });
-    }
-
-    for (const [actor, count] of Object.entries(actorCounts)) {
-      metricsToInsert.push({
-        datasetId: dataset.id,
-        name: `actor_message_count`,
-        stringValue: actor,
-        value: count,
-        category: 'actors',
-      });
-    }
-
-    await this.prisma.metric.createMany({
-      data: metricsToInsert,
-    });
-
-    // Update dataset metadata
-    await this.prisma.dataset.update({
-      where: { id: dataset.id },
-      data: {
-        metadata: {
-          totalMessages,
-          dateRange: {
-            start: minTimestamp?.toISOString() || null,
-            end: maxTimestamp?.toISOString() || null,
-          },
-          actorCounts,
-          processingTimeMs,
-        },
-      },
-    });
-
+    // Strict privacy logging: only metadata counts, never message content
     this.logger.log(
-      `Processed ${totalMessages} messages in ${processingTimeMs}ms for dataset ${dataset.id}`,
+      `Dataset ingested successfully: id=${dataset.id}, totalMessages=${totalMessages}, duration=${processingTimeMs}ms`,
     );
 
     return {
       datasetId: dataset.id,
-      name: dataset.name,
+      name: filename,
       totalMessages,
       dateRange: {
-        start: minTimestamp?.toISOString() || null,
-        end: maxTimestamp?.toISOString() || null,
+        start: startDate,
+        end: endDate,
       },
       actorCounts,
       processingTimeMs,
     };
+  }
+
+  private async flushBatch(batch: any[]) {
+    await this.prisma.timelineEvent.createMany({
+      data: batch.map((item) => ({
+        datasetId: item.datasetId,
+        timestamp: item.timestamp,
+        actor: item.actor,
+        content: item.content,
+        eventType: item.eventType,
+      })),
+    });
+    batch.length = 0;
+  }
+
+  parseDate(dateStr: string): Date {
+    try {
+      const parts = dateStr.trim().split(/[\s,]+/);
+      if (parts.length >= 2) {
+        const datePart = parts[0];
+        const timePart = parts.slice(1).join(' ');
+
+        if (datePart.includes('/')) {
+          const [d, m, y] = datePart.split('/');
+          const fullYear = y.length === 2 ? `20${y}` : y;
+          const isoCandidate = `${fullYear}-${m.padStart(2, '0')}-${d.padStart(2, '0')} ${timePart}`;
+          const parsed = new Date(isoCandidate);
+          if (!isNaN(parsed.getTime())) return parsed;
+        }
+      }
+
+      const direct = new Date(dateStr);
+      if (!isNaN(direct.getTime())) return direct;
+    } catch {
+      // ignore
+    }
+    return new Date();
   }
 }
