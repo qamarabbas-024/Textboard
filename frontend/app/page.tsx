@@ -1,10 +1,13 @@
 'use client';
 
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { TimelineView } from '../components/TimelineView';
 import { ChatView } from '../components/ChatView';
 import { WordCloudView } from '../components/WordCloudView';
 import { FilterToolbar } from '../components/FilterToolbar';
+import { ThemeToggle, ThemeMode } from '../components/ThemeToggle';
+import { BootSequence } from '../components/BootSequence';
+import { AnimatedCounter } from '../components/AnimatedCounter';
 
 interface DatasetMetadata {
   datasetId: string;
@@ -20,6 +23,10 @@ interface DatasetMetadata {
 
 export default function DashboardPage() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+  // Theme state
+  const [theme, setTheme] = useState<ThemeMode>('terminal');
+  const [hasBooted, setHasBooted] = useState(false);
 
   // Active dataset state
   const [dataset, setDataset] = useState<DatasetMetadata | null>(null);
@@ -37,6 +44,29 @@ export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeWord, setActiveWord] = useState<string | null>(null);
   const [activeActor, setActiveActor] = useState<string | null>(null);
+
+  // Initialize theme from storage or default to terminal
+  useEffect(() => {
+    const savedTheme = (localStorage.getItem('archive_theme') as ThemeMode) || 'terminal';
+    setTheme(savedTheme);
+    document.documentElement.setAttribute('data-theme', savedTheme);
+
+    const booted = sessionStorage.getItem('archive_booted');
+    if (booted || savedTheme !== 'terminal') {
+      setHasBooted(true);
+    }
+  }, []);
+
+  const handleThemeChange = (newTheme: ThemeMode) => {
+    setTheme(newTheme);
+    localStorage.setItem('archive_theme', newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
+  };
+
+  const handleBootComplete = () => {
+    setHasBooted(true);
+    sessionStorage.setItem('archive_booted', 'true');
+  };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -68,7 +98,6 @@ export default function DashboardPage() {
 
       const data: DatasetMetadata = await res.json();
       setDataset(data);
-      // Reset filters
       setSelectedRange({ start: null, end: null });
       setSearchQuery('');
       setActiveWord(null);
@@ -88,111 +117,151 @@ export default function DashboardPage() {
   };
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-zinc-100 p-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <header className="flex items-center justify-between border-b border-zinc-800 pb-4 mb-6">
-        <div>
-          <h1 className="text-xl font-bold tracking-tight text-white">
-            Archive <span className="text-zinc-500 font-normal text-sm">/ text-chat-analyzer</span>
-          </h1>
-          {dataset && (
-            <p className="text-xs text-zinc-400 mt-1">
-              Dataset: <span className="text-zinc-200 font-medium">{dataset.name}</span> &bull;{' '}
-              {dataset.totalMessages.toLocaleString()} total events
-            </p>
-          )}
-        </div>
+    <div className="min-h-screen relative terminal-grid transition-colors">
+      {/* Scanline overlay for Terminal theme */}
+      <div className="fixed inset-0 terminal-scanline pointer-events-none z-40 opacity-40" />
 
-        {dataset && (
-          <button
-            onClick={() => setDataset(null)}
-            className="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 px-3 py-1.5 rounded transition-colors"
-          >
-            Upload New File
-          </button>
-        )}
-      </header>
-
-      {!dataset ? (
-        /* Upload View */
-        <div className="max-w-md mx-auto my-16 border border-zinc-800 bg-zinc-900 rounded p-6 shadow-xl">
-          <h2 className="text-base font-semibold mb-4 text-zinc-100">Upload Text Chat Export</h2>
-          <form onSubmit={handleUpload} className="flex flex-col gap-4">
-            <div>
-              <label htmlFor="upload-input" className="block text-xs text-zinc-400 mb-2">
-                Select .txt chat file export:
-              </label>
-              <input
-                id="upload-input"
-                type="file"
-                accept=".txt,text/plain"
-                onChange={handleFileChange}
-                className="w-full text-xs text-zinc-300 file:mr-3 file:py-2 file:px-3 file:rounded file:border-0 file:text-xs file:bg-zinc-800 file:text-zinc-200 hover:file:bg-zinc-700 cursor-pointer"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={uploading || !file}
-              className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-zinc-800 disabled:text-zinc-600 text-white text-xs font-semibold rounded transition-colors"
-            >
-              {uploading ? 'Processing & Ingesting...' : 'Upload & Analyze'}
-            </button>
-          </form>
-
-          {uploadError && (
-            <div className="mt-4 p-3 bg-rose-950 border border-rose-800 text-rose-300 text-xs rounded">
-              {uploadError}
-            </div>
-          )}
-        </div>
-      ) : (
-        /* Interactive Dashboard */
-        <div className="flex flex-col gap-4">
-          {/* 1. Timeline Volume with Range Filter */}
-          <TimelineView
-            datasetId={dataset.datasetId}
-            apiUrl={apiUrl}
-            selectedRange={selectedRange}
-            onRangeSelect={setSelectedRange}
-            searchQuery={searchQuery}
-            activeWord={activeWord}
-            activeActor={activeActor}
-          />
-
-          {/* 2. Filter Toolbar (Search & Active Filters) */}
-          <FilterToolbar
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            selectedRange={selectedRange}
-            onClearRange={() => setSelectedRange({ start: null, end: null })}
-            activeWord={activeWord}
-            onClearWord={() => setActiveWord(null)}
-            activeActor={activeActor}
-            onClearActor={() => setActiveActor(null)}
-            onResetAll={handleResetAllFilters}
-          />
-
-          {/* 3. Word & Emoji Frequencies */}
-          <WordCloudView
-            datasetId={dataset.datasetId}
-            apiUrl={apiUrl}
-            activeWord={activeWord}
-            onSelectWord={setActiveWord}
-          />
-
-          {/* 4. Virtualized Infinite-Scroll Chat View */}
-          <ChatView
-            datasetId={dataset.datasetId}
-            apiUrl={apiUrl}
-            selectedRange={selectedRange}
-            searchQuery={searchQuery}
-            activeWord={activeWord}
-            activeActor={activeActor}
-            onSelectActor={setActiveActor}
-          />
-        </div>
+      {/* Boot sequence animation on first load */}
+      {!hasBooted && theme === 'terminal' && (
+        <BootSequence onComplete={handleBootComplete} />
       )}
-    </main>
+
+      <main className="relative z-10 max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        {/* Top Navbar */}
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-theme-border pb-4 mb-6">
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-theme bg-theme-raised border border-theme-border flex items-center justify-center font-bold text-theme-accent text-sm shadow-sm">
+              ▲
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-base sm:text-lg font-bold tracking-tight text-theme-text uppercase">
+                  Archive
+                </h1>
+                <span className="text-[11px] text-theme-dim">/ text-chat-analyzer</span>
+                <span className="inline-block w-1.5 h-3 bg-theme-accent animate-cursor ml-0.5" />
+              </div>
+              {dataset && (
+                <p className="text-xs text-theme-muted mt-0.5">
+                  Dataset:{' '}
+                  <span className="text-theme-text font-semibold">{dataset.name}</span> &bull;{' '}
+                  <span className="text-theme-accent font-mono font-medium">
+                    <AnimatedCounter value={dataset.totalMessages} />
+                  </span>{' '}
+                  events
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <ThemeToggle currentTheme={theme} onThemeChange={handleThemeChange} />
+
+            {dataset && (
+              <button
+                onClick={() => setDataset(null)}
+                className="text-xs bg-theme-raised hover:bg-theme-active text-theme-text border border-theme-border px-3 py-1.5 rounded-theme transition-colors font-medium"
+              >
+                Upload New File
+              </button>
+            )}
+          </div>
+        </header>
+
+        {!dataset ? (
+          /* Upload View */
+          <div className="max-w-lg mx-auto my-16 border border-theme-border bg-theme-surface rounded-theme p-6 sm:p-8 shadow-xl terminal-interactive transition-all">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-theme-accent text-xs">&gt;</span>
+              <h2 className="text-sm sm:text-base font-bold text-theme-text uppercase tracking-wide">
+                Ingest Chat Export
+              </h2>
+            </div>
+            <p className="text-xs text-theme-muted mb-6">
+              Select a plain text (.txt) chat export file. Streamed line-by-line into PostgreSQL and Redis.
+            </p>
+
+            <form onSubmit={handleUpload} className="flex flex-col gap-4">
+              <div className="border border-dashed border-theme-border bg-theme-base p-4 rounded-theme text-center">
+                <input
+                  id="upload-input"
+                  type="file"
+                  accept=".txt,text/plain"
+                  onChange={handleFileChange}
+                  className="w-full text-xs text-theme-muted file:mr-3 file:py-2 file:px-3 file:rounded-theme file:border-0 file:text-xs file:bg-theme-raised file:text-theme-text hover:file:bg-theme-active cursor-pointer"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={uploading || !file}
+                className="w-full py-2.5 bg-theme-raised hover:bg-theme-active disabled:opacity-50 text-theme-accent border border-theme-border-hi/60 text-xs font-bold uppercase tracking-wider rounded-theme transition-all shadow-theme-glow flex items-center justify-center gap-2"
+              >
+                {uploading ? (
+                  <>
+                    <span className="h-2 w-2 rounded-full bg-theme-accent animate-ping" />
+                    <span>Parsing &amp; Ingesting...</span>
+                  </>
+                ) : (
+                  <span>Process Dataset</span>
+                )}
+              </button>
+            </form>
+
+            {uploadError && (
+              <div className="mt-4 p-3 bg-rose-950/60 border border-rose-800 text-rose-300 text-xs rounded-theme">
+                {uploadError}
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Interactive Dashboard */
+          <div className="flex flex-col gap-4">
+            {/* 1. Animated Timeline with Range Filter */}
+            <TimelineView
+              datasetId={dataset.datasetId}
+              apiUrl={apiUrl}
+              selectedRange={selectedRange}
+              onRangeSelect={setSelectedRange}
+              searchQuery={searchQuery}
+              activeWord={activeWord}
+              activeActor={activeActor}
+            />
+
+            {/* 2. Filter Toolbar (Search & Active Filters) */}
+            <FilterToolbar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              selectedRange={selectedRange}
+              onClearRange={() => setSelectedRange({ start: null, end: null })}
+              activeWord={activeWord}
+              onClearWord={() => setActiveWord(null)}
+              activeActor={activeActor}
+              onClearActor={() => setActiveActor(null)}
+              onResetAll={handleResetAllFilters}
+            />
+
+            {/* 3. Word & Emoji Frequencies (Redis Cached) */}
+            <WordCloudView
+              datasetId={dataset.datasetId}
+              apiUrl={apiUrl}
+              activeWord={activeWord}
+              onSelectWord={setActiveWord}
+            />
+
+            {/* 4. Virtualized Infinite-Scroll Chat View */}
+            <ChatView
+              datasetId={dataset.datasetId}
+              apiUrl={apiUrl}
+              selectedRange={selectedRange}
+              searchQuery={searchQuery}
+              activeWord={activeWord}
+              activeActor={activeActor}
+              onSelectActor={setActiveActor}
+            />
+          </div>
+        )}
+      </main>
+    </div>
   );
 }

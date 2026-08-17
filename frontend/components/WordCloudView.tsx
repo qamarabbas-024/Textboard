@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface FrequencyItem {
   text: string;
@@ -62,16 +63,24 @@ export function WordCloudView({
   const maxCount = Math.max(1, ...(items.map((i) => i.count) || [1]));
 
   return (
-    <div className="border border-zinc-700 bg-zinc-900 rounded p-4 mb-4">
-      <div className="flex items-center justify-between mb-3 pb-2 border-b border-zinc-800">
+    <div className="border border-theme-border bg-theme-surface rounded-theme p-4 mb-4 terminal-interactive transition-all shadow-sm">
+      <div className="flex items-center justify-between mb-3 pb-2 border-b border-theme-border">
         <div className="flex items-center gap-2">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-200">
-            Frequencies
-          </h3>
+          <div className="flex items-center gap-1.5">
+            <span className="text-theme-accent text-xs">⚡</span>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-theme-text">
+              Frequencies &amp; Entities
+            </h3>
+          </div>
+
           {activeWord && (
-            <span className="text-xs bg-indigo-950 text-indigo-300 border border-indigo-700 px-2 py-0.5 rounded">
-              Active: &ldquo;{activeWord}&rdquo;
-            </span>
+            <motion.span
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="text-[11px] bg-theme-raised text-theme-accent border border-theme-border px-2 py-0.5 rounded-theme font-medium"
+            >
+              Filter: &ldquo;{activeWord}&rdquo;
+            </motion.span>
           )}
         </div>
 
@@ -79,29 +88,29 @@ export function WordCloudView({
           {activeWord && (
             <button
               onClick={() => onSelectWord(null)}
-              className="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2 py-1 rounded border border-zinc-700"
+              className="text-xs bg-theme-raised hover:bg-theme-active text-theme-muted hover:text-theme-text px-2.5 py-1 rounded-theme border border-theme-border transition-colors"
             >
               Clear
             </button>
           )}
 
-          <div className="flex bg-zinc-800 rounded p-0.5 border border-zinc-700">
+          <div className="flex bg-theme-raised rounded-theme p-0.5 border border-theme-border">
             <button
               onClick={() => setTab('words')}
-              className={`px-2.5 py-1 text-xs rounded capitalize font-medium ${
+              className={`px-3 py-1 text-xs rounded-theme capitalize font-medium transition-all ${
                 tab === 'words'
-                  ? 'bg-zinc-600 text-white shadow-sm'
-                  : 'text-zinc-400 hover:text-zinc-200'
+                  ? 'bg-theme-surface text-theme-accent shadow-sm border border-theme-border font-semibold'
+                  : 'text-theme-muted hover:text-theme-text'
               }`}
             >
               Top Words ({data?.words?.length || 0})
             </button>
             <button
               onClick={() => setTab('emojis')}
-              className={`px-2.5 py-1 text-xs rounded capitalize font-medium ${
+              className={`px-3 py-1 text-xs rounded-theme capitalize font-medium transition-all ${
                 tab === 'emojis'
-                  ? 'bg-zinc-600 text-white shadow-sm'
-                  : 'text-zinc-400 hover:text-zinc-200'
+                  ? 'bg-theme-surface text-theme-accent shadow-sm border border-theme-border font-semibold'
+                  : 'text-theme-muted hover:text-theme-text'
               }`}
             >
               Emojis ({data?.emojis?.length || 0})
@@ -111,39 +120,49 @@ export function WordCloudView({
       </div>
 
       {loading && !data ? (
-        <div className="py-8 text-center text-xs text-zinc-500">
+        <div className="py-8 text-center text-xs text-theme-muted">
           Loading frequencies (cached in Redis)...
         </div>
       ) : items.length === 0 ? (
-        <div className="py-8 text-center text-xs text-zinc-500">
-          No items found.
+        <div className="py-8 text-center text-xs text-theme-muted">
+          No frequency data available.
         </div>
       ) : (
-        <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-1">
-          {items.map((item) => {
-            const isSelected = activeWord === item.text;
-            // Relative font size weighting from 12px to 20px
-            const weight = 0.75 + (item.count / maxCount) * 0.75;
+        <div className="max-h-44 overflow-y-auto p-1">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={tab}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.2 }}
+              className="flex flex-wrap gap-2"
+            >
+              {items.map((item) => {
+                const isSelected = activeWord === item.text;
+                const weight = 0.75 + (item.count / maxCount) * 0.75;
 
-            return (
-              <button
-                key={item.text}
-                onClick={() => onSelectWord(isSelected ? null : item.text)}
-                style={{ fontSize: `${weight}rem` }}
-                title={`${item.text}: ${item.count.toLocaleString()} occurrences`}
-                className={`px-2 py-0.5 rounded border transition-colors flex items-center gap-1.5 ${
-                  isSelected
-                    ? 'bg-indigo-600 border-indigo-400 text-white shadow-md'
-                    : 'bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:bg-zinc-750'
-                }`}
-              >
-                <span>{item.text}</span>
-                <span className="text-[10px] text-zinc-400 opacity-80">
-                  {item.count.toLocaleString()}
-                </span>
-              </button>
-            );
-          })}
+                return (
+                  <button
+                    key={item.text}
+                    onClick={() => onSelectWord(isSelected ? null : item.text)}
+                    style={{ fontSize: `${weight}rem` }}
+                    title={`${item.text}: ${item.count.toLocaleString()} occurrences`}
+                    className={`px-2.5 py-1 rounded-theme border transition-all flex items-center gap-1.5 ${
+                      isSelected
+                        ? 'bg-theme-accent text-theme-base border-theme-border-hi font-bold shadow-theme-glow'
+                        : 'bg-theme-raised border-theme-border text-theme-muted hover:text-theme-text hover:border-theme-border-hi/60 hover:bg-theme-active'
+                    }`}
+                  >
+                    <span>{item.text}</span>
+                    <span className="text-[10px] opacity-75">
+                      {item.count.toLocaleString()}
+                    </span>
+                  </button>
+                );
+              })}
+            </motion.div>
+          </AnimatePresence>
         </div>
       )}
     </div>

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface TimelineBucket {
   bucket: string;
@@ -29,6 +30,7 @@ export function TimelineView({
   const [interval, setInterval] = useState<'day' | 'week' | 'month'>('week');
   const [buckets, setBuckets] = useState<TimelineBucket[]>([]);
   const [loading, setLoading] = useState(false);
+  const [hoveredBucket, setHoveredBucket] = useState<TimelineBucket | null>(null);
 
   useEffect(() => {
     let isCancelled = false;
@@ -103,18 +105,43 @@ export function TimelineView({
     return bDate >= sDate && bDate < eDate;
   };
 
+  // Generate SVG path for the smooth drawn line
+  const svgLinePath = useMemo(() => {
+    if (buckets.length < 2) return '';
+    const width = 1000;
+    const height = 120;
+    const padding = 20;
+
+    const points = buckets.map((b, i) => {
+      const x = (i / (buckets.length - 1)) * (width - padding * 2) + padding;
+      const y = height - padding - (b.count / maxCount) * (height - padding * 2);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    });
+
+    return `M ${points.join(' L ')}`;
+  }, [buckets, maxCount]);
+
   return (
-    <div className="border border-zinc-700 bg-zinc-900 rounded p-4 mb-4">
-      <div className="flex items-center justify-between mb-3 pb-2 border-b border-zinc-800">
+    <div className="border border-theme-border bg-theme-surface rounded-theme p-4 mb-4 terminal-interactive shadow-sm transition-all relative overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3 pb-2 border-b border-theme-border">
         <div className="flex items-center gap-3">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-200">
-            Timeline Volume
-          </h3>
+          <div className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-theme-accent inline-block animate-pulse" />
+            <h3 className="text-xs font-bold uppercase tracking-wider text-theme-text">
+              Timeline Trend
+            </h3>
+          </div>
+
           {selectedRange.start && (
-            <span className="text-xs bg-indigo-950 text-indigo-300 border border-indigo-700 px-2 py-0.5 rounded">
+            <motion.span
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="text-[11px] bg-theme-raised text-theme-accent border border-theme-border px-2 py-0.5 rounded-theme font-medium"
+            >
               Filter Active: {new Date(selectedRange.start).toLocaleDateString()} –{' '}
               {new Date(selectedRange.end!).toLocaleDateString()}
-            </span>
+            </motion.span>
           )}
         </div>
 
@@ -122,21 +149,21 @@ export function TimelineView({
           {selectedRange.start && (
             <button
               onClick={() => onRangeSelect({ start: null, end: null })}
-              className="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2.5 py-1 rounded border border-zinc-700"
+              className="text-xs bg-theme-raised hover:bg-theme-active text-theme-muted hover:text-theme-text px-2.5 py-1 rounded-theme border border-theme-border transition-colors"
             >
               Reset Range
             </button>
           )}
 
-          <div className="flex bg-zinc-800 rounded p-0.5 border border-zinc-700">
+          <div className="flex bg-theme-raised rounded-theme p-0.5 border border-theme-border">
             {(['day', 'week', 'month'] as const).map((mode) => (
               <button
                 key={mode}
                 onClick={() => setInterval(mode)}
-                className={`px-2.5 py-1 text-xs rounded capitalize font-medium ${
+                className={`px-2.5 py-1 text-xs rounded-theme capitalize font-medium transition-all ${
                   interval === mode
-                    ? 'bg-zinc-600 text-white shadow-sm'
-                    : 'text-zinc-400 hover:text-zinc-200'
+                    ? 'bg-theme-surface text-theme-accent shadow-sm border border-theme-border'
+                    : 'text-theme-muted hover:text-theme-text'
                 }`}
               >
                 {mode}
@@ -147,40 +174,78 @@ export function TimelineView({
       </div>
 
       {loading && buckets.length === 0 ? (
-        <div className="h-28 flex items-center justify-center text-xs text-zinc-500">
+        <div className="h-32 flex items-center justify-center text-xs text-theme-muted">
           Loading timeline buckets...
         </div>
       ) : buckets.length === 0 ? (
-        <div className="h-28 flex items-center justify-center text-xs text-zinc-500">
+        <div className="h-32 flex items-center justify-center text-xs text-theme-muted">
           No events in selected filter
         </div>
       ) : (
-        <div className="h-32 flex items-end gap-1 overflow-x-auto pt-2 pb-1">
-          {buckets.map((b) => {
-            const heightPercent = Math.max(8, (b.count / maxCount) * 100);
-            const selected = isBucketSelected(b.bucket);
-
-            return (
-              <button
-                key={b.bucket}
-                onClick={() => handleBucketClick(b)}
-                title={`${new Date(b.bucket).toLocaleDateString()}: ${b.count.toLocaleString()} messages`}
-                className={`flex-1 min-w-[14px] max-w-[40px] flex flex-col items-center justify-end group transition-colors`}
-              >
-                <div
-                  style={{ height: `${heightPercent}%` }}
-                  className={`w-full rounded-t-sm transition-all ${
-                    selected
-                      ? 'bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)]'
-                      : 'bg-zinc-600 group-hover:bg-zinc-400'
-                  }`}
+        <div className="relative h-36 flex flex-col justify-end pt-2">
+          {/* Animated SVG trendline */}
+          {svgLinePath && (
+            <div className="absolute inset-0 pointer-events-none opacity-40">
+              <svg viewBox="0 0 1000 120" preserveAspectRatio="none" className="w-full h-full">
+                <motion.path
+                  d={svgLinePath}
+                  fill="none"
+                  stroke="var(--accent)"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: 1 }}
+                  transition={{ duration: 1.2, ease: 'easeInOut' }}
                 />
-                <span className="text-[10px] text-zinc-500 mt-1 whitespace-nowrap overflow-hidden text-ellipsis w-full text-center">
-                  {formatBucketLabel(b.bucket)}
-                </span>
-              </button>
-            );
-          })}
+              </svg>
+            </div>
+          )}
+
+          {/* Interactive bars */}
+          <div className="flex items-end gap-1 overflow-x-auto h-full pb-1 z-10">
+            {buckets.map((b, idx) => {
+              const heightPercent = Math.max(8, (b.count / maxCount) * 100);
+              const selected = isBucketSelected(b.bucket);
+
+              return (
+                <button
+                  key={b.bucket}
+                  onClick={() => handleBucketClick(b)}
+                  onMouseEnter={() => setHoveredBucket(b)}
+                  onMouseLeave={() => setHoveredBucket(null)}
+                  title={`${new Date(b.bucket).toLocaleDateString()}: ${b.count.toLocaleString()} messages`}
+                  className="flex-1 min-w-[14px] max-w-[44px] flex flex-col items-center justify-end group transition-all relative"
+                >
+                  <motion.div
+                    initial={{ height: 0 }}
+                    animate={{ height: `${heightPercent}%` }}
+                    transition={{
+                      duration: 0.5,
+                      delay: Math.min(idx * 0.015, 0.4),
+                      ease: 'easeOut',
+                    }}
+                    className={`w-full rounded-t-sm transition-all ${
+                      selected
+                        ? 'bg-theme-accent shadow-theme-glow border-t-2 border-theme-border-hi'
+                        : 'bg-theme-raised group-hover:bg-theme-active border border-theme-border/40 group-hover:border-theme-border-hi/60'
+                    }`}
+                  />
+                  <span className="text-[10px] text-theme-dim mt-1 whitespace-nowrap overflow-hidden text-ellipsis w-full text-center group-hover:text-theme-muted">
+                    {formatBucketLabel(b.bucket)}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Hover readout */}
+          {hoveredBucket && (
+            <div className="absolute top-1 right-2 text-[11px] font-mono text-theme-accent bg-theme-base border border-theme-border px-2 py-0.5 rounded-theme shadow-md">
+              {new Date(hoveredBucket.bucket).toLocaleDateString()}:{' '}
+              {hoveredBucket.count.toLocaleString()} msgs
+            </div>
+          )}
         </div>
       )}
     </div>

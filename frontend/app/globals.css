@@ -2,20 +2,90 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 10, 10, 15;
-  --background-end-rgb: 15, 17, 23;
+/* 1. Terminal Theme (Default) */
+:root,
+[data-theme="terminal"] {
+  --bg-base: #060907;
+  --bg-surface: #0c120e;
+  --bg-surface-raised: #121c16;
+  --bg-surface-active: #1a2a21;
+  --border-subtle: #193324;
+  --border-highlight: #22c55e;
+  --text-main: #dcfce7;
+  --text-muted: #86efac;
+  --text-dim: #4ade8088;
+  --accent: #22c55e;
+  --accent-glow: 0 0 14px rgba(34, 197, 94, 0.45);
+  --font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --radius: 0.25rem;
+}
+
+/* 2. Soft Theme (Warm, rounded, sentimental) */
+[data-theme="soft"] {
+  --bg-base: #faf6f0;
+  --bg-surface: #ffffff;
+  --bg-surface-raised: #f4ede4;
+  --bg-surface-active: #ecdccf;
+  --border-subtle: #e5d5c5;
+  --border-highlight: #d97706;
+  --text-main: #292524;
+  --text-muted: #57534e;
+  --text-dim: #a8a29e;
+  --accent: #d97706;
+  --accent-glow: 0 4px 16px rgba(217, 119, 6, 0.18);
+  --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --radius: 1rem;
+}
+
+/* 3. Minimal Theme (Clean, professional, analysis-focused) */
+[data-theme="minimal"] {
+  --bg-base: #0a0b10;
+  --bg-surface: #12141c;
+  --bg-surface-raised: #191c28;
+  --bg-surface-active: #222636;
+  --border-subtle: #24293d;
+  --border-highlight: #6366f1;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  --accent: #6366f1;
+  --accent-glow: 0 0 12px rgba(99, 102, 241, 0.35);
+  --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --radius: 0.375rem;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background-color: var(--bg-base);
+  color: var(--text-main);
+  font-family: var(--font-family);
   min-height: 100vh;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Terminal Scanline & Grid Effect */
+[data-theme="terminal"] .terminal-grid {
+  background-image: 
+    linear-gradient(rgba(34, 197, 94, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 197, 94, 0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+[data-theme="terminal"] .terminal-scanline {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.03),
+    rgba(0, 255, 0, 0.01),
+    rgba(0, 0, 255, 0.03)
+  );
+  background-size: 100% 4px, 6px 100%;
+  pointer-events: none;
+}
+
+/* Interactive Hover Glow in Terminal Mode */
+[data-theme="terminal"] .terminal-interactive:hover {
+  box-shadow: var(--accent-glow);
+  border-color: var(--border-highlight);
 }

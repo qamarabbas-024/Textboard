@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { AnimatedCounter } from './AnimatedCounter';
 
 export interface TimelineEventItem {
   id: string;
@@ -24,26 +25,26 @@ interface ChatViewProps {
   onTotalCountChange?: (count: number) => void;
 }
 
-const AUTHOR_COLORS = [
-  'bg-emerald-950 text-emerald-300 border-emerald-800',
-  'bg-cyan-950 text-cyan-300 border-cyan-800',
-  'bg-violet-950 text-violet-300 border-violet-800',
-  'bg-amber-950 text-amber-300 border-amber-800',
-  'bg-rose-950 text-rose-300 border-rose-800',
-  'bg-blue-950 text-blue-300 border-blue-800',
-  'bg-fuchsia-950 text-fuchsia-300 border-fuchsia-800',
-  'bg-teal-950 text-teal-300 border-teal-800',
+const AUTHOR_PALETTE = [
+  'border-emerald-600/70 text-emerald-400 bg-emerald-950/40',
+  'border-cyan-600/70 text-cyan-400 bg-cyan-950/40',
+  'border-purple-600/70 text-purple-400 bg-purple-950/40',
+  'border-amber-600/70 text-amber-400 bg-amber-950/40',
+  'border-rose-600/70 text-rose-400 bg-rose-950/40',
+  'border-blue-600/70 text-blue-400 bg-blue-950/40',
+  'border-fuchsia-600/70 text-fuchsia-400 bg-fuchsia-950/40',
+  'border-teal-600/70 text-teal-400 bg-teal-950/40',
 ];
 
 function getActorStyle(actor: string | null) {
-  if (!actor) return 'bg-zinc-800 text-zinc-300 border-zinc-700';
+  if (!actor) return 'border-theme-border text-theme-muted bg-theme-raised';
   let hash = 0;
   for (let i = 0; i < actor.length; i++) {
     hash = (hash << 5) - hash + actor.charCodeAt(i);
     hash |= 0;
   }
-  const index = Math.abs(hash) % AUTHOR_COLORS.length;
-  return AUTHOR_COLORS[index];
+  const index = Math.abs(hash) % AUTHOR_PALETTE.length;
+  return AUTHOR_PALETTE[index];
 }
 
 export function ChatView({
@@ -129,7 +130,7 @@ export function ChatView({
     }
   }, [nextCursor, loadingMore, apiUrl, datasetId, selectedRange, searchQuery, activeWord, activeActor]);
 
-  // React Virtualizer setup
+  // Virtualizer setup
   const rowVirtualizer = useVirtualizer({
     count: events.length,
     getScrollElement: () => parentRef.current,
@@ -139,7 +140,6 @@ export function ChatView({
 
   const virtualItems = rowVirtualizer.getVirtualItems();
 
-  // Trigger loadMore when scrolling close to end
   useEffect(() => {
     if (virtualItems.length === 0) return;
     const lastItem = virtualItems[virtualItems.length - 1];
@@ -149,30 +149,33 @@ export function ChatView({
   }, [virtualItems, events.length, nextCursor, loadingMore, loadMore]);
 
   return (
-    <div className="flex flex-col h-[550px] border border-zinc-700 bg-zinc-950 rounded overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-2 bg-zinc-900 border-b border-zinc-800 text-xs text-zinc-400">
+    <div className="flex flex-col h-[550px] border border-theme-border bg-theme-surface rounded-theme overflow-hidden terminal-interactive shadow-sm transition-all">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-theme-raised border-b border-theme-border text-xs text-theme-muted">
         <div className="flex items-center gap-2">
           <span>
-            Showing <strong className="text-zinc-200">{events.length.toLocaleString()}</strong> of{' '}
-            <strong className="text-zinc-200">{totalMatching.toLocaleString()}</strong> matching messages
+            Showing <strong className="text-theme-text">{events.length.toLocaleString()}</strong> of{' '}
+            <strong className="text-theme-text">
+              <AnimatedCounter value={totalMatching} />
+            </strong>{' '}
+            matching events
           </span>
           {activeActor && (
-            <span className="bg-zinc-800 text-zinc-300 border border-zinc-700 px-2 py-0.5 rounded">
+            <span className="bg-theme-surface text-theme-accent border border-theme-border px-2 py-0.5 rounded-theme">
               Sender: {activeActor}
             </span>
           )}
         </div>
-        {loading && <span className="text-amber-400">Loading...</span>}
+        {loading && <span className="text-theme-accent animate-pulse">Streaming records...</span>}
       </div>
 
       <div ref={parentRef} className="flex-1 overflow-y-auto p-4 relative">
         {loading && events.length === 0 ? (
-          <div className="h-full flex items-center justify-center text-sm text-zinc-500">
-            Loading messages...
+          <div className="h-full flex items-center justify-center text-sm text-theme-muted">
+            Streaming virtualized events...
           </div>
         ) : events.length === 0 ? (
-          <div className="h-full flex items-center justify-center text-sm text-zinc-500">
-            No messages found matching the selected filters.
+          <div className="h-full flex items-center justify-center text-sm text-theme-muted">
+            No events found matching the selected filters.
           </div>
         ) : (
           <div
@@ -206,9 +209,9 @@ export function ChatView({
                 >
                   {isSystem ? (
                     <div className="flex justify-center my-1">
-                      <div className="text-xs bg-zinc-900 border border-zinc-800 text-zinc-400 px-3 py-1 rounded-full max-w-lg text-center">
+                      <div className="text-xs bg-theme-base border border-theme-border text-theme-muted px-3.5 py-1 rounded-theme max-w-lg text-center">
                         {event.content}
-                        <span className="ml-2 text-[10px] text-zinc-600">{formattedDate}</span>
+                        <span className="ml-2 text-[10px] text-theme-dim">{formattedDate}</span>
                       </div>
                     </div>
                   ) : (
@@ -218,13 +221,13 @@ export function ChatView({
                           onClick={() =>
                             onSelectActor?.(activeActor === event.actor ? null : event.actor)
                           }
-                          className={`text-xs font-semibold px-2 py-0.5 rounded border transition-colors ${actorStyle}`}
+                          className={`text-[11px] font-semibold px-2 py-0.5 rounded-theme border transition-all ${actorStyle}`}
                         >
                           {event.actor}
                         </button>
-                        <span className="text-[10px] text-zinc-500">{formattedDate}</span>
+                        <span className="text-[10px] text-theme-dim">{formattedDate}</span>
                       </div>
-                      <div className="bg-zinc-900 border border-zinc-800 text-zinc-200 text-sm px-3.5 py-2 rounded-lg whitespace-pre-wrap break-words leading-relaxed shadow-sm">
+                      <div className="bg-theme-base border border-theme-border text-theme-text text-xs sm:text-sm px-3.5 py-2 rounded-theme whitespace-pre-wrap break-words leading-relaxed shadow-sm hover:border-theme-border-hi/40 transition-colors">
                         {event.content}
                       </div>
                     </div>
@@ -236,7 +239,7 @@ export function ChatView({
         )}
 
         {loadingMore && (
-          <div className="py-2 text-center text-xs text-zinc-500">
+          <div className="py-2 text-center text-xs text-theme-muted">
             Loading next 50 messages...
           </div>
         )}
