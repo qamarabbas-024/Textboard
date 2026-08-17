@@ -6,3 +6,63 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
+
+model Dataset {
+  id         String          @id @default(uuid())
+  name       String
+  sourceType String
+  metadata   Json?
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  events     TimelineEvent[]
+  metrics    Metric[]
+  highlights Highlight[]
+
+  @@map("datasets")
+}
+
+model TimelineEvent {
+  id        String   @id @default(uuid())
+  datasetId String
+  dataset   Dataset  @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  timestamp DateTime
+  actor     String?
+  content   String   @db.Text
+  eventType String   @default("message")
+  metadata  Json?
+
+  @@index([datasetId, timestamp])
+  @@index([datasetId, actor])
+  @@map("timeline_events")
+}
+
+model Metric {
+  id          String   @id @default(uuid())
+  datasetId   String
+  dataset     Dataset  @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  name        String
+  value       Float?
+  stringValue String?
+  jsonValue   Json?
+  category    String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  @@index([datasetId, name])
+  @@map("metrics")
+}
+
+model Highlight {
+  id          String   @id @default(uuid())
+  datasetId   String
+  dataset     Dataset  @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  title       String
+  description String?  @db.Text
+  score       Float?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  @@index([datasetId])
+  @@map("highlights")
+}
