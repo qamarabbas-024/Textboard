@@ -5,10 +5,14 @@ import {
   Query,
 } from '@nestjs/common';
 import { DatasetsService } from './datasets.service';
+import { DatasetsAnalyticsService } from './datasets-analytics.service';
 
 @Controller('datasets')
 export class DatasetsController {
-  constructor(private readonly datasetsService: DatasetsService) {}
+  constructor(
+    private readonly datasetsService: DatasetsService,
+    private readonly analyticsService: DatasetsAnalyticsService,
+  ) {}
 
   @Get(':id')
   async getDataset(@Param('id') id: string) {
@@ -59,5 +63,60 @@ export class DatasetsController {
   @Get(':id/frequencies')
   async getFrequencies(@Param('id') id: string) {
     return this.datasetsService.getFrequencies(id);
+  }
+
+  @Get(':id/highlights')
+  async getHighlights(@Param('id') id: string) {
+    return this.analyticsService.getHighlights(id);
+  }
+
+  @Get(':id/first-occurrence')
+  async getFirstOccurrence(
+    @Param('id') id: string,
+    @Query('keyword') keyword: string,
+  ) {
+    return this.analyticsService.getFirstOccurrence(id, keyword);
+  }
+
+  @Get(':id/people')
+  async getPeopleStats(@Param('id') id: string) {
+    return this.analyticsService.getPeopleStats(id);
+  }
+
+  @Get(':id/streaks')
+  async getStreaks(@Param('id') id: string) {
+    return this.analyticsService.getStreaks(id);
+  }
+
+  @Get(':id/milestones')
+  async getMilestones(@Param('id') id: string) {
+    return this.analyticsService.getMilestones(id);
+  }
+
+  @Get(':id/on-this-day')
+  async getOnThisDay(
+    @Param('id') id: string,
+    @Query('month') month?: string,
+    @Query('day') day?: string,
+  ) {
+    return this.analyticsService.getOnThisDay(
+      id,
+      month ? parseInt(month, 10) : undefined,
+      day ? parseInt(day, 10) : undefined,
+    );
+  }
+
+  @Get(':id/random-memory')
+  async getRandomMemory(@Param('id') id: string) {
+    return this.analyticsService.getRandomMemory(id);
+  }
+
+  @Get(':id/compare')
+  async comparePeople(
+    @Param('id') id: string,
+    @Query('actorA') actorA: string,
+    @Query('actorB') actorB: string,
+  ) {
+    return this.analyticsService.comparePeople(id, actorA, actorB);
   }
 }

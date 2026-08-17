@@ -8,6 +8,11 @@ import { FilterToolbar } from '../components/FilterToolbar';
 import { ThemeToggle, ThemeMode } from '../components/ThemeToggle';
 import { BootSequence } from '../components/BootSequence';
 import { AnimatedCounter } from '../components/AnimatedCounter';
+import { HighlightsView } from '../components/HighlightsView';
+import { PeopleView } from '../components/PeopleView';
+import { CompareView } from '../components/CompareView';
+import { OnThisDayView } from '../components/OnThisDayView';
+import { PdfExportModal } from '../components/PdfExportModal';
 
 interface DatasetMetadata {
   datasetId: string;
@@ -21,6 +26,8 @@ interface DatasetMetadata {
   processingTimeMs: number;
 }
 
+type TabMode = 'chat' | 'highlights' | 'people' | 'compare' | 'on-this-day';
+
 export default function DashboardPage() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -30,6 +37,10 @@ export default function DashboardPage() {
 
   // Active dataset state
   const [dataset, setDataset] = useState<DatasetMetadata | null>(null);
+  const [activeTab, setActiveTab] = useState<TabMode>('chat');
+
+  // PDF Export Modal state
+  const [pdfModalOpen, setPdfModalOpen] = useState(false);
 
   // Upload states
   const [file, setFile] = useState<File | null>(null);
@@ -102,6 +113,7 @@ export default function DashboardPage() {
       setSearchQuery('');
       setActiveWord(null);
       setActiveActor(null);
+      setActiveTab('chat');
     } catch (err: any) {
       setUploadError(err.message || 'An error occurred during upload.');
     } finally {
@@ -124,6 +136,17 @@ export default function DashboardPage() {
       {/* Boot sequence animation on first load */}
       {!hasBooted && theme === 'terminal' && (
         <BootSequence onComplete={handleBootComplete} />
+      )}
+
+      {/* PDF Export Modal */}
+      {dataset && (
+        <PdfExportModal
+          isOpen={pdfModalOpen}
+          onClose={() => setPdfModalOpen(false)}
+          datasetId={dataset.datasetId}
+          apiUrl={apiUrl}
+          selectedRange={selectedRange}
+        />
       )}
 
       <main className="relative z-10 max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
@@ -154,16 +177,26 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <ThemeToggle currentTheme={theme} onThemeChange={handleThemeChange} />
 
             {dataset && (
-              <button
-                onClick={() => setDataset(null)}
-                className="text-xs bg-theme-raised hover:bg-theme-active text-theme-text border border-theme-border px-3 py-1.5 rounded-theme transition-colors font-medium"
-              >
-                Upload New File
-              </button>
+              <>
+                <button
+                  onClick={() => setPdfModalOpen(true)}
+                  className="text-xs bg-theme-raised hover:bg-theme-active text-theme-accent border border-theme-border-hi/50 px-3 py-1.5 rounded-theme transition-colors font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-theme-glow"
+                >
+                  <span>📄</span>
+                  <span>Export PDF</span>
+                </button>
+
+                <button
+                  onClick={() => setDataset(null)}
+                  className="text-xs bg-theme-raised hover:bg-theme-active text-theme-muted hover:text-theme-text border border-theme-border px-3 py-1.5 rounded-theme transition-colors font-medium"
+                >
+                  Upload New
+                </button>
+              </>
             )}
           </div>
         </header>
@@ -215,50 +248,97 @@ export default function DashboardPage() {
             )}
           </div>
         ) : (
-          /* Interactive Dashboard */
-          <div className="flex flex-col gap-4">
-            {/* 1. Animated Timeline with Range Filter */}
-            <TimelineView
-              datasetId={dataset.datasetId}
-              apiUrl={apiUrl}
-              selectedRange={selectedRange}
-              onRangeSelect={setSelectedRange}
-              searchQuery={searchQuery}
-              activeWord={activeWord}
-              activeActor={activeActor}
-            />
+          /* Main Interactive Dashboard & Navigation */
+          <div className="flex flex-col gap-5">
+            {/* Tab Bar */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 border-b border-theme-border">
+              {[
+                { id: 'chat', label: '💬 Chat & Timeline' },
+                { id: 'highlights', label: '🌟 Highlights & Milestones' },
+                { id: 'people', label: '👥 People & Response Times' },
+                { id: 'compare', label: '⚖️ Compare Participants' },
+                { id: 'on-this-day', label: '🕯 On This Day & Streaks' },
+              ].map((tab) => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id as TabMode)}
+                    className={`px-3.5 py-2 text-xs font-bold uppercase tracking-wider rounded-theme transition-all whitespace-nowrap ${
+                      isActive
+                        ? 'bg-theme-surface text-theme-accent border border-theme-border shadow-sm'
+                        : 'text-theme-muted hover:text-theme-text hover:bg-theme-raised'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
 
-            {/* 2. Filter Toolbar (Search & Active Filters) */}
-            <FilterToolbar
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              selectedRange={selectedRange}
-              onClearRange={() => setSelectedRange({ start: null, end: null })}
-              activeWord={activeWord}
-              onClearWord={() => setActiveWord(null)}
-              activeActor={activeActor}
-              onClearActor={() => setActiveActor(null)}
-              onResetAll={handleResetAllFilters}
-            />
+            {/* TAB 1: Chat & Timeline */}
+            {activeTab === 'chat' && (
+              <div className="flex flex-col gap-4">
+                <TimelineView
+                  datasetId={dataset.datasetId}
+                  apiUrl={apiUrl}
+                  selectedRange={selectedRange}
+                  onRangeSelect={setSelectedRange}
+                  searchQuery={searchQuery}
+                  activeWord={activeWord}
+                  activeActor={activeActor}
+                />
 
-            {/* 3. Word & Emoji Frequencies (Redis Cached) */}
-            <WordCloudView
-              datasetId={dataset.datasetId}
-              apiUrl={apiUrl}
-              activeWord={activeWord}
-              onSelectWord={setActiveWord}
-            />
+                <FilterToolbar
+                  searchQuery={searchQuery}
+                  onSearchChange={setSearchQuery}
+                  selectedRange={selectedRange}
+                  onClearRange={() => setSelectedRange({ start: null, end: null })}
+                  activeWord={activeWord}
+                  onClearWord={() => setActiveWord(null)}
+                  activeActor={activeActor}
+                  onClearActor={() => setActiveActor(null)}
+                  onResetAll={handleResetAllFilters}
+                />
 
-            {/* 4. Virtualized Infinite-Scroll Chat View */}
-            <ChatView
-              datasetId={dataset.datasetId}
-              apiUrl={apiUrl}
-              selectedRange={selectedRange}
-              searchQuery={searchQuery}
-              activeWord={activeWord}
-              activeActor={activeActor}
-              onSelectActor={setActiveActor}
-            />
+                <WordCloudView
+                  datasetId={dataset.datasetId}
+                  apiUrl={apiUrl}
+                  activeWord={activeWord}
+                  onSelectWord={setActiveWord}
+                />
+
+                <ChatView
+                  datasetId={dataset.datasetId}
+                  apiUrl={apiUrl}
+                  selectedRange={selectedRange}
+                  searchQuery={searchQuery}
+                  activeWord={activeWord}
+                  activeActor={activeActor}
+                  onSelectActor={setActiveActor}
+                />
+              </div>
+            )}
+
+            {/* TAB 2: Highlights & Milestones */}
+            {activeTab === 'highlights' && (
+              <HighlightsView datasetId={dataset.datasetId} apiUrl={apiUrl} />
+            )}
+
+            {/* TAB 3: People & Response Times */}
+            {activeTab === 'people' && (
+              <PeopleView datasetId={dataset.datasetId} apiUrl={apiUrl} />
+            )}
+
+            {/* TAB 4: Compare Two People */}
+            {activeTab === 'compare' && (
+              <CompareView datasetId={dataset.datasetId} apiUrl={apiUrl} />
+            )}
+
+            {/* TAB 5: On This Day & Streaks */}
+            {activeTab === 'on-this-day' && (
+              <OnThisDayView datasetId={dataset.datasetId} apiUrl={apiUrl} />
+            )}
           </div>
         )}
       </main>
