@@ -27,6 +27,7 @@ interface DatasetMetadata {
 }
 
 type TabMode = 'chat' | 'highlights' | 'people' | 'compare' | 'on-this-day';
+type AnalyzerType = 'text-chat' | 'spreadsheet' | 'document';
 
 export default function DashboardPage() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
@@ -39,11 +40,14 @@ export default function DashboardPage() {
   const [dataset, setDataset] = useState<DatasetMetadata | null>(null);
   const [activeTab, setActiveTab] = useState<TabMode>('chat');
 
+  // Analyzer selection state for upload
+  const [analyzerType, setAnalyzerType] = useState<AnalyzerType>('text-chat');
+
   // PDF Export Modal state
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
 
   // Upload states
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<FileList | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
@@ -80,24 +84,36 @@ export default function DashboardPage() {
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+    if (e.target.files && e.target.files.length > 0) {
+      setFiles(e.target.files);
       setUploadError(null);
     }
   };
 
   const handleUpload = async (e: FormEvent) => {
     e.preventDefault();
-    if (!file) return;
+    if (!files || files.length === 0) return;
 
     setUploading(true);
     setUploadError(null);
 
     const formData = new FormData();
-    formData.append('file', file);
+    let endpoint = `${apiUrl}/analyzers/text-chat/upload`;
+
+    if (analyzerType === 'spreadsheet') {
+      endpoint = `${apiUrl}/analyzers/spreadsheet/upload`;
+      formData.append('file', files[0]);
+    } else if (analyzerType === 'document') {
+      endpoint = `${apiUrl}/analyzers/document/upload`;
+      for (let i = 0; i < files.length; i++) {
+        formData.append('files', files[i]);
+      }
+    } else {
+      formData.append('file', files[0]);
+    }
 
     try {
-      const res = await fetch(`${apiUrl}/analyzers/text-chat/upload`, {
+      const res = await fetch(endpoint, {
         method: 'POST',
         body: formData,
       });
@@ -161,7 +177,7 @@ export default function DashboardPage() {
                 <h1 className="text-base sm:text-lg font-bold tracking-tight text-theme-text uppercase">
                   Archive
                 </h1>
-                <span className="text-[11px] text-theme-dim">/ text-chat-analyzer</span>
+                <span className="text-[11px] text-theme-dim">/ universal data platform</span>
                 <span className="inline-block w-1.5 h-3 bg-theme-accent animate-cursor ml-0.5" />
               </div>
               {dataset && (
@@ -202,38 +218,81 @@ export default function DashboardPage() {
         </header>
 
         {!dataset ? (
-          /* Upload View */
-          <div className="max-w-lg mx-auto my-16 border border-theme-border bg-theme-surface rounded-theme p-6 sm:p-8 shadow-xl terminal-interactive transition-all">
+          /* Universal Upload View with Analyzer Selector */
+          <div className="max-w-xl mx-auto my-12 border border-theme-border bg-theme-surface rounded-theme p-6 sm:p-8 shadow-xl terminal-interactive transition-all">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-theme-accent text-xs">&gt;</span>
               <h2 className="text-sm sm:text-base font-bold text-theme-text uppercase tracking-wide">
-                Ingest Chat Export
+                Universal Dataset Ingestion
               </h2>
             </div>
-            <p className="text-xs text-theme-muted mb-6">
-              Select a plain text (.txt) chat export file. Streamed line-by-line into PostgreSQL and Redis.
+            <p className="text-xs text-theme-muted mb-5">
+              Select an analyzer module below. All inputs normalize automatically into the common Archive schema.
             </p>
+
+            {/* Analyzer Selector Tabs */}
+            <div className="grid grid-cols-3 gap-2 mb-5">
+              {[
+                { id: 'text-chat', icon: '💬', label: 'Text Chat', desc: '.txt exports' },
+                { id: 'spreadsheet', icon: '📊', label: 'Spreadsheet', desc: '.csv, .xlsx, .xls' },
+                { id: 'document', icon: '📄', label: 'Documents', desc: '.pdf, .docx, notes' },
+              ].map((m) => {
+                const isSel = analyzerType === m.id;
+                return (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => {
+                      setAnalyzerType(m.id as AnalyzerType);
+                      setFiles(null);
+                      setUploadError(null);
+                    }}
+                    className={`p-3 rounded-theme border text-left transition-all ${
+                      isSel
+                        ? 'bg-theme-raised border-theme-border-hi text-theme-accent font-bold shadow-sm'
+                        : 'bg-theme-base border-theme-border text-theme-muted hover:text-theme-text hover:bg-theme-raised'
+                    }`}
+                  >
+                    <div className="text-base mb-1">{m.icon}</div>
+                    <div className="text-xs font-bold text-theme-text">{m.label}</div>
+                    <div className="text-[10px] text-theme-dim">{m.desc}</div>
+                  </button>
+                );
+              })}
+            </div>
 
             <form onSubmit={handleUpload} className="flex flex-col gap-4">
               <div className="border border-dashed border-theme-border bg-theme-base p-4 rounded-theme text-center">
                 <input
                   id="upload-input"
                   type="file"
-                  accept=".txt,text/plain"
+                  multiple={analyzerType === 'document'}
+                  accept={
+                    analyzerType === 'text-chat'
+                      ? '.txt,text/plain'
+                      : analyzerType === 'spreadsheet'
+                      ? '.csv,.xlsx,.xls,.tsv'
+                      : '.pdf,.docx,.txt,.md,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                  }
                   onChange={handleFileChange}
                   className="w-full text-xs text-theme-muted file:mr-3 file:py-2 file:px-3 file:rounded-theme file:border-0 file:text-xs file:bg-theme-raised file:text-theme-text hover:file:bg-theme-active cursor-pointer"
                 />
+                {analyzerType === 'document' && (
+                  <p className="text-[11px] text-theme-dim mt-2">
+                    Multi-document mode enabled: select one or more files to analyze &amp; compare overlap.
+                  </p>
+                )}
               </div>
 
               <button
                 type="submit"
-                disabled={uploading || !file}
+                disabled={uploading || !files || files.length === 0}
                 className="w-full py-2.5 bg-theme-raised hover:bg-theme-active disabled:opacity-50 text-theme-accent border border-theme-border-hi/60 text-xs font-bold uppercase tracking-wider rounded-theme transition-all shadow-theme-glow flex items-center justify-center gap-2"
               >
                 {uploading ? (
                   <>
                     <span className="h-2 w-2 rounded-full bg-theme-accent animate-ping" />
-                    <span>Parsing &amp; Ingesting...</span>
+                    <span>Ingesting &amp; Normalizing into Schema...</span>
                   </>
                 ) : (
                   <span>Process Dataset</span>
@@ -248,15 +307,15 @@ export default function DashboardPage() {
             )}
           </div>
         ) : (
-          /* Main Interactive Dashboard & Navigation */
+          /* Main Interactive Dashboard & Navigation (Universal for all Analyzers) */
           <div className="flex flex-col gap-5">
             {/* Tab Bar */}
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 border-b border-theme-border">
               {[
-                { id: 'chat', label: '💬 Chat & Timeline' },
+                { id: 'chat', label: '💬 Timeline & Event View' },
                 { id: 'highlights', label: '🌟 Highlights & Milestones' },
-                { id: 'people', label: '👥 People & Response Times' },
-                { id: 'compare', label: '⚖️ Compare Participants' },
+                { id: 'people', label: '👥 People / Entities & Activity' },
+                { id: 'compare', label: '⚖️ Compare Entities' },
                 { id: 'on-this-day', label: '🕯 On This Day & Streaks' },
               ].map((tab) => {
                 const isActive = activeTab === tab.id;
@@ -276,7 +335,7 @@ export default function DashboardPage() {
               })}
             </div>
 
-            {/* TAB 1: Chat & Timeline */}
+            {/* TAB 1: Chat / Records & Timeline */}
             {activeTab === 'chat' && (
               <div className="flex flex-col gap-4">
                 <TimelineView
@@ -325,12 +384,12 @@ export default function DashboardPage() {
               <HighlightsView datasetId={dataset.datasetId} apiUrl={apiUrl} />
             )}
 
-            {/* TAB 3: People & Response Times */}
+            {/* TAB 3: People / Entities & Response Times */}
             {activeTab === 'people' && (
               <PeopleView datasetId={dataset.datasetId} apiUrl={apiUrl} />
             )}
 
-            {/* TAB 4: Compare Two People */}
+            {/* TAB 4: Compare Two Entities */}
             {activeTab === 'compare' && (
               <CompareView datasetId={dataset.datasetId} apiUrl={apiUrl} />
             )}
