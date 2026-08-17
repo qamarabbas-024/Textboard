@@ -46,14 +46,30 @@ export class TextChatParserService {
     batchSize = 5000,
     timeoutMs = PARSE_TIMEOUT_MS,
   ): Promise<ParseResult> {
-    const parsePromise = this.internalProcessStream(stream, filename, batchSize);
+    let timer: NodeJS.Timeout;
     const timeoutPromise = new Promise<ParseResult>((_, reject) => {
-      setTimeout(() => {
+      timer = setTimeout(() => {
         reject(new RequestTimeoutException(`Parsing timed out after ${timeoutMs / 1000}s`));
       }, timeoutMs);
+      if (timer.unref) timer.unref();
     });
 
-    return Promise.race([parsePromise, timeoutPromise]);
+    try {
+      return await Promise.race([
+        this.internalProcessStream(stream, filename, batchSize),
+        timeoutPromise,
+      ]);
+    } finally {
+      clearTimeout(timer!);
+    }
+  }
+
+  async processChatExport(
+    stream: Readable,
+    filename: string,
+    batchSize = 5000,
+  ): Promise<ParseResult> {
+    return this.processStream(stream, filename, batchSize);
   }
 
   private async internalProcessStream(

@@ -20,14 +20,22 @@ export class SpreadsheetParserService {
       throw new BadRequestException('Uploaded spreadsheet file is empty (0 bytes).');
     }
 
-    const parsePromise = this.internalProcessSpreadsheet(buffer, filename, batchSize);
+    let timer: NodeJS.Timeout;
     const timeoutPromise = new Promise<any>((_, reject) => {
-      setTimeout(() => {
+      timer = setTimeout(() => {
         reject(new RequestTimeoutException(`Spreadsheet parsing timed out after ${timeoutMs / 1000}s`));
       }, timeoutMs);
+      if (timer.unref) timer.unref();
     });
 
-    return Promise.race([parsePromise, timeoutPromise]);
+    try {
+      return await Promise.race([
+        this.internalProcessSpreadsheet(buffer, filename, batchSize),
+        timeoutPromise,
+      ]);
+    } finally {
+      clearTimeout(timer!);
+    }
   }
 
   private async internalProcessSpreadsheet(

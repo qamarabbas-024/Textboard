@@ -41,14 +41,22 @@ export class DocumentParserService {
       throw new BadRequestException('No documents provided for ingestion.');
     }
 
-    const parsePromise = this.internalProcessDocuments(files, datasetName);
+    let timer: NodeJS.Timeout;
     const timeoutPromise = new Promise<any>((_, reject) => {
-      setTimeout(() => {
+      timer = setTimeout(() => {
         reject(new RequestTimeoutException(`Document processing timed out after ${timeoutMs / 1000}s`));
       }, timeoutMs);
+      if (timer.unref) timer.unref();
     });
 
-    return Promise.race([parsePromise, timeoutPromise]);
+    try {
+      return await Promise.race([
+        this.internalProcessDocuments(files, datasetName),
+        timeoutPromise,
+      ]);
+    } finally {
+      clearTimeout(timer!);
+    }
   }
 
   private async internalProcessDocuments(
