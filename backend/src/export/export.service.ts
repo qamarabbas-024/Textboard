@@ -124,7 +124,7 @@ export class ExportService {
     ]);
 
     // Title
-    doc.fillColor('#065f46').fontSize(22).text('Archive Analytics Report', { align: 'center' });
+    doc.fillColor('#065f46').fontSize(22).text('Textboard Analytics Report', { align: 'center' });
     doc.moveDown(0.3);
     doc.fillColor('#374151').fontSize(12).text(`Dataset: ${dataset.name}`, { align: 'center' });
     doc.fillColor('#6b7280').fontSize(10).text(`Generated: ${new Date().toUTCString()}`, { align: 'center' });

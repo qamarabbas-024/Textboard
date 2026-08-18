@@ -1,25 +1,25 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: archive-postgres
+    container_name: textboard-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-archive_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-archive_password}
-      POSTGRES_DB: ${POSTGRES_DB:-archive_db}
+      POSTGRES_USER: ${POSTGRES_USER:-textboard_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-textboard_password}
+      POSTGRES_DB: ${POSTGRES_DB:-textboard_db}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-archive_user} -d ${POSTGRES_DB:-archive_db}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-textboard_user} -d ${POSTGRES_DB:-textboard_db}"]
       interval: 5s
       timeout: 5s
       retries: 5
 
   redis:
     image: redis:7-alpine
-    container_name: archive-redis
+    container_name: textboard-redis
     restart: unless-stopped
     ports:
       - "${REDIS_PORT:-6379}:6379"

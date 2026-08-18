@@ -1,4 +1,4 @@
-# Archive
+# Textboard
 
 A local-first multipurpose data dashboard application.
 
@@ -35,11 +35,12 @@ docker compose up -d
 ```
 
 ### 4. Backend Setup
-Install dependencies and run the NestJS API:
+Install dependencies, apply database migrations, and run the NestJS API:
 ```bash
 cd backend
 npm install
 npx prisma generate
+npx prisma migrate deploy
 npm run start:dev
 ```
 The backend will be available at `http://localhost:3001` (Health check: `http://localhost:3001/health`).
@@ -52,6 +53,11 @@ npm install
 npm run dev
 ```
 The frontend will be available at `http://localhost:3000`.
+
+---
+
+## Security & Privacy Note
+- **Local PIN Lock**: The optional PIN lock is a local UI convenience lock only, browser-controlled, and does not protect server APIs or stored data.
 
 ---
 

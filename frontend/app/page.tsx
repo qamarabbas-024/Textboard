@@ -65,17 +65,17 @@ export default function DashboardPage() {
 
   // Initialize theme & security from storage
   useEffect(() => {
-    const savedTheme = (localStorage.getItem('archive_theme') as ThemeMode) || 'terminal';
+    const savedTheme = (localStorage.getItem('textboard_theme') || localStorage.getItem('archive_theme')) as ThemeMode || 'terminal';
     setTheme(savedTheme);
     document.documentElement.setAttribute('data-theme', savedTheme);
 
-    const booted = sessionStorage.getItem('archive_booted');
+    const booted = sessionStorage.getItem('textboard_booted') || sessionStorage.getItem('archive_booted');
     if (booted || savedTheme !== 'terminal') {
       setHasBooted(true);
     }
 
-    const pinEnabled = localStorage.getItem('archive_pin_enabled') === 'true';
-    const pinHash = localStorage.getItem('archive_pin_hash');
+    const pinEnabled = (localStorage.getItem('textboard_pin_enabled') || localStorage.getItem('archive_pin_enabled')) === 'true';
+    const pinHash = localStorage.getItem('textboard_pin_hash') || localStorage.getItem('archive_pin_hash');
     if (pinEnabled && pinHash) {
       setIsLocked(true);
       setHasPinConfigured(true);
@@ -84,13 +84,13 @@ export default function DashboardPage() {
 
   const handleThemeChange = (newTheme: ThemeMode) => {
     setTheme(newTheme);
-    localStorage.setItem('archive_theme', newTheme);
+    localStorage.setItem('textboard_theme', newTheme);
     document.documentElement.setAttribute('data-theme', newTheme);
   };
 
   const handleBootComplete = () => {
     setHasBooted(true);
-    sessionStorage.setItem('archive_booted', 'true');
+    sessionStorage.setItem('textboard_booted', 'true');
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -192,7 +192,7 @@ export default function DashboardPage() {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-base sm:text-lg font-bold tracking-tight text-theme-text uppercase">
-                  Archive
+                  Textboard
                 </h1>
                 <span className="text-[11px] text-theme-dim">/ universal data platform</span>
                 <span className="inline-block w-1.5 h-3 bg-theme-accent animate-cursor ml-0.5" />
@@ -254,7 +254,7 @@ export default function DashboardPage() {
               </h2>
             </div>
             <p className="text-xs text-theme-muted mb-5">
-              Select an analyzer module below. All inputs normalize automatically into the common Archive schema.
+              Select an analyzer module below. All inputs normalize automatically into the common Textboard schema.
             </p>
 
             {/* Analyzer Selector Tabs */}

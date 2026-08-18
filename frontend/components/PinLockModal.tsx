@@ -9,7 +9,16 @@ interface PinLockModalProps {
   onPinConfigured: () => void;
 }
 
-// Simple deterministic hash for local browser security
+/**
+ * Local UI Convenience PIN Lock Component
+ *
+ * NOTE: This is a local UI convenience lock only, controlled entirely within the browser
+ * (via localStorage and client-side state). It is intended to prevent casual shoulder-surfing
+ * in local sessions. It DOES NOT provide cryptographic server-side security, nor does it
+ * authenticate or protect backend server APIs, database records, or stored data.
+ */
+
+// Simple deterministic hash for local browser UI lock convenience
 function hashPin(pin: string, salt: string): string {
   let hash = 0;
   const combined = `${salt}:${pin}:${salt}`;
@@ -28,7 +37,7 @@ export function PinLockModal({ isLocked, onUnlock, onPinConfigured }: PinLockMod
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    const storedHash = localStorage.getItem('archive_pin_hash');
+    const storedHash = localStorage.getItem('textboard_pin_hash') || localStorage.getItem('archive_pin_hash');
     setHasStoredPin(Boolean(storedHash));
   }, [isLocked]);
 
@@ -47,8 +56,8 @@ export function PinLockModal({ isLocked, onUnlock, onPinConfigured }: PinLockMod
 
         // Auto verify on 4-6 digits
         if (next.length >= 4) {
-          const storedHash = localStorage.getItem('archive_pin_hash');
-          const storedSalt = localStorage.getItem('archive_pin_salt') || 'default_salt';
+          const storedHash = localStorage.getItem('textboard_pin_hash') || localStorage.getItem('archive_pin_hash');
+          const storedSalt = localStorage.getItem('textboard_pin_salt') || localStorage.getItem('archive_pin_salt') || 'default_salt';
           if (storedHash && hashPin(next, storedSalt) === storedHash) {
             setPinInput('');
             onUnlock();
@@ -79,9 +88,9 @@ export function PinLockModal({ isLocked, onUnlock, onPinConfigured }: PinLockMod
 
     const salt = Math.random().toString(36).substring(2, 10);
     const hash = hashPin(pinInput, salt);
-    localStorage.setItem('archive_pin_hash', hash);
-    localStorage.setItem('archive_pin_salt', salt);
-    localStorage.setItem('archive_pin_enabled', 'true');
+    localStorage.setItem('textboard_pin_hash', hash);
+    localStorage.setItem('textboard_pin_salt', salt);
+    localStorage.setItem('textboard_pin_enabled', 'true');
 
     setHasStoredPin(true);
     setIsSettingUp(false);
@@ -103,7 +112,7 @@ export function PinLockModal({ isLocked, onUnlock, onPinConfigured }: PinLockMod
             🔒
           </div>
           <h2 className="text-base font-bold uppercase tracking-wider text-theme-text">
-            {hasStoredPin && !isSettingUp ? 'Archive Security Lock' : 'Set Local Security PIN'}
+            {hasStoredPin && !isSettingUp ? 'Textboard Security Lock' : 'Set Local Security PIN'}
           </h2>
           <p className="text-xs text-theme-muted mt-1">
             {hasStoredPin && !isSettingUp
@@ -171,6 +180,9 @@ export function PinLockModal({ isLocked, onUnlock, onPinConfigured }: PinLockMod
             <button
               onClick={() => {
                 if (confirm('Resetting PIN will clear local authentication tokens. Continue?')) {
+                  localStorage.removeItem('textboard_pin_hash');
+                  localStorage.removeItem('textboard_pin_salt');
+                  localStorage.removeItem('textboard_pin_enabled');
                   localStorage.removeItem('archive_pin_hash');
                   localStorage.removeItem('archive_pin_salt');
                   localStorage.removeItem('archive_pin_enabled');

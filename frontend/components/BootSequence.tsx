@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const BOOT_LINES = [
-  'INITIALIZING ARCHIVE v0.4 CORE KERNEL...',
+  'INITIALIZING TEXTBOARD v0.4 CORE KERNEL...',
   'MOUNTING POSTGRESQL (105K+ RECORDS INDEXED)...',
   'ESTABLISHING REDIS MEMORY & FREQUENCY PIPELINES...',
   'INITIALIZING VIRTUALIZED TIMELINE & CHAT BUFFERS...',
@@ -79,7 +79,7 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
           <div className="flex items-center gap-2 mb-6 border-b border-emerald-900 pb-3">
             <span className="h-3 w-3 bg-emerald-500 rounded-full animate-ping" />
             <span className="text-xs tracking-widest text-emerald-500 font-bold uppercase">
-              ARCHIVE // BOOT SEQUENCE
+              TEXTBOARD // BOOT SEQUENCE
             </span>
           </div>
 

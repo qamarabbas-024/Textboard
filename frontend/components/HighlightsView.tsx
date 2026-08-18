@@ -90,7 +90,7 @@ export function HighlightsView({ datasetId, apiUrl }: HighlightsViewProps) {
             </h3>
           </div>
           <p className="text-xs text-theme-muted">
-            Pull an unexpected memory from anywhere across the archive.
+            Pull an unexpected memory from anywhere across Textboard.
           </p>
         </div>
 
@@ -262,7 +262,7 @@ export function HighlightsView({ datasetId, apiUrl }: HighlightsViewProps) {
                 </p>
               </div>
             ) : (
-              <p className="text-xs text-theme-dim">No occurrences found in archive.</p>
+              <p className="text-xs text-theme-dim">No occurrences found in Textboard.</p>
             )}
           </motion.div>
         )}

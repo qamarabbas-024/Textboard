@@ -150,7 +150,7 @@ export function OnThisDayView({ datasetId, apiUrl }: OnThisDayViewProps) {
 
         {loading ? (
           <div className="py-8 text-center text-xs text-theme-muted">
-            Searching archive memories...
+            Searching Textboard memories...
           </div>
         ) : onThisDay?.events?.length === 0 ? (
           <div className="py-8 text-center text-xs text-theme-dim">

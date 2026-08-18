@@ -8,8 +8,10 @@ import {
   Param,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Throttle } from '@nestjs/throttler';
 import { TextChatParserService } from './text-chat-parser.service';
 import { PrismaService } from '../../prisma/prisma.service';
+import { textChatMulterOptions } from '../../common/upload.config';
 import { Readable } from 'stream';
 
 @Controller('analyzers/text-chat')
@@ -20,24 +22,8 @@ export class TextChatController {
   ) {}
 
   @Post('upload')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      fileFilter: (req, file, callback) => {
-        const isTxt =
-          file.originalname.toLowerCase().endsWith('.txt') ||
-          file.mimetype === 'text/plain';
-        if (!isTxt) {
-          return callback(
-            new BadRequestException(
-              'Invalid file type. Only plain text (.txt) exports are supported.',
-            ),
-            false,
-          );
-        }
-        callback(null, true);
-      },
-    }),
-  )
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
+  @UseInterceptors(FileInterceptor('file', textChatMulterOptions))
   async uploadFile(@UploadedFile() file?: Express.Multer.File) {
     if (!file) {
       throw new BadRequestException('No file provided');
