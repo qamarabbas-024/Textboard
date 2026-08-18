@@ -179,13 +179,13 @@ export function PdfExportModal({
               <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="p-4 bg-emerald-950/60 border border-emerald-800 text-emerald-300 rounded-theme text-center"
+                className="p-4 bg-theme-raised border border-theme-border-hi/60 text-theme-text rounded-theme text-center"
               >
-                <div className="font-bold text-xs mb-2">✅ PDF is ready to download!</div>
+                <div className="font-bold text-xs mb-2 text-theme-accent">✅ PDF is ready to download!</div>
                 <a
                   href={downloadUrl}
                   download
-                  className="inline-block px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider rounded-theme shadow-md transition-colors"
+                  className="inline-block px-4 py-2 bg-theme-accent hover:opacity-90 text-theme-base font-bold text-xs uppercase tracking-wider rounded-theme shadow-theme-glow transition-all"
                 >
                   Download PDF File
                 </a>

@@ -48,7 +48,7 @@ export function OnThisDayView({ datasetId, apiUrl }: OnThisDayViewProps) {
               Longest Daily Streak
             </span>
           </div>
-          <div className="text-2xl font-bold font-mono text-theme-accent mt-1">
+          <div className="text-2xl font-bold font-mono text-theme-highlight mt-1">
             <AnimatedCounter value={streaks?.longestStreak?.days || 0} /> Days
           </div>
           {streaks?.longestStreak?.startDate && (
@@ -86,7 +86,7 @@ export function OnThisDayView({ datasetId, apiUrl }: OnThisDayViewProps) {
               Total Active Days
             </span>
           </div>
-          <div className="text-2xl font-bold font-mono text-theme-accent mt-1">
+          <div className="text-2xl font-bold font-mono text-theme-highlight mt-1">
             <AnimatedCounter value={streaks?.totalActiveDays || 0} />
           </div>
           <p className="text-[11px] text-theme-dim mt-1">Total conversation calendar days</p>

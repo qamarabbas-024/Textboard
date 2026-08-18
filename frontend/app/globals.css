@@ -2,54 +2,57 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 1. Terminal Theme (Default) */
+/* 1. Terminal Theme (Default - Modern Dark IDE) */
 :root,
 [data-theme="terminal"] {
-  --bg-base: #060907;
-  --bg-surface: #0c120e;
-  --bg-surface-raised: #121c16;
-  --bg-surface-active: #1a2a21;
-  --border-subtle: #193324;
-  --border-highlight: #22c55e;
-  --text-main: #dcfce7;
-  --text-muted: #86efac;
-  --text-dim: #4ade8088;
-  --accent: #22c55e;
-  --accent-glow: 0 0 14px rgba(34, 197, 94, 0.45);
+  --bg-base: #0f1117;
+  --bg-surface: #161922;
+  --bg-surface-raised: #1e2230;
+  --bg-surface-active: #282e40;
+  --border-subtle: #242938;
+  --border-highlight: #7dd3c0;
+  --text-main: #d8dae0;
+  --text-muted: #9ea3b0;
+  --text-dim: #656b7c;
+  --accent: #7dd3c0;
+  --accent-glow: 0 0 10px rgba(125, 211, 192, 0.22);
+  --stat-highlight: #e8c07d;
   --font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --radius: 0.25rem;
 }
 
-/* 2. Soft Theme (Warm, rounded, sentimental) */
+/* 2. Soft Theme (Warm, lower-contrast, comfortable viewing) */
 [data-theme="soft"] {
-  --bg-base: #faf6f0;
-  --bg-surface: #ffffff;
-  --bg-surface-raised: #f4ede4;
-  --bg-surface-active: #ecdccf;
-  --border-subtle: #e5d5c5;
-  --border-highlight: #d97706;
-  --text-main: #292524;
-  --text-muted: #57534e;
-  --text-dim: #a8a29e;
-  --accent: #d97706;
-  --accent-glow: 0 4px 16px rgba(217, 119, 6, 0.18);
+  --bg-base: #f5f1ea;
+  --bg-surface: #efe9df;
+  --bg-surface-raised: #e7e0d4;
+  --bg-surface-active: #ded6c8;
+  --border-subtle: #ded5c7;
+  --border-highlight: #c98a7d;
+  --text-main: #3a352e;
+  --text-muted: #6e665c;
+  --text-dim: #9e9488;
+  --accent: #c98a7d;
+  --accent-glow: 0 2px 8px rgba(201, 138, 125, 0.15);
+  --stat-highlight: #b57063;
   --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-  --radius: 1rem;
+  --radius: 0.75rem;
 }
 
 /* 3. Minimal Theme (Clean, professional, analysis-focused) */
 [data-theme="minimal"] {
-  --bg-base: #0a0b10;
-  --bg-surface: #12141c;
-  --bg-surface-raised: #191c28;
-  --bg-surface-active: #222636;
-  --border-subtle: #24293d;
-  --border-highlight: #6366f1;
-  --text-main: #f8fafc;
+  --bg-base: #0b0d13;
+  --bg-surface: #131722;
+  --bg-surface-raised: #1b2030;
+  --bg-surface-active: #252b40;
+  --border-subtle: #252b3e;
+  --border-highlight: #818cf8;
+  --text-main: #e2e8f0;
   --text-muted: #94a3b8;
   --text-dim: #64748b;
-  --accent: #6366f1;
-  --accent-glow: 0 0 12px rgba(99, 102, 241, 0.35);
+  --accent: #818cf8;
+  --accent-glow: 0 0 10px rgba(129, 140, 248, 0.2);
+  --stat-highlight: #38bdf8;
   --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --radius: 0.375rem;
 }
@@ -65,20 +68,20 @@ body {
 /* Terminal Scanline & Grid Effect */
 [data-theme="terminal"] .terminal-grid {
   background-image: 
-    linear-gradient(rgba(34, 197, 94, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(34, 197, 94, 0.03) 1px, transparent 1px);
+    linear-gradient(rgba(125, 211, 192, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(125, 211, 192, 0.025) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
 [data-theme="terminal"] .terminal-scanline {
   background: linear-gradient(
-    rgba(18, 16, 16, 0) 50%, 
-    rgba(0, 0, 0, 0.25) 50%
+    rgba(15, 17, 23, 0) 50%, 
+    rgba(0, 0, 0, 0.15) 50%
   ), linear-gradient(
     90deg,
-    rgba(255, 0, 0, 0.03),
-    rgba(0, 255, 0, 0.01),
-    rgba(0, 0, 255, 0.03)
+    rgba(125, 211, 192, 0.015),
+    rgba(0, 0, 0, 0),
+    rgba(125, 211, 192, 0.015)
   );
   background-size: 100% 4px, 6px 100%;
   pointer-events: none;

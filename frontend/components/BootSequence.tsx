@@ -73,33 +73,33 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
           setIsDone(true);
           onComplete();
         }}
-        className="fixed inset-0 z-50 bg-[#060907] flex flex-col justify-between p-8 font-mono text-emerald-400 cursor-pointer select-none"
+        className="fixed inset-0 z-50 bg-theme-base flex flex-col justify-between p-8 font-mono text-theme-text cursor-pointer select-none"
       >
         <div className="max-w-2xl">
-          <div className="flex items-center gap-2 mb-6 border-b border-emerald-900 pb-3">
-            <span className="h-3 w-3 bg-emerald-500 rounded-full animate-ping" />
-            <span className="text-xs tracking-widest text-emerald-500 font-bold uppercase">
+          <div className="flex items-center gap-2 mb-6 border-b border-theme-border pb-3">
+            <span className="h-2.5 w-2.5 bg-theme-accent rounded-full animate-ping" />
+            <span className="text-xs tracking-widest text-theme-accent font-bold uppercase">
               TEXTBOARD // BOOT SEQUENCE
             </span>
           </div>
 
           <div className="space-y-2 text-xs sm:text-sm">
             {BOOT_LINES.slice(0, currentLineIndex).map((line, idx) => (
-              <div key={idx} className="text-emerald-500/80 flex items-center gap-2">
-                <span className="text-emerald-700">&gt;</span> {line}
+              <div key={idx} className="text-theme-muted flex items-center gap-2">
+                <span className="text-theme-dim">&gt;</span> {line}
               </div>
             ))}
 
             {currentLineIndex < BOOT_LINES.length && (
-              <div className="text-emerald-300 font-semibold flex items-center gap-2">
-                <span className="text-emerald-500">&gt;</span> {displayedText}
-                <span className="inline-block w-2 h-4 bg-emerald-400 animate-cursor" />
+              <div className="text-theme-text font-semibold flex items-center gap-2">
+                <span className="text-theme-accent">&gt;</span> {displayedText}
+                <span className="inline-block w-2 h-4 bg-theme-accent animate-cursor" />
               </div>
             )}
           </div>
         </div>
 
-        <div className="flex items-center justify-between text-[11px] text-emerald-600 border-t border-emerald-950 pt-3">
+        <div className="flex items-center justify-between text-[11px] text-theme-dim border-t border-theme-border pt-3">
           <span>Click anywhere or press [ESC] to skip</span>
           <span>v0.4.0-PROD</span>
         </div>

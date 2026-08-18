@@ -20,6 +20,7 @@ const config: Config = {
           muted: 'var(--text-muted)',
           dim: 'var(--text-dim)',
           accent: 'var(--accent)',
+          highlight: 'var(--stat-highlight)',
         },
       },
       borderRadius: {

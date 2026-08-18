@@ -68,7 +68,7 @@ export function PeopleView({ datasetId, apiUrl }: PeopleViewProps) {
           <span className="text-[11px] uppercase tracking-wider font-semibold text-theme-dim">
             Total Participants
           </span>
-          <div className="text-2xl font-bold font-mono text-theme-accent mt-1">
+          <div className="text-2xl font-bold font-mono text-theme-highlight mt-1">
             <AnimatedCounter value={data.totalParticipants} />
           </div>
         </div>

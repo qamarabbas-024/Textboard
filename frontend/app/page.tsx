@@ -201,7 +201,7 @@ export default function DashboardPage() {
                 <p className="text-xs text-theme-muted mt-0.5">
                   Dataset:{' '}
                   <span className="text-theme-text font-semibold">{dataset.name}</span> &bull;{' '}
-                  <span className="text-theme-accent font-mono font-medium">
+                  <span className="text-theme-highlight font-mono font-medium">
                     <AnimatedCounter value={dataset.totalMessages} />
                   </span>{' '}
                   events
