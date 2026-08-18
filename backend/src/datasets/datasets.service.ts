@@ -65,6 +65,45 @@ export class DatasetsService {
     const actor = filters?.actor || null;
     const search = filters?.search ? `%${filters.search}%` : null;
 
+    if (this.prisma.isLocalFallback) {
+      // In SQLite mode, query events and bucket in JavaScript
+      const events = await this.prisma.timelineEvent.findMany({
+        where: {
+          datasetId,
+          timestamp: {
+            gte: startDate || undefined,
+            lte: endDate || undefined,
+          },
+          actor: actor || undefined,
+          content: filters?.search ? { contains: filters.search } : undefined,
+        },
+        select: { timestamp: true },
+        orderBy: { timestamp: 'asc' },
+      });
+
+      const bucketMap = new Map<string, number>();
+      for (const ev of events) {
+        const d = new Date(ev.timestamp);
+        let key = d.toISOString().slice(0, 10);
+        if (selectedInterval === 'month') {
+          key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-01`;
+        } else if (selectedInterval === 'week') {
+          const day = d.getUTCDay();
+          const diff = d.getUTCDate() - day + (day === 0 ? -6 : 1);
+          const monday = new Date(d.setUTCDate(diff));
+          key = monday.toISOString().slice(0, 10);
+        } else if (selectedInterval === 'hour') {
+          key = `${d.toISOString().slice(0, 13)}:00:00.000Z`;
+        }
+        bucketMap.set(key, (bucketMap.get(key) || 0) + 1);
+      }
+
+      return Array.from(bucketMap.entries()).map(([bucket, count]) => ({
+        bucket: new Date(bucket).toISOString(),
+        count,
+      }));
+    }
+
     // Use fast native SQL date_trunc aggregation
     const results: Array<{ bucket: Date; count: bigint | number }> = await this.prisma.$queryRaw`
       SELECT 

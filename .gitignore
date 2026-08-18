@@ -26,6 +26,8 @@ tmp/
 temp/
 uploads/
 storage/
+*.db
+*.db-*
 
 # Logs
 logs/
