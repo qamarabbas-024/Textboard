@@ -29,9 +29,9 @@ export class DatasetsAnalyticsService {
 
     // 2. Longest message (by character length) using SQL
     const longestRows: any[] = await this.prisma.$queryRaw`
-      SELECT id, "datasetId", timestamp, actor, content, "eventType", LENGTH(content) as char_length
+      SELECT id, datasetId, timestamp, actor, content, eventType, LENGTH(content) as char_length
       FROM timeline_events
-      WHERE "datasetId" = ${datasetId} AND "eventType" = 'message'
+      WHERE datasetId = ${datasetId} AND eventType = 'message'
       ORDER BY LENGTH(content) DESC
       LIMIT 1;
     `;
@@ -41,7 +41,7 @@ export class DatasetsAnalyticsService {
     const emojiRows = await this.prisma.timelineEvent.findMany({
       where: { datasetId, eventType: 'message' },
       select: { id: true, timestamp: true, actor: true, content: true },
-      take: 5000, // Top sample
+      take: 5000,
       orderBy: { timestamp: 'asc' },
     });
 
@@ -81,7 +81,7 @@ export class DatasetsAnalyticsService {
     const event = await this.prisma.timelineEvent.findFirst({
       where: {
         datasetId,
-        content: { contains: keyword.trim(), mode: 'insensitive' },
+        content: { contains: keyword.trim() },
       },
       orderBy: { timestamp: 'asc' },
     });
@@ -89,7 +89,7 @@ export class DatasetsAnalyticsService {
     const totalOccurrences = await this.prisma.timelineEvent.count({
       where: {
         datasetId,
-        content: { contains: keyword.trim(), mode: 'insensitive' },
+        content: { contains: keyword.trim() },
       },
     });
 
@@ -109,18 +109,17 @@ export class DatasetsAnalyticsService {
     const actorStats: any[] = await this.prisma.$queryRaw`
       SELECT 
         actor,
-        COUNT(*)::int as message_count,
-        SUM(LENGTH(content))::bigint as total_chars,
+        COUNT(*) as message_count,
+        SUM(LENGTH(content)) as total_chars,
         MIN(timestamp) as first_active,
         MAX(timestamp) as last_active
       FROM timeline_events
-      WHERE "datasetId" = ${datasetId} AND actor IS NOT NULL
+      WHERE datasetId = ${datasetId} AND actor IS NOT NULL
       GROUP BY actor
       ORDER BY message_count DESC;
     `;
 
     // 2. Response Time & Activity Latency Analysis
-    // Stream consecutive events to compute response times between distinct actors
     const responseTimesByActor: Record<string, number[]> = {};
     const hourlyDistribution: Record<string, number[]> = {};
     const dailyDistribution: Record<string, number[]> = {};
@@ -149,7 +148,6 @@ export class DatasetsAnalyticsService {
 
       if (prevActor && prevActor !== actor && prevTime) {
         const diffSecs = (time - prevTime) / 1000;
-        // Consider response if within 12 hours
         if (diffSecs > 0 && diffSecs < 43200) {
           if (!responseTimesByActor[actor]) responseTimesByActor[actor] = [];
           responseTimesByActor[actor].push(diffSecs);
@@ -202,11 +200,10 @@ export class DatasetsAnalyticsService {
     const cached = await this.redis.get(cacheKey);
     if (cached) return JSON.parse(cached);
 
-    // Get distinct active days in UTC
     const daysRaw: any[] = await this.prisma.$queryRaw`
-      SELECT DISTINCT date_trunc('day', timestamp) as day
+      SELECT DISTINCT SUBSTR(timestamp, 1, 10) as day
       FROM timeline_events
-      WHERE "datasetId" = ${datasetId}
+      WHERE datasetId = ${datasetId}
       ORDER BY day ASC;
     `;
 
@@ -294,22 +291,24 @@ export class DatasetsAnalyticsService {
 
   async getOnThisDay(datasetId: string, month?: number, day?: number) {
     const now = new Date();
-    const targetMonth = month || now.getUTCMonth() + 1;
-    const targetDay = day || now.getUTCDate();
+    const targetMonth = String(month || now.getUTCMonth() + 1).padStart(2, '0');
+    const targetDay = String(day || now.getUTCDate()).padStart(2, '0');
+
+    // Matches 'YYYY-MM-DD%'
+    const pattern = `%-${targetMonth}-${targetDay}%`;
 
     const events: any[] = await this.prisma.$queryRaw`
-      SELECT id, timestamp, actor, content, "eventType"
+      SELECT id, timestamp, actor, content, eventType
       FROM timeline_events
-      WHERE "datasetId" = ${datasetId}
-        AND EXTRACT(MONTH FROM timestamp) = ${targetMonth}
-        AND EXTRACT(DAY FROM timestamp) = ${targetDay}
+      WHERE datasetId = ${datasetId}
+        AND timestamp LIKE ${pattern}
       ORDER BY timestamp ASC
       LIMIT 100;
     `;
 
     return {
-      targetMonth,
-      targetDay,
+      targetMonth: Number(targetMonth),
+      targetDay: Number(targetDay),
       events,
     };
   }

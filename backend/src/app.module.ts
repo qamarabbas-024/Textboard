@@ -5,6 +5,9 @@ import { APP_GUARD } from '@nestjs/core';
 import { PrismaModule } from './prisma/prisma.module';
 import { RedisModule } from './redis/redis.module';
 import { HealthModule } from './health/health.module';
+import { IngestionModule } from './ingestion/ingestion.module';
+import { AnalyticsModule } from './analytics/analytics.module';
+import { SearchModule } from './search/search.module';
 import { TextChatModule } from './analyzers/text-chat/text-chat.module';
 import { SpreadsheetModule } from './analyzers/spreadsheet/spreadsheet.module';
 import { DocumentModule } from './analyzers/document/document.module';
@@ -25,6 +28,9 @@ import { ExportModule } from './export/export.module';
     PrismaModule,
     RedisModule,
     HealthModule,
+    IngestionModule,
+    AnalyticsModule,
+    SearchModule,
     TextChatModule,
     SpreadsheetModule,
     DocumentModule,

@@ -84,9 +84,9 @@ export class TextChatParserService {
       data: {
         name: filename,
         sourceType: 'text-chat',
-        metadata: {
+        metadata: JSON.stringify({
           originalFilename: filename,
-        },
+        }),
       },
     });
 

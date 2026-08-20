@@ -14,7 +14,6 @@ const STOP_WORDS = new Set([
   'is', 'are', 'was', 'were', 'been', 'has', 'had', 'did', 'does', 'am', 'pm', 'ok', 'okay', 'yes', 'yeah', 'hey', 'hi', 'hello'
 ]);
 
-// Unicode emoji match pattern
 const EMOJI_REGEX = /(?:\p{Extended_Pictographic}|\p{Emoji_Presentation})/gu;
 
 @Injectable()
@@ -54,7 +53,6 @@ export class DatasetsService {
     const validIntervals = ['day', 'week', 'month', 'hour'];
     const selectedInterval = validIntervals.includes(interval) ? interval : 'day';
 
-    // Verify dataset exists
     const datasetExists = await this.prisma.dataset.count({ where: { id: datasetId } });
     if (!datasetExists) {
       throw new NotFoundException(`Dataset ${datasetId} not found`);
@@ -63,65 +61,41 @@ export class DatasetsService {
     const startDate = filters?.startDate ? new Date(filters.startDate) : null;
     const endDate = filters?.endDate ? new Date(filters.endDate) : null;
     const actor = filters?.actor || null;
-    const search = filters?.search ? `%${filters.search}%` : null;
 
-    if (this.prisma.isLocalFallback) {
-      // In SQLite mode, query events and bucket in JavaScript
-      const events = await this.prisma.timelineEvent.findMany({
-        where: {
-          datasetId,
-          timestamp: {
-            gte: startDate || undefined,
-            lte: endDate || undefined,
-          },
-          actor: actor || undefined,
-          content: filters?.search ? { contains: filters.search } : undefined,
+    const events = await this.prisma.timelineEvent.findMany({
+      where: {
+        datasetId,
+        timestamp: {
+          gte: startDate || undefined,
+          lte: endDate || undefined,
         },
-        select: { timestamp: true },
-        orderBy: { timestamp: 'asc' },
-      });
+        actor: actor || undefined,
+        content: filters?.search ? { contains: filters.search } : undefined,
+      },
+      select: { timestamp: true },
+      orderBy: { timestamp: 'asc' },
+    });
 
-      const bucketMap = new Map<string, number>();
-      for (const ev of events) {
-        const d = new Date(ev.timestamp);
-        let key = d.toISOString().slice(0, 10);
-        if (selectedInterval === 'month') {
-          key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-01`;
-        } else if (selectedInterval === 'week') {
-          const day = d.getUTCDay();
-          const diff = d.getUTCDate() - day + (day === 0 ? -6 : 1);
-          const monday = new Date(d.setUTCDate(diff));
-          key = monday.toISOString().slice(0, 10);
-        } else if (selectedInterval === 'hour') {
-          key = `${d.toISOString().slice(0, 13)}:00:00.000Z`;
-        }
-        bucketMap.set(key, (bucketMap.get(key) || 0) + 1);
+    const bucketMap = new Map<string, number>();
+    for (const ev of events) {
+      const d = new Date(ev.timestamp);
+      let key = d.toISOString().slice(0, 10);
+      if (selectedInterval === 'month') {
+        key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-01`;
+      } else if (selectedInterval === 'week') {
+        const day = d.getUTCDay();
+        const diff = d.getUTCDate() - day + (day === 0 ? -6 : 1);
+        const monday = new Date(d.setUTCDate(diff));
+        key = monday.toISOString().slice(0, 10);
+      } else if (selectedInterval === 'hour') {
+        key = `${d.toISOString().slice(0, 13)}:00:00.000Z`;
       }
-
-      return Array.from(bucketMap.entries()).map(([bucket, count]) => ({
-        bucket: new Date(bucket).toISOString(),
-        count,
-      }));
+      bucketMap.set(key, (bucketMap.get(key) || 0) + 1);
     }
 
-    // Use fast native SQL date_trunc aggregation
-    const results: Array<{ bucket: Date; count: bigint | number }> = await this.prisma.$queryRaw`
-      SELECT 
-        date_trunc(${selectedInterval}, timestamp) AS bucket,
-        COUNT(*)::int AS count
-      FROM timeline_events
-      WHERE "datasetId" = ${datasetId}
-        AND (${startDate}::timestamp IS NULL OR timestamp >= ${startDate}::timestamp)
-        AND (${endDate}::timestamp IS NULL OR timestamp <= ${endDate}::timestamp)
-        AND (${actor}::text IS NULL OR actor = ${actor}::text)
-        AND (${search}::text IS NULL OR content ILIKE ${search})
-      GROUP BY bucket
-      ORDER BY bucket ASC;
-    `;
-
-    return results.map((r) => ({
-      bucket: r.bucket.toISOString(),
-      count: Number(r.count),
+    return Array.from(bucketMap.entries()).map(([bucket, count]) => ({
+      bucket: new Date(bucket).toISOString(),
+      count,
     }));
   }
 
@@ -159,7 +133,6 @@ export class DatasetsService {
     if (term) {
       where.content = {
         contains: term,
-        mode: 'insensitive',
       };
     }
 
@@ -193,7 +166,6 @@ export class DatasetsService {
       return JSON.parse(cached);
     }
 
-    // Verify dataset exists
     const dataset = await this.prisma.dataset.findUnique({ where: { id: datasetId } });
     if (!dataset) {
       throw new NotFoundException(`Dataset ${datasetId} not found`);
@@ -202,7 +174,6 @@ export class DatasetsService {
     this.logger.log(`Computing word & emoji frequencies for dataset ${datasetId}...`);
     const startTime = Date.now();
 
-    // Query in batches of 10,000 contents to avoid huge memory spikes
     const wordCounts: Record<string, number> = {};
     const emojiCounts: Record<string, number> = {};
     let totalWords = 0;
@@ -275,7 +246,6 @@ export class DatasetsService {
       computedInMs: Date.now() - startTime,
     };
 
-    // Cache in Redis for 24 hours
     await this.redis.set(cacheKey, JSON.stringify(result), 86400);
 
     return result;

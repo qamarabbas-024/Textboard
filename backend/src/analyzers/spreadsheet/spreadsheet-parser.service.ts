@@ -130,7 +130,7 @@ export class SpreadsheetParserService {
       data: {
         name: filename,
         sourceType: 'spreadsheet',
-        metadata: {
+        metadata: JSON.stringify({
           columns,
           columnTypes,
           rowCount: rawRows.length,
@@ -138,7 +138,7 @@ export class SpreadsheetParserService {
           isGradebook,
           actorColumn: actorCol,
           dateColumn: dateCol || null,
-        },
+        }),
       },
     });
 

@@ -16,8 +16,8 @@ export interface TimelineEventItem {
 
 interface ChatViewProps {
   datasetId: string;
-  apiUrl: string;
-  selectedRange: { start: string | null; end: string | null };
+  apiUrl?: string;
+  selectedRange?: { start: string | null; end: string | null };
   searchQuery?: string;
   activeWord?: string | null;
   activeActor?: string | null;
@@ -43,14 +43,13 @@ function getActorStyle(actor: string | null) {
     hash = (hash << 5) - hash + actor.charCodeAt(i);
     hash |= 0;
   }
-  const index = Math.abs(hash) % AUTHOR_PALETTE.length;
-  return AUTHOR_PALETTE[index];
+  return AUTHOR_PALETTE[Math.abs(hash) % AUTHOR_PALETTE.length];
 }
 
 export function ChatView({
   datasetId,
-  apiUrl,
-  selectedRange,
+  apiUrl = '',
+  selectedRange = { start: null, end: null },
   searchQuery,
   activeWord,
   activeActor,
@@ -60,187 +59,178 @@ export function ChatView({
   const [events, setEvents] = useState<TimelineEventItem[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [totalMatching, setTotalMatching] = useState<number>(0);
-  const [loading, setLoading] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [hasMore, setHasMore] = useState<boolean>(true);
 
   const parentRef = useRef<HTMLDivElement>(null);
 
-  // Fetch initial batch whenever filters change
-  useEffect(() => {
-    let isCancelled = false;
-    async function loadFirstPage() {
-      setLoading(true);
+  const fetchPage = useCallback(
+    async (cursor?: string, append = false) => {
+      if (!datasetId) return;
+      setIsLoading(true);
+
       try {
-        const params = new URLSearchParams();
-        params.set('limit', '50');
-        if (selectedRange.start) params.set('startDate', selectedRange.start);
-        if (selectedRange.end) params.set('endDate', selectedRange.end);
-        if (searchQuery) params.set('search', searchQuery);
-        if (activeWord) params.set('word', activeWord);
-        if (activeActor) params.set('actor', activeActor);
+        const url = new URL(`${apiUrl}/api/v1/datasets/${datasetId}/events`, window.location.origin);
+        url.searchParams.set('limit', '50');
+        if (cursor) url.searchParams.set('cursor', cursor);
+        if (selectedRange.start) url.searchParams.set('startDate', selectedRange.start);
+        if (selectedRange.end) url.searchParams.set('endDate', selectedRange.end);
+        if (searchQuery) url.searchParams.set('search', searchQuery);
+        if (activeWord) url.searchParams.set('word', activeWord);
+        if (activeActor) url.searchParams.set('actor', activeActor);
 
-        const res = await fetch(`${apiUrl}/datasets/${datasetId}/events?${params.toString()}`);
-        if (res.ok) {
-          const data = await res.json();
-          if (!isCancelled) {
-            setEvents(data.events || []);
-            setNextCursor(data.nextCursor || null);
-            setTotalMatching(data.totalMatching || 0);
-            onTotalCountChange?.(data.totalMatching || 0);
-          }
-        }
-      } catch (err) {
-        console.error('Failed to fetch events', err);
-      } finally {
-        if (!isCancelled) setLoading(false);
-      }
-    }
+        const res = await fetch(url.toString());
+        if (!res.ok) throw new Error('Failed to fetch events');
 
-    loadFirstPage();
-    return () => {
-      isCancelled = true;
-    };
-  }, [datasetId, apiUrl, selectedRange, searchQuery, activeWord, activeActor]);
-
-  // Infinite scroll loader
-  const loadMore = useCallback(async () => {
-    if (!nextCursor || loadingMore) return;
-    setLoadingMore(true);
-
-    try {
-      const params = new URLSearchParams();
-      params.set('limit', '50');
-      params.set('cursor', nextCursor);
-      if (selectedRange.start) params.set('startDate', selectedRange.start);
-      if (selectedRange.end) params.set('endDate', selectedRange.end);
-      if (searchQuery) params.set('search', searchQuery);
-      if (activeWord) params.set('word', activeWord);
-      if (activeActor) params.set('actor', activeActor);
-
-      const res = await fetch(`${apiUrl}/datasets/${datasetId}/events?${params.toString()}`);
-      if (res.ok) {
         const data = await res.json();
-        setEvents((prev) => [...prev, ...(data.events || [])]);
-        setNextCursor(data.nextCursor || null);
-      }
-    } catch (err) {
-      console.error('Failed to load more events', err);
-    } finally {
-      setLoadingMore(false);
-    }
-  }, [nextCursor, loadingMore, apiUrl, datasetId, selectedRange, searchQuery, activeWord, activeActor]);
+        setTotalMatching(data.totalMatching);
+        if (onTotalCountChange) onTotalCountChange(data.totalMatching);
 
-  // Virtualizer setup
-  const rowVirtualizer = useVirtualizer({
+        setEvents((prev) => (append ? [...prev, ...data.events] : data.events));
+        setNextCursor(data.nextCursor);
+        setHasMore(Boolean(data.nextCursor));
+      } catch (err) {
+        console.error('ChatView fetch error:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [datasetId, apiUrl, selectedRange, searchQuery, activeWord, activeActor, onTotalCountChange],
+  );
+
+  useEffect(() => {
+    fetchPage();
+  }, [fetchPage]);
+
+  const virtualizer = useVirtualizer({
     count: events.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 80,
+    estimateSize: () => 72,
     overscan: 10,
   });
 
-  const virtualItems = rowVirtualizer.getVirtualItems();
+  const virtualItems = virtualizer.getVirtualItems();
 
   useEffect(() => {
-    if (virtualItems.length === 0) return;
     const lastItem = virtualItems[virtualItems.length - 1];
-    if (lastItem && lastItem.index >= events.length - 10 && nextCursor && !loadingMore) {
-      loadMore();
+    if (!lastItem) return;
+
+    if (lastItem.index >= events.length - 1 && hasMore && !isLoading && nextCursor) {
+      fetchPage(nextCursor, true);
     }
-  }, [virtualItems, events.length, nextCursor, loadingMore, loadMore]);
+  }, [virtualItems, events.length, hasMore, isLoading, nextCursor, fetchPage]);
 
   return (
-    <div className="flex flex-col h-[550px] border border-theme-border bg-theme-surface rounded-theme overflow-hidden terminal-interactive shadow-sm transition-all">
-      <div className="flex items-center justify-between px-4 py-2.5 bg-theme-raised border-b border-theme-border text-xs text-theme-muted">
+    <div className="flex flex-col h-[650px] w-full bg-theme-surface border border-theme-border rounded-theme overflow-hidden font-mono text-xs shadow-2xl">
+      {/* Header Bar */}
+      <div className="flex items-center justify-between px-4 py-2 bg-theme-raised border-b border-theme-border text-theme-muted select-none">
         <div className="flex items-center gap-2">
-          <span>
-            Showing <strong className="text-theme-text">{events.length.toLocaleString()}</strong> of{' '}
-            <strong className="text-theme-text">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="font-semibold text-theme-text uppercase tracking-wider">EVENT FEED</span>
+          <span className="text-theme-dim">({datasetId.slice(0, 8)}...)</span>
+        </div>
+
+        <div className="flex items-center gap-4 text-[11px]">
+          {activeActor && (
+            <div className="flex items-center gap-1 bg-theme-active border border-theme-border px-2 py-0.5 rounded text-theme-text">
+              <span>Actor: {activeActor}</span>
+              {onSelectActor && (
+                <button
+                  onClick={() => onSelectActor(null)}
+                  className="hover:text-rose-400 font-bold ml-1"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          )}
+
+          <div>
+            TOTAL:{' '}
+            <strong className="text-theme-text font-bold">
               <AnimatedCounter value={totalMatching} />
             </strong>{' '}
-            matching events
-          </span>
-          {activeActor && (
-            <span className="bg-theme-surface text-theme-accent border border-theme-border px-2 py-0.5 rounded-theme">
-              Sender: {activeActor}
-            </span>
-          )}
+            EVENTS
+          </div>
         </div>
-        {loading && <span className="text-theme-accent animate-pulse">Streaming records...</span>}
       </div>
 
-      <div ref={parentRef} className="flex-1 overflow-y-auto p-4 relative">
-        {loading && events.length === 0 ? (
-          <div className="h-full flex items-center justify-center text-sm text-theme-muted">
-            Streaming virtualized events...
-          </div>
-        ) : events.length === 0 ? (
-          <div className="h-full flex items-center justify-center text-sm text-theme-muted">
-            No events found matching the selected filters.
-          </div>
-        ) : (
-          <div
-            style={{
-              height: `${rowVirtualizer.getTotalSize()}px`,
-              width: '100%',
-              position: 'relative',
-            }}
-          >
-            {virtualItems.map((virtualRow) => {
-              const event = events[virtualRow.index];
-              if (!event) return null;
-
-              const isSystem = !event.actor || event.eventType === 'system_event';
-              const actorStyle = getActorStyle(event.actor);
-              const formattedDate = new Date(event.timestamp).toLocaleString();
-
-              return (
-                <div
-                  key={virtualRow.key}
-                  ref={rowVirtualizer.measureElement}
-                  data-index={virtualRow.index}
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    transform: `translateY(${virtualRow.start}px)`,
-                  }}
-                  className="py-1.5"
-                >
-                  {isSystem ? (
-                    <div className="flex justify-center my-1">
-                      <div className="text-xs bg-theme-base border border-theme-border text-theme-muted px-3.5 py-1 rounded-theme max-w-lg text-center">
-                        {event.content}
-                        <span className="ml-2 text-[10px] text-theme-dim">{formattedDate}</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-start max-w-2xl">
-                      <div className="flex items-center gap-2 mb-1">
-                        <button
-                          onClick={() =>
-                            onSelectActor?.(activeActor === event.actor ? null : event.actor)
-                          }
-                          className={`text-[11px] font-semibold px-2 py-0.5 rounded-theme border transition-all ${actorStyle}`}
-                        >
-                          {event.actor}
-                        </button>
-                        <span className="text-[10px] text-theme-dim">{formattedDate}</span>
-                      </div>
-                      <div className="bg-theme-base border border-theme-border text-theme-text text-xs sm:text-sm px-3.5 py-2 rounded-theme whitespace-pre-wrap break-words leading-relaxed shadow-sm hover:border-theme-border-hi/40 transition-colors">
-                        {event.content}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+      {/* Virtualized Messages Container */}
+      <div ref={parentRef} className="flex-1 overflow-y-auto p-4 space-y-2 relative">
+        {events.length === 0 && !isLoading && (
+          <div className="flex flex-col items-center justify-center h-full text-theme-dim">
+            <p>No timeline records matching current filters.</p>
           </div>
         )}
 
-        {loadingMore && (
-          <div className="py-2 text-center text-xs text-theme-muted">
-            Loading next 50 messages...
+        <div
+          style={{
+            height: `${virtualizer.getTotalSize()}px`,
+            width: '100%',
+            position: 'relative',
+          }}
+        >
+          {virtualItems.map((virtualRow) => {
+            const ev = events[virtualRow.index];
+            if (!ev) return null;
+
+            const actorTagStyle = getActorStyle(ev.actor);
+            const dateObj = new Date(ev.timestamp);
+            const timeFormatted = dateObj.toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+            });
+            const dateFormatted = dateObj.toLocaleDateString([], {
+              month: 'short',
+              day: 'numeric',
+            });
+
+            return (
+              <div
+                key={ev.id}
+                data-index={virtualRow.index}
+                ref={virtualizer.measureElement}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  transform: `translateY(${virtualRow.start}px)`,
+                }}
+                className="pb-2"
+              >
+                <div className="p-3 bg-theme-raised/40 hover:bg-theme-active/80 border border-theme-border rounded transition-all duration-150 group">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2">
+                      <span
+                        onClick={() => onSelectActor && ev.actor && onSelectActor(ev.actor)}
+                        className={`px-2 py-0.5 border text-[10px] rounded font-bold uppercase tracking-wider cursor-pointer hover:opacity-80 transition-opacity ${actorTagStyle}`}
+                      >
+                        {ev.actor || 'System'}
+                      </span>
+                      <span className="text-[10px] text-theme-dim">#{virtualRow.index + 1}</span>
+                    </div>
+
+                    <div className="text-[10px] text-theme-dim group-hover:text-theme-muted transition-colors">
+                      <span>{dateFormatted}</span> <span className="text-theme-dim/60">•</span>{' '}
+                      <span>{timeFormatted}</span>
+                    </div>
+                  </div>
+
+                  <div className="text-theme-text text-xs leading-relaxed break-words font-sans selection:bg-theme-border-hi selection:text-black">
+                    {ev.content}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {isLoading && (
+          <div className="flex items-center justify-center p-4 text-theme-muted gap-2 text-xs">
+            <span className="inline-block w-3 h-3 border-2 border-theme-border-hi border-t-transparent rounded-full animate-spin" />
+            <span>Streaming virtual records...</span>
           </div>
         )}
       </div>

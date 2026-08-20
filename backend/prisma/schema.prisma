@@ -1,5 +1,5 @@
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -8,32 +8,145 @@ generator client {
 }
 
 model Dataset {
-  id         String          @id @default(uuid())
-  name       String
-  sourceType String
-  metadata   Json?
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
+  id          String   @id @default(uuid())
+  name        String
+  sourceType  String   // 'text-chat' | 'spreadsheet' | 'document' | 'composite'
+  description String?
+  metadata    String?  // JSON encoded string
+  totalEvents Int      @default(0)
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  events     TimelineEvent[]
-  metrics    Metric[]
-  highlights Highlight[]
+  files       SourceFile[]
+  jobs        ImportJob[]
+  events      TimelineEvent[]
+  entities    DatasetEntity[]
+  metrics     Metric[]
+  highlights  Highlight[]
 
+  @@index([sourceType])
+  @@index([createdAt])
   @@map("datasets")
 }
 
+model SourceFile {
+  id           String    @id @default(uuid())
+  datasetId    String
+  dataset      Dataset   @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  
+  filename     String
+  fileSize     Int
+  mimeType     String
+  checksum     String?
+  storagePath  String?
+  status       String    @default("pending")
+  createdAt    DateTime  @default(now())
+
+  events       TimelineEvent[]
+  jobs         ImportJob[]
+
+  @@index([datasetId])
+  @@index([checksum])
+  @@map("source_files")
+}
+
+model ImportJob {
+  id              String      @id @default(uuid())
+  datasetId       String
+  dataset         Dataset     @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  sourceFileId    String?
+  sourceFile      SourceFile? @relation(fields: [sourceFileId], references: [id], onDelete: SetNull)
+  
+  status          String      @default("QUEUED") // 'QUEUED' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'CANCELLED'
+  step            String?     // 'spooling' | 'parsing' | 'normalizing' | 'indexing' | 'completed'
+  progress        Int         @default(0)
+  processedRows   Int         @default(0)
+  failedRows      Int         @default(0)
+  totalRows       Int         @default(0)
+  lastOffset      Int         @default(0)
+  errorMessage    String?
+  errorDetails    String?     // JSON array of error samples
+  executionTimeMs Int?
+  startedAt       DateTime?
+  completedAt     DateTime?
+  
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([datasetId, status])
+  @@index([status])
+  @@map("import_jobs")
+}
+
+model Entity {
+  id           String          @id @default(uuid())
+  displayName  String
+  normalizedId String          @unique
+  entityType   String          @default("person")
+  avatarUrl    String?
+  colorTheme   String?
+  aliases      String?         // JSON array string
+  metadata     String?         // JSON string
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  events       TimelineEvent[]
+  datasets     DatasetEntity[]
+
+  @@map("entities")
+}
+
+model DatasetEntity {
+  datasetId    String
+  entityId     String
+  dataset      Dataset  @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  entity       Entity   @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  
+  eventCount   Int      @default(0)
+  totalChars   Int      @default(0)
+  firstActive  DateTime?
+  lastActive   DateTime?
+  
+  @@id([datasetId, entityId])
+  @@index([datasetId, eventCount])
+  @@map("dataset_entities")
+}
+
 model TimelineEvent {
-  id        String   @id @default(uuid())
-  datasetId String
-  dataset   Dataset  @relation(fields: [datasetId], references: [id], onDelete: Cascade)
-  timestamp DateTime
-  actor     String?
-  content   String   @db.Text
-  eventType String   @default("message")
-  metadata  Json?
+  id           String      @id @default(uuid())
+  datasetId    String
+  dataset      Dataset     @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  sourceFileId String?
+  sourceFile   SourceFile? @relation(fields: [sourceFileId], references: [id], onDelete: SetNull)
+  
+  entityId     String?
+  entity       Entity?     @relation(fields: [entityId], references: [id], onDelete: SetNull)
+  actor        String?     // Compatibility field for legacy views
+  actorName    String?     // Canonical actor name
+  
+  timestamp    DateTime
+  rawTimestamp String?
+  sequenceNum  Int         @default(0)
+  
+  content      String
+  eventType    String      @default("message")
+  
+  charLength   Int         @default(0)
+  wordCount    Int         @default(0)
+  hasUrls      Boolean     @default(false)
+  hasEmojis    Boolean     @default(false)
+  hasMedia     Boolean     @default(false)
+  
+  metadata     String?     // JSON string
+  embeddingRef String?
 
   @@index([datasetId, timestamp])
   @@index([datasetId, actor])
+  @@index([datasetId, entityId])
+  @@index([datasetId, eventType])
+  @@index([timestamp])
   @@map("timeline_events")
 }
 
@@ -42,14 +155,15 @@ model Metric {
   datasetId   String
   dataset     Dataset  @relation(fields: [datasetId], references: [id], onDelete: Cascade)
   name        String
+  category    String?
   value       Float?
   stringValue String?
-  jsonValue   Json?
-  category    String?
-  metadata    Json?
+  jsonValue   String?  // JSON string
+  metadata    String?  // JSON string
   createdAt   DateTime @default(now())
 
   @@index([datasetId, name])
+  @@index([datasetId, category])
   @@map("metrics")
 }
 
@@ -58,9 +172,9 @@ model Highlight {
   datasetId   String
   dataset     Dataset  @relation(fields: [datasetId], references: [id], onDelete: Cascade)
   title       String
-  description String?  @db.Text
+  description String?
   score       Float?
-  metadata    Json?
+  metadata    String?  // JSON string
   createdAt   DateTime @default(now())
 
   @@index([datasetId])

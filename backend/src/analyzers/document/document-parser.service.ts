@@ -166,7 +166,7 @@ export class DocumentParserService {
       data: {
         name: title,
         sourceType: 'document',
-        metadata: {
+        metadata: JSON.stringify({
           fileCount: files.length,
           totalWords,
           totalPages,
@@ -177,7 +177,7 @@ export class DocumentParserService {
           })),
           topTopics,
           similarityMatrix,
-        },
+        }),
       },
     });
 
