@@ -2,7 +2,7 @@ export type ExportJobStatus = 'QUEUED' | 'PROCESSING' | 'COMPLETED' | 'FAILED' |
 
 export interface ChatExportOptions {
   type?: 'chat' | 'highlights' | 'summary';
-  theme?: 'light' | 'dark' | 'monochrome';
+  theme?: 'light' | 'dark' | 'monochrome' | 'matrix';
   pageBgColor?: string;
   sentBubbleColor?: string;
   receivedBubbleColor?: string;

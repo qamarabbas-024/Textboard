@@ -8,6 +8,7 @@ import {
   CpuIcon,
   RefreshCwIcon,
 } from './Icons';
+import { ThemeSwitcher } from './ThemeSwitcher';
 
 export type NavTab = 'HOME' | 'DATA' | 'EXPLORE' | 'SEARCH' | 'INSIGHTS';
 
@@ -81,8 +82,10 @@ export function WorkstationNav({
           })}
         </nav>
 
-        {/* Live Processing Indicator or Telemetry Summary */}
+        {/* Right Side: Theme Switcher & System Telemetry */}
         <div className="flex items-center gap-3">
+          <ThemeSwitcher />
+
           {activeJob ? (
             <button
               onClick={onOpenProcessingModal}

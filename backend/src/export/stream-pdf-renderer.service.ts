@@ -34,7 +34,7 @@ export interface DocumentTheme {
   dateSeparatorText: string;
 }
 
-export const THEMES: Record<'light' | 'dark' | 'monochrome', DocumentTheme> = {
+export const THEMES: Record<'light' | 'dark' | 'monochrome' | 'matrix', DocumentTheme> = {
   light: {
     pageBg: '#EFEAE2', // Eye-care warm cream (eye-comfort reading background)
     headerBg: '#FFFFFF',
@@ -71,6 +71,24 @@ export const THEMES: Record<'light' | 'dark' | 'monochrome', DocumentTheme> = {
     dateSeparatorBorder: '#475569',
     dateSeparatorText: '#CBD5E1',
   },
+  matrix: {
+    pageBg: '#050805', // Deep pitch black
+    headerBg: '#08140a',
+    headerBorder: '#166534',
+    headerText: '#4ADE80',
+    headerSubtext: '#22C55E',
+    sentBubbleBg: '#14532D', // Phosphor emerald
+    sentBubbleBorder: '#22C55E',
+    sentTextColor: '#86EFAC',
+    sentTimestampColor: '#4ADE80',
+    receivedBubbleBg: '#0A180E',
+    receivedBubbleBorder: '#166534',
+    receivedTextColor: '#4ADE80',
+    receivedTimestampColor: '#16A34A',
+    dateSeparatorBg: '#0A180E',
+    dateSeparatorBorder: '#166534',
+    dateSeparatorText: '#22C55E',
+  },
   monochrome: {
     pageBg: '#FFFFFF',
     headerBg: '#F9FAFB',
@@ -78,15 +96,15 @@ export const THEMES: Record<'light' | 'dark' | 'monochrome', DocumentTheme> = {
     headerText: '#111827',
     headerSubtext: '#4B5563',
     sentBubbleBg: '#F3F4F6',
-    sentBubbleBorder: '#D1D5DB',
+    sentBubbleBorder: '#E5E7EB',
     sentTextColor: '#111827',
     sentTimestampColor: '#6B7280',
     receivedBubbleBg: '#FFFFFF',
-    receivedBubbleBorder: '#E5E7EB',
+    receivedBubbleBorder: '#D1D5DB',
     receivedTextColor: '#111827',
     receivedTimestampColor: '#6B7280',
     dateSeparatorBg: '#F3F4F6',
-    dateSeparatorBorder: '#D1D5DB',
+    dateSeparatorBorder: '#E5E7EB',
     dateSeparatorText: '#374151',
   },
 };
@@ -504,7 +522,7 @@ export class StreamPdfRendererService {
     doc: PDFKit.PDFDocument,
     date: Date,
     fonts: RegisteredFontFamily,
-    themeName: 'light' | 'dark' | 'monochrome' = 'light',
+    themeName: 'light' | 'dark' | 'monochrome' | 'matrix' = 'light',
   ) {
     const theme = THEMES[themeName];
     const pageWidth = doc.page.width;

@@ -33,6 +33,7 @@ export interface ExportManifest {
 }
 
 const PAGE_BG_PRESETS = [
+  { label: 'Hacker Matrix Terminal', color: '#050805', border: '#15803d', desc: 'Phosphor green terminal mode' },
   { label: 'Eye-Care Warm Cream', color: '#EFEAE2', border: '#DCD4C7', desc: 'Optimal warm tone, lowest eye-strain' },
   { label: 'Soft Ice Blue', color: '#F0F7FF', border: '#BAE6FD', desc: 'Modern digital reading' },
   { label: 'Executive Slate Dark', color: '#0F172A', border: '#334155', desc: 'Midnight dark mode' },
@@ -42,6 +43,7 @@ const PAGE_BG_PRESETS = [
 
 const RECEIVED_BUBBLE_PRESETS = [
   { label: 'Light Blue (Default)', color: '#E0F2FE', border: '#BAE6FD' },
+  { label: 'Terminal Dark Green', color: '#0d1f12', border: '#166534' },
   { label: 'Soft Lavender', color: '#F3E8FF', border: '#D8B4FE' },
   { label: 'Soft Mint', color: '#ECFDF5', border: '#A7F3D0' },
   { label: 'Crisp White', color: '#FFFFFF', border: '#E2E8F0' },
@@ -50,6 +52,7 @@ const RECEIVED_BUBBLE_PRESETS = [
 
 const SENT_BUBBLE_PRESETS = [
   { label: 'Soft Mint (Default)', color: '#D9FDD3', border: '#B9F6CA' },
+  { label: 'Phosphor Matrix Green', color: '#14532d', border: '#22c55e' },
   { label: 'Soft Emerald', color: '#C8F7C5', border: '#86EFAC' },
   { label: 'Ocean Cyan', color: '#CFFAFE', border: '#67E8F9' },
   { label: 'Warm Peach', color: '#FFEDD5', border: '#FDBA74' },
