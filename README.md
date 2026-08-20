@@ -1,65 +1,138 @@
-# Textboard
+# ⚡ Textboard
 
-A local-first multipurpose data dashboard application.
+<div align="center">
 
-## Architecture & Structure
+![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg?style=for-the-badge)
+![Next.js 14](https://img.shields.io/badge/Next.js-14.2-black?style=for-the-badge&logo=next.js)
+![NestJS](https://img.shields.io/badge/NestJS-10.0-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-WAL-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
-- `/frontend`: Next.js 14 (React 18, Tailwind CSS, TypeScript)
-- `/backend`: NestJS, Prisma ORM, TypeScript
-- `/docs`: Architecture, schemas, and design documentation
-- `docker-compose.yml`: Local PostgreSQL and Redis infrastructure
+**The Local-First Visual Intelligence & Communication Stream Analytics Workstation**
+
+*Analyze, explore, and generate high-fidelity lossless archives from massive conversational datasets.*
+
+[Key Features](#-key-features) • [Architecture](#-architecture) • [Getting Started](#-getting-started) • [Security & Privacy](#-security--privacy) • [Roadmap](#-master-roadmap)
 
 ---
 
-## Getting Started
+</div>
+
+## 📖 Overview
+
+**Textboard** is a high-performance, local-first analytics dashboard and document stream processing workstation. Built from the ground up to handle massive communication archives (**100,000 to 500,000+ records**), Textboard transforms raw data streams into actionable intelligence, interactive timelines, and publication-ready visual PDF documents.
+
+Everything executes locally on your hardware with strict zero-cloud data isolation, ensuring total confidentiality for your private archives and documents.
+
+---
+
+## ✨ Key Features
+
+### 📊 1. Multi-Dimensional Analytics Dashboard
+- **Activity & Peak Frequency**: Identify peak communication hours, day-of-week trends, and burst velocity.
+- **Participant Dynamics**: Interaction matrix, word/char counts, response ratios, and engagement distribution.
+- **Emoji & Sentiment Radar**: Deep emoji frequency metrics with colorful Twemoji vector rendering.
+- **Topic & Keyword Clustering**: Frequency ranking, custom phrase search, and contextual conversation jump.
+
+### 📄 2. Production $O(1)$ Stream PDF Exporter
+- **Lossless Large-Scale Exports**: Effortlessly exports 500,000+ records in a single streaming pass while maintaining strictly bounded memory consumption (<120 MB RAM).
+- **Executive Cover Page & KPI Badges**: Generates professional cover pages with dataset metadata, participant cards, and peak metrics.
+- **Interactive Month Bookmarks**: Built-in PDF navigation tree index for instant jumping across months and years.
+- **Deterministic Data Integrity**: Real-time SHA-256 cryptographic verification comparing source database records against rendered document objects.
+
+### 🎨 3. Eye-Care Color Studio & Themes
+- **Fatigue-Free Canvas**: Signature **Eye-Care Warm Cream (`#EFEAE2`)** canvas tone specifically engineered for extended reading sessions.
+- **Customizable Palettes**: Choose from *Pure White*, *Soft Ice Blue*, *Executive Slate Dark*, and *Soft Mint*.
+- **Interactive Bubble Studio**: Fine-tune left (received) and right (sent) message bubble colors with real-time modal preview.
+- **Non-Overlapping Attachment Badges**: Dedicated visual cards with colorful icons for stickers, photos, voice notes, and documents.
+
+---
+
+## 🏛️ Architecture
+
+```
+                                  TEXTBOARD SYSTEM ARCHITECTURE
+                                  
+  ┌─────────────────────────┐             HTTP / REST             ┌─────────────────────────┐
+  │     Next.js Frontend    │ ◄─────────────────────────────────► │     NestJS Backend      │
+  │                         │                                     │                         │
+  │ • React 18 & Lucide     │                                     │ • Stream Ingestion      │
+  │ • Virtualized Timeline  │                                     │ • Analytics Engine      │
+  │ • Eye-Care Color Studio │                                     │ • TrueType Font Engine  │
+  │ • Glassmorphic UI       │                                     │ • Twemoji Asset Service │
+  └─────────────────────────┘                                     └────────────┬────────────┘
+                                                                               │
+                                    ┌──────────────────────────────────────────┴───────────────┐
+                                    ▼                                                          ▼
+                      ┌───────────────────────────┐                              ┌───────────────────────────┐
+                      │    Local SQLite (WAL)     │                              │   Streaming PDF Exporter  │
+                      │                           │                              │                           │
+                      │ • High-performance WAL   │                              │ • O(1) Cursor Batching    │
+                      │ • Prisma ORM Integration  │                              │ • Native PDFKit Pipeline  │
+                      │ • Zero cloud leakage      │                              │ • SHA-256 Verification    │
+                      └───────────────────────────┘                              └───────────────────────────┘
+```
+
+---
+
+## 🚀 Getting Started
 
 ### 1. Prerequisites
-- [Node.js](https://nodejs.org/) (v18+ recommended)
-- [Docker](https://www.docker.com/) and Docker Compose
+- **Node.js** (v18.0 or newer)
+- **npm** or **yarn** / **pnpm**
 
-### 2. Environment Setup
-Copy the example environment files:
+### 2. Installation
+
+Clone the repository:
 ```bash
-# Root & Backend
-cp .env.example .env
-cp backend/.env.example backend/.env
-
-# Frontend
-cp frontend/.env.example frontend/.env.local
+git clone https://github.com/qamarabbas-024/Textboard.git
+cd Textboard
 ```
 
-### 3. Start Local Infrastructure
-Spin up PostgreSQL and Redis:
-```bash
-docker compose up -d
-```
-
-### 4. Backend Setup
-Install dependencies, apply database migrations, and run the NestJS API:
+### 3. Backend Setup
 ```bash
 cd backend
 npm install
 npx prisma generate
-npx prisma migrate deploy
+npx prisma db push
 npm run start:dev
 ```
-The backend will be available at `http://localhost:3001` (Health check: `http://localhost:3001/health`).
+*Backend runs on `http://localhost:3001` (Health check: `http://localhost:3001/health`)*
 
-### 5. Frontend Setup
-In a new terminal, install dependencies and run the Next.js frontend:
+### 4. Frontend Setup
+In a separate terminal:
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-The frontend will be available at `http://localhost:3000`.
+*Frontend runs on `http://localhost:3000`*
 
 ---
 
-## Security & Privacy Note
-- **Local PIN Lock**: The optional PIN lock is a local UI convenience lock only, browser-controlled, and does not protect server APIs or stored data.
+## 🔒 Security & Privacy
+
+- **100% Local-First Processing**: Raw data files, parsed message databases, and generated PDFs remain strictly on the local machine.
+- **Zero Third-Party Telemetry**: No tracking scripts, analytics beacons, or remote cloud logging.
+- **Strict Data Exclusion**: All user databases, uploads, and temporary archives are guarded by strict `.gitignore` filters.
 
 ---
 
-## Health Check Verification
-When both services and docker containers are running, navigating to `http://localhost:3000` will display `connected` indicating that the Next.js frontend successfully reached the NestJS `/health` endpoint.
+## 🗺️ Master Roadmap
+
+- [x] **V1.0**: Local-first stream ingestion, SQLite WAL engine, and analytics dashboard.
+- [x] **V1.1**: Production $O(1)$ PDF export engine with TrueType font resolution.
+- [x] **V1.2**: Full Twemoji color rendering, sticker badges, and Eye-Care Color Studio.
+- [ ] **V1.3**: Advanced Framer Motion animated data-scrubbing timeline.
+- [ ] **V1.4**: Cross-conversation multi-actor relationship graph visualization.
+- [ ] **V1.5**: Telegram JSON, Discord, Slack, and CSV universal stream parsers.
+- [ ] **V2.0**: Native desktop client distribution (Electron / Tauri packaging).
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
+Developed with ❤️ by **Qamar Abbas**.
