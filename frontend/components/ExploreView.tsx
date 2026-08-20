@@ -9,7 +9,8 @@ import {
   SearchIcon,
   RefreshCwIcon,
 } from './Icons';
-import { ChatView } from './ChatView';
+import { StreamTimelineView } from './StreamTimelineView';
+import { PdfExportModal } from './PdfExportModal';
 
 export type ExploreSubTab = 'timeline' | 'people' | 'activity' | 'emoji' | 'topics' | 'links';
 
@@ -34,6 +35,7 @@ export function ExploreView({
   const [subTab, setSubTab] = useState<ExploreSubTab>('timeline');
   const [analytics, setAnalytics] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isExportOpen, setIsExportOpen] = useState(false);
 
   const activeDataset = datasets.find((d) => d.id === selectedDatasetId) || datasets[0] || null;
 
@@ -92,25 +94,36 @@ export function ExploreView({
           </div>
         </div>
 
-        {/* Sub-Navigation Tabs */}
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0">
-          {subTabs.map((t) => {
-            const isActive = subTab === t.id;
-            return (
-              <button
-                key={t.id}
-                onClick={() => setSubTab(t.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs tracking-wider transition-all whitespace-nowrap ${
-                  isActive
-                    ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-semibold shadow-[0_0_8px_rgba(34,211,238,0.15)]'
-                    : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/[0.04] border border-transparent'
-                }`}
-              >
-                {t.icon}
-                <span>{t.label}</span>
-              </button>
-            );
-          })}
+        {/* Sub-Navigation Tabs & Actions */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+          <div className="flex items-center gap-1">
+            {subTabs.map((t) => {
+              const isActive = subTab === t.id;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => setSubTab(t.id)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs tracking-wider transition-all whitespace-nowrap ${
+                    isActive
+                      ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-semibold shadow-[0_0_8px_rgba(34,211,238,0.15)]'
+                      : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/[0.04] border border-transparent'
+                  }`}
+                >
+                  {t.icon}
+                  <span>{t.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <button
+            onClick={() => setIsExportOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white/[0.06] hover:bg-cyan-500/20 text-neutral-200 hover:text-cyan-300 border border-white/[0.12] hover:border-cyan-500/40 text-xs font-semibold transition-all whitespace-nowrap shadow-xs"
+            title="Export Visual PDF Archive"
+          >
+            <span>📄</span>
+            <span>EXPORT PDF</span>
+          </button>
         </div>
       </div>
 
@@ -311,6 +324,17 @@ export function ExploreView({
             ))}
           </div>
         </section>
+      )}
+
+      {/* Full Chat PDF Export Modal */}
+      {isExportOpen && (
+        <PdfExportModal
+          isOpen={isExportOpen}
+          onClose={() => setIsExportOpen(false)}
+          datasetId={activeDataset.id}
+          datasetName={activeDataset.name}
+          totalEvents={activeDataset.totalEvents}
+        />
       )}
     </div>
   );

@@ -8,6 +8,7 @@ import {
   TerminalIcon,
 } from './Icons';
 import { IngestionJobState } from './ProcessingModal';
+import { PdfExportModal } from './PdfExportModal';
 
 interface DatasetItem {
   id: string;
@@ -36,6 +37,7 @@ export function DataView({
   const [isUploading, setIsUploading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [localPathInput, setLocalPathInput] = useState('');
+  const [exportingDataset, setExportingDataset] = useState<DatasetItem | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (file: File) => {
@@ -193,10 +195,10 @@ export function DataView({
 
           <div>
             <p className="text-sm font-medium text-neutral-200">
-              {isUploading ? 'Spooling Stream to Disk...' : 'Drop chat export or tabular file here'}
+              {isUploading ? 'Spooling Stream to Disk...' : 'Drop communication stream or tabular dataset here'}
             </p>
             <p className="text-xs text-neutral-500 mt-1">
-              Supports large 100,000+ message exports without memory limits
+              Supports large 100,000+ entry datasets without memory limits
             </p>
           </div>
         </div>
@@ -209,7 +211,7 @@ export function DataView({
           </div>
           <input
             type="text"
-            placeholder="C:\path\to\chat_export.txt or /var/log/data.csv"
+            placeholder="C:\path\to\stream_export.txt or /var/log/data.csv"
             value={localPathInput}
             onChange={(e) => setLocalPathInput(e.target.value)}
             className="flex-1 bg-white/[0.03] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-cyan-500/50"
@@ -273,6 +275,14 @@ export function DataView({
                     </td>
                     <td className="py-3.5 px-4 text-right space-x-2">
                       <button
+                        onClick={() => setExportingDataset(ds)}
+                        className="px-2.5 py-1 rounded bg-white/[0.06] hover:bg-white/[0.12] text-neutral-200 border border-white/[0.15] transition-colors inline-flex items-center gap-1"
+                        title="Export Visual PDF Archive"
+                      >
+                        <span>📄</span>
+                        <span>Export PDF</span>
+                      </button>
+                      <button
                         onClick={() => onExploreDataset(ds.id)}
                         className="px-3 py-1 rounded bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 transition-colors"
                       >
@@ -292,6 +302,17 @@ export function DataView({
           </div>
         )}
       </section>
+
+      {/* Full Chat PDF Export Modal */}
+      {exportingDataset && (
+        <PdfExportModal
+          isOpen={Boolean(exportingDataset)}
+          onClose={() => setExportingDataset(null)}
+          datasetId={exportingDataset.id}
+          datasetName={exportingDataset.name}
+          totalEvents={exportingDataset.totalEvents}
+        />
+      )}
     </div>
   );
 }

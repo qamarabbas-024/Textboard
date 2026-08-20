@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+svg {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+  max-width: 100%;
+}
+
 /* 1. Terminal Theme (Default - Modern Dark IDE) */
 :root,
 [data-theme="terminal"] {
