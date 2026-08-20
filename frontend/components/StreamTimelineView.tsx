@@ -190,8 +190,37 @@ export function StreamTimelineView({
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [primaryActor, setPrimaryActor] = useState<string | null>(null);
   const [distinctActors, setDistinctActors] = useState<string[]>([]);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const parentRef = useRef<HTMLDivElement>(null);
+
+  const copyMessage = (text: string, id: string) => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 1800);
+    }
+  };
+
+  const renderHighlightedText = (content: string, highlight?: string | null) => {
+    if (!highlight || !highlight.trim()) return content;
+    const escaped = highlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escaped})`, 'gi');
+    const parts = content.split(regex);
+    return (
+      <>
+        {parts.map((part, i) =>
+          part.toLowerCase() === highlight.toLowerCase() ? (
+            <mark key={i} className="bg-cyan-400/30 text-cyan-200 px-0.5 rounded font-semibold border-b border-cyan-400">
+              {part}
+            </mark>
+          ) : (
+            part
+          )
+        )}
+      </>
+    );
+  };
 
   // Fetch distinct actors for primary sender alignment
   useEffect(() => {
@@ -410,18 +439,38 @@ export function StreamTimelineView({
 
                     {/* Message Text Content */}
                     {!isPureMedia && (
-                      <div className="text-xs leading-relaxed break-words font-sans selection:bg-cyan-500/30 selection:text-white">
-                        {ev.content}
+                      <div className="text-xs leading-relaxed break-words font-sans selection:bg-cyan-500/30 selection:text-white group relative">
+                        {renderHighlightedText(ev.content, searchQuery || activeWord)}
                       </div>
                     )}
 
-                    {/* Footer: Date & Timestamp */}
-                    <div className={`flex items-center gap-1.5 mt-1.5 text-[10px] font-mono select-none ${
-                      isSent ? 'text-emerald-400/70 justify-end' : 'text-neutral-500 justify-end'
+                    {/* Footer: Date & Timestamp & Quick Actions */}
+                    <div className={`flex items-center gap-2 mt-1.5 text-[10px] font-mono select-none ${
+                      isSent ? 'text-emerald-400/70 justify-end' : 'text-neutral-500 justify-between'
                     }`}>
-                      <span>{dateFormatted}</span>
-                      <span>•</span>
-                      <span>{timeFormatted}</span>
+                      {!isSent && (
+                        <button
+                          onClick={() => copyMessage(ev.content, ev.id)}
+                          className="opacity-40 hover:opacity-100 hover:text-cyan-300 transition-opacity text-[9px] px-1 py-0.5 rounded bg-white/[0.04]"
+                          title="Copy message text"
+                        >
+                          {copiedId === ev.id ? '✓ COPIED' : 'COPY'}
+                        </button>
+                      )}
+                      <div className="flex items-center gap-1.5">
+                        {isSent && (
+                          <button
+                            onClick={() => copyMessage(ev.content, ev.id)}
+                            className="opacity-40 hover:opacity-100 hover:text-emerald-300 transition-opacity text-[9px] px-1 py-0.5 rounded bg-white/[0.04]"
+                            title="Copy message text"
+                          >
+                            {copiedId === ev.id ? '✓ COPIED' : 'COPY'}
+                          </button>
+                        )}
+                        <span>{dateFormatted}</span>
+                        <span>•</span>
+                        <span>{timeFormatted}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
