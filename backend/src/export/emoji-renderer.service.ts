@@ -58,7 +58,49 @@ export class EmojiRendererService {
       return filePath;
     }
 
+    // Try single primary codepoint if multi-part was not found
+    const primaryHex = emoji.codePointAt(0)?.toString(16);
+    if (primaryHex) {
+      const primaryPath = path.join(this.cacheDir, `${primaryHex}.png`);
+      if (fs.existsSync(primaryPath)) {
+        return primaryPath;
+      }
+    }
+
     return null;
+  }
+
+  /**
+   * Asynchronously fetches an emoji from Twemoji CDN if not cached
+   */
+  async fetchEmojiImage(emoji: string): Promise<string | null> {
+    const hex = this.emojiToHex(emoji);
+    if (!hex) return null;
+
+    const filePath = path.join(this.cacheDir, `${hex}.png`);
+    if (fs.existsSync(filePath)) {
+      return filePath;
+    }
+
+    try {
+      const url = `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/${hex}.png`;
+      await new Promise<void>((resolve, reject) => {
+        https.get(url, (res) => {
+          if (res.statusCode !== 200) {
+            return reject(new Error(`Status ${res.statusCode}`));
+          }
+          const chunks: Buffer[] = [];
+          res.on('data', (d) => chunks.push(d));
+          res.on('end', () => {
+            fs.writeFileSync(filePath, Buffer.concat(chunks));
+            resolve();
+          });
+        }).on('error', reject);
+      });
+      return filePath;
+    } catch {
+      return null;
+    }
   }
 
   /**

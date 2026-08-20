@@ -130,7 +130,7 @@ export function ExploreView({
       {/* Main Content Area */}
       {subTab === 'timeline' && (
         <section className="rounded-xl border border-white/[0.08] bg-[#10141d]/80 p-4">
-          <ChatView datasetId={activeDataset.id} />
+          <StreamTimelineView datasetId={activeDataset.id} />
         </section>
       )}
 
