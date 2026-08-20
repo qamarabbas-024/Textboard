@@ -10,6 +10,7 @@ import {
   RefreshCwIcon,
 } from './Icons';
 import { StreamTimelineView } from './StreamTimelineView';
+import { ActivityHeatmap } from './ActivityHeatmap';
 import { PdfExportModal } from './PdfExportModal';
 
 export type ExploreSubTab = 'timeline' | 'people' | 'activity' | 'emoji' | 'topics' | 'links';
@@ -173,64 +174,74 @@ export function ExploreView({
       )}
 
       {subTab === 'activity' && analytics && (
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Day of Week Breakdown */}
-          <div className="p-5 rounded-xl border border-white/[0.08] bg-[#10141d]/80 space-y-4">
-            <h3 className="text-xs font-semibold text-neutral-200 uppercase tracking-wider">
-              DAY OF WEEK DISTRIBUTION
-            </h3>
-            <div className="space-y-2">
-              {analytics.messageAnalytics?.byDayOfWeek.map((day: any) => (
-                <div key={day.dayName} className="space-y-1">
-                  <div className="flex items-center justify-between text-xs text-neutral-300">
-                    <span>{day.dayName}</span>
-                    <span className="text-neutral-400">
-                      {day.count.toLocaleString()} ({day.percentage}%)
-                    </span>
+        <section className="space-y-6">
+          {/* 24/7 Activity Heatmap Matrix */}
+          <ActivityHeatmap
+            data={{
+              byDayOfWeek: analytics.messageAnalytics?.byDayOfWeek,
+              byHourOfDay: analytics.activityAnalytics?.byHourOfDay,
+            }}
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Day of Week Breakdown */}
+            <div className="p-5 rounded-xl border border-white/[0.08] bg-[#10141d]/80 space-y-4">
+              <h3 className="text-xs font-semibold text-neutral-200 uppercase tracking-wider">
+                DAY OF WEEK DISTRIBUTION
+              </h3>
+              <div className="space-y-2">
+                {analytics.messageAnalytics?.byDayOfWeek.map((day: any) => (
+                  <div key={day.dayName} className="space-y-1">
+                    <div className="flex items-center justify-between text-xs text-neutral-300">
+                      <span>{day.dayName}</span>
+                      <span className="text-neutral-400">
+                        {day.count.toLocaleString()} ({day.percentage}%)
+                      </span>
+                    </div>
+                    <div className="w-full h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+                      <div className="h-full bg-cyan-400 rounded-full" style={{ width: `${day.percentage}%` }} />
+                    </div>
                   </div>
-                  <div className="w-full h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
-                    <div className="h-full bg-cyan-400 rounded-full" style={{ width: `${day.percentage}%` }} />
-                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Streaks & Gaps Overview */}
+            <div className="p-5 rounded-xl border border-white/[0.08] bg-[#10141d]/80 space-y-4">
+              <h3 className="text-xs font-semibold text-neutral-200 uppercase tracking-wider">
+                CONVERSATION CADENCE & STREAKS
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 rounded-lg bg-white/[0.02] border border-white/[0.05]">
+                  <span className="text-neutral-500 text-[11px] block">LONGEST STREAK</span>
+                  <span className="text-xl font-bold text-cyan-300">
+                    {analytics.activityAnalytics?.longestStreak?.days || 0} DAYS
+                  </span>
+                  <span className="text-[10px] text-neutral-500 block mt-1">
+                    {analytics.activityAnalytics?.longestStreak?.startDate} to {analytics.activityAnalytics?.longestStreak?.endDate}
+                  </span>
                 </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Streaks & Gaps Overview */}
-          <div className="p-5 rounded-xl border border-white/[0.08] bg-[#10141d]/80 space-y-4">
-            <h3 className="text-xs font-semibold text-neutral-200 uppercase tracking-wider">
-              CONVERSATION CADENCE & STREAKS
-            </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 rounded-lg bg-white/[0.02] border border-white/[0.05]">
-                <span className="text-neutral-500 text-[11px] block">LONGEST STREAK</span>
-                <span className="text-xl font-bold text-cyan-300">
-                  {analytics.activityAnalytics?.longestStreak?.days || 0} DAYS
-                </span>
-                <span className="text-[10px] text-neutral-500 block mt-1">
-                  {analytics.activityAnalytics?.longestStreak?.startDate} to {analytics.activityAnalytics?.longestStreak?.endDate}
-                </span>
+                <div className="p-4 rounded-lg bg-white/[0.02] border border-white/[0.05]">
+                  <span className="text-neutral-500 text-[11px] block">LONGEST GAP</span>
+                  <span className="text-xl font-bold text-amber-300">
+                    {analytics.activityAnalytics?.longestGap?.days || 0} DAYS
+                  </span>
+                  <span className="text-[10px] text-neutral-500 block mt-1">
+                    Quiet period between messages
+                  </span>
+                </div>
               </div>
 
-              <div className="p-4 rounded-lg bg-white/[0.02] border border-white/[0.05]">
-                <span className="text-neutral-500 text-[11px] block">LONGEST GAP</span>
-                <span className="text-xl font-bold text-amber-300">
-                  {analytics.activityAnalytics?.longestGap?.days || 0} DAYS
-                </span>
-                <span className="text-[10px] text-neutral-500 block mt-1">
-                  Quiet period between messages
-                </span>
-              </div>
-            </div>
-
-            <div className="p-4 rounded-lg bg-white/[0.02] border border-white/[0.05] text-xs space-y-1">
-              <div className="flex justify-between text-neutral-400">
-                <span>TOTAL ACTIVE DAYS:</span>
-                <strong className="text-neutral-200">{analytics.activityAnalytics?.totalActiveDays || 0}</strong>
-              </div>
-              <div className="flex justify-between text-neutral-400">
-                <span>AVG DAILY VOLUME:</span>
-                <strong className="text-neutral-200">{analytics.activityAnalytics?.averageMessagesPerActiveDay || 0} msgs/day</strong>
+              <div className="p-4 rounded-lg bg-white/[0.02] border border-white/[0.05] text-xs space-y-1">
+                <div className="flex justify-between text-neutral-400">
+                  <span>TOTAL ACTIVE DAYS:</span>
+                  <strong className="text-neutral-200">{analytics.activityAnalytics?.totalActiveDays || 0}</strong>
+                </div>
+                <div className="flex justify-between text-neutral-400">
+                  <span>AVG DAILY VOLUME:</span>
+                  <strong className="text-neutral-200">{analytics.activityAnalytics?.averageMessagesPerActiveDay || 0} msgs/day</strong>
+                </div>
               </div>
             </div>
           </div>
