@@ -35,7 +35,21 @@ export class DatasetsAnalyticsService {
       ORDER BY LENGTH(content) DESC
       LIMIT 1;
     `;
-    const longestMessage = longestRows[0] || null;
+    const longestMessage = longestRows[0]
+      ? {
+          id: longestRows[0].id,
+          datasetId: longestRows[0].datasetId,
+          timestamp: longestRows[0].timestamp != null
+            ? typeof longestRows[0].timestamp === 'bigint' || typeof longestRows[0].timestamp === 'number'
+              ? new Date(Number(longestRows[0].timestamp)).toISOString()
+              : new Date(longestRows[0].timestamp).toISOString()
+            : null,
+          actor: longestRows[0].actor,
+          content: longestRows[0].content,
+          eventType: longestRows[0].eventType,
+          charLength: Number(longestRows[0].char_length || 0),
+        }
+      : null;
 
     // 3. Most emoji-dense message (sample top candidates or scan)
     const emojiRows = await this.prisma.timelineEvent.findMany({
@@ -62,12 +76,7 @@ export class DatasetsAnalyticsService {
 
     const result = {
       firstMessage,
-      longestMessage: longestMessage
-        ? {
-            ...longestMessage,
-            charLength: Number(longestMessage.char_length),
-          }
-        : null,
+      longestMessage,
       mostEmojiMessage: mostEmojiMessage || firstMessage,
     };
 
@@ -169,8 +178,18 @@ export class DatasetsAnalyticsService {
         ? Math.round(sorted[Math.floor(sorted.length / 2)])
         : null;
 
-      const msgCount = Number(a.message_count);
+      const msgCount = Number(a.message_count || 0);
       const totalChars = Number(a.total_chars || 0);
+      const firstActive = a.first_active != null
+        ? typeof a.first_active === 'bigint' || typeof a.first_active === 'number'
+          ? new Date(Number(a.first_active)).toISOString()
+          : new Date(a.first_active).toISOString()
+        : null;
+      const lastActive = a.last_active != null
+        ? typeof a.last_active === 'bigint' || typeof a.last_active === 'number'
+          ? new Date(Number(a.last_active)).toISOString()
+          : new Date(a.last_active).toISOString()
+        : null;
 
       return {
         actor: a.actor,
@@ -179,8 +198,8 @@ export class DatasetsAnalyticsService {
         avgCharsPerMessage: msgCount > 0 ? Math.round(totalChars / msgCount) : 0,
         avgResponseSecs,
         medianResponseSecs,
-        firstActive: a.first_active,
-        lastActive: a.last_active,
+        firstActive,
+        lastActive,
         hourly: hourlyDistribution[a.actor] || new Array(24).fill(0),
         daily: dailyDistribution[a.actor] || new Array(7).fill(0),
       };
@@ -306,10 +325,19 @@ export class DatasetsAnalyticsService {
       LIMIT 100;
     `;
 
+    const sanitizedEvents = events.map((ev) => ({
+      ...ev,
+      timestamp: ev.timestamp != null
+        ? typeof ev.timestamp === 'bigint' || typeof ev.timestamp === 'number'
+          ? new Date(Number(ev.timestamp)).toISOString()
+          : new Date(ev.timestamp).toISOString()
+        : null,
+    }));
+
     return {
       targetMonth: Number(targetMonth),
       targetDay: Number(targetDay),
-      events,
+      events: sanitizedEvents,
     };
   }
 

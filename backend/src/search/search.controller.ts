@@ -36,6 +36,20 @@ export class SearchController {
   }
 
   /**
+   * Direct dataset search endpoint alias (/api/v1/search/:datasetId).
+   */
+  @Get('search/:datasetId')
+  async datasetSearchAlias(
+    @Param('datasetId') datasetId: string,
+    @Query() params: SearchParams,
+  ) {
+    return this.searchService.search({
+      ...params,
+      datasetId,
+    });
+  }
+
+  /**
    * Advanced search using JSON query payload.
    */
   @Post('search/query')

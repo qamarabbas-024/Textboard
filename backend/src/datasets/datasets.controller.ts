@@ -1,18 +1,29 @@
 import {
   Controller,
   Get,
+  Delete,
   Param,
   Query,
 } from '@nestjs/common';
 import { DatasetsService } from './datasets.service';
 import { DatasetsAnalyticsService } from './datasets-analytics.service';
 
-@Controller('datasets')
+@Controller('api/v1/datasets')
 export class DatasetsController {
   constructor(
     private readonly datasetsService: DatasetsService,
     private readonly analyticsService: DatasetsAnalyticsService,
   ) {}
+
+  @Get()
+  async listDatasets() {
+    return this.datasetsService.listDatasets();
+  }
+
+  @Delete(':id')
+  async deleteDataset(@Param('id') id: string) {
+    return this.datasetsService.deleteDataset(id);
+  }
 
   @Get(':id')
   async getDataset(@Param('id') id: string) {

@@ -25,6 +25,25 @@ export class DatasetsService {
     private readonly redis: RedisService,
   ) {}
 
+  async listDatasets() {
+    return this.prisma.dataset.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        metrics: true,
+      },
+    });
+  }
+
+  async deleteDataset(id: string) {
+    const dataset = await this.prisma.dataset.findUnique({ where: { id } });
+    if (!dataset) {
+      throw new NotFoundException(`Dataset with ID ${id} not found`);
+    }
+
+    await this.prisma.dataset.delete({ where: { id } });
+    return { success: true, id };
+  }
+
   async getDataset(id: string) {
     const dataset = await this.prisma.dataset.findUnique({
       where: { id },

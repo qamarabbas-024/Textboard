@@ -24,6 +24,18 @@ export class AnalyticsController {
   }
 
   /**
+   * Alias endpoint for complete dataset analytics summary.
+   */
+  @Get(':datasetId/summary')
+  async getDatasetSummary(
+    @Param('datasetId') datasetId: string,
+    @Query('refresh') refresh?: string,
+  ) {
+    const forceRefresh = refresh === 'true' || refresh === '1';
+    return this.analyticsEngine.getDatasetAnalytics(datasetId, forceRefresh);
+  }
+
+  /**
    * Get message volume and author distribution metrics.
    */
   @Get(':datasetId/messages')
