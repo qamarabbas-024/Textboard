@@ -21,7 +21,7 @@ out/
 .env.production.local
 *.env
 
-# Temporary and Upload Directories
+# Temporary, Data and Upload Directories
 tmp/
 temp/
 uploads/
@@ -29,6 +29,22 @@ storage/
 .textboard/
 *.db
 *.db-*
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.pdf
+*.txt
+*.csv
+*.xlsx
+*.vcf
+*.webp
+scratch/
+check_db.js
+checkpoint_wal.js
+find_data.js
+scratch_check_stickers.js
 
 # Logs
 logs/
