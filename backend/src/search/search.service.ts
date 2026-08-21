@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { QueryParserService } from './query-parser.service';
+import { SemanticVectorService } from './semantic-vector.service';
 import { SearchParams, SearchResponse, SearchResultItem, ParsedSearchQuery } from './search.types';
 import { Prisma } from '@prisma/client';
 
@@ -11,14 +12,17 @@ export class SearchService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly queryParser: QueryParserService,
+    private readonly semanticVector: SemanticVectorService,
   ) {}
 
   /**
    * Executes structured full-text & faceted search over normalized SQLite stored events.
+   * Supports exact, hybrid, and semantic vector AI similarity modes.
    */
   async search(params: SearchParams): Promise<SearchResponse> {
     const startTime = Date.now();
     const parsed = this.queryParser.parseQuery(params);
+    const searchMode = params.mode || 'hybrid';
 
     const limit = Math.min(Math.max(1, params.limit ? Number(params.limit) : 20), 100);
     const page = Math.max(1, params.page ? Number(params.page) : 1);
@@ -50,22 +54,24 @@ export class SearchService {
     if (parsed.hasMedia !== undefined) where.hasMedia = parsed.hasMedia;
     if (parsed.hasEmojis !== undefined) where.hasEmojis = parsed.hasEmojis;
 
-    // 5. Content text & exact phrases matching
+    // 5. Content text & exact phrases matching (for exact or hybrid base filtering)
     const textConditions: Prisma.TimelineEventWhereInput[] = [];
 
-    if (parsed.text) {
-      const keywords = parsed.text.split(/\s+/).filter((k) => k.length > 0);
-      for (const kw of keywords) {
-        textConditions.push({ content: { contains: kw } });
+    if (searchMode === 'exact' || searchMode === 'hybrid') {
+      if (parsed.text && searchMode === 'exact') {
+        const keywords = parsed.text.split(/\s+/).filter((k) => k.length > 0);
+        for (const kw of keywords) {
+          textConditions.push({ content: { contains: kw } });
+        }
       }
-    }
 
-    for (const phrase of parsed.exactPhrases) {
-      textConditions.push({ content: { contains: phrase } });
-    }
+      for (const phrase of parsed.exactPhrases) {
+        textConditions.push({ content: { contains: phrase } });
+      }
 
-    for (const emoji of parsed.emojis) {
-      textConditions.push({ content: { contains: emoji } });
+      for (const emoji of parsed.emojis) {
+        textConditions.push({ content: { contains: emoji } });
+      }
     }
 
     if (textConditions.length > 0) {
@@ -80,26 +86,46 @@ export class SearchService {
       orderBy = { timestamp: 'desc' };
     }
 
+    // Generate query embedding vector if semantic search is requested
+    const queryVector =
+      (searchMode === 'semantic' || searchMode === 'hybrid') && (parsed.text || params.q)
+        ? this.semanticVector.generateEmbedding(parsed.text || params.q || '')
+        : null;
+
     // Execute count and query in parallel using SQLite compound index
     const [totalMatches, rawEvents] = await Promise.all([
       this.prisma.timelineEvent.count({ where }),
       this.prisma.timelineEvent.findMany({
         where,
-        take: limit + 1,
-        skip,
+        take: searchMode === 'semantic' ? 100 : limit + 1,
+        skip: searchMode === 'semantic' ? 0 : skip,
         cursor: params.cursor ? { id: params.cursor } : undefined,
         orderBy,
       }),
     ]);
 
     const hasMore = rawEvents.length > limit;
-    const records = hasMore ? rawEvents.slice(0, limit) : rawEvents;
+    const records = hasMore && searchMode !== 'semantic' ? rawEvents.slice(0, limit) : rawEvents;
     const nextCursor = hasMore && records.length > 0 ? records[records.length - 1].id : null;
 
     // Build highlighted snippets and relevance scores
-    const items: SearchResultItem[] = records.map((ev) => {
+    let items: SearchResultItem[] = records.map((ev) => {
       const highlight = this.generateHighlightSnippet(ev.content, parsed);
-      const score = this.calculateRelevanceScore(ev.content, parsed);
+      const bm25Score = this.calculateRelevanceScore(ev.content, parsed);
+
+      let semanticScore: number | undefined = undefined;
+      let combinedScore = bm25Score;
+
+      if (queryVector && ev.content) {
+        const docVector = this.semanticVector.generateEmbedding(ev.content);
+        semanticScore = Number(this.semanticVector.calculateCosineSimilarity(queryVector, docVector).toFixed(3));
+        
+        if (searchMode === 'semantic') {
+          combinedScore = semanticScore * 100;
+        } else if (searchMode === 'hybrid') {
+          combinedScore = Number((0.6 * (semanticScore * 50) + 0.4 * bm25Score).toFixed(2));
+        }
+      }
 
       let metadata: Record<string, any> | undefined = undefined;
       if (ev.metadata) {
@@ -124,17 +150,21 @@ export class SearchService {
         hasMedia: ev.hasMedia,
         metadata,
         highlight,
-        score,
+        score: combinedScore,
+        semanticScore,
       };
     });
 
-    // If relevance ordering was requested, sort the page by score
-    if (params.orderBy === 'relevance') {
+    // If semantic or relevance ordering was requested, sort by score
+    if (searchMode === 'semantic' || searchMode === 'hybrid' || params.orderBy === 'relevance') {
       items.sort((a, b) => (b.score || 0) - (a.score || 0));
+      if (searchMode === 'semantic') {
+        items = items.slice(skip, skip + limit);
+      }
     }
 
     const elapsed = Date.now() - startTime;
-    this.logger.log(`Search completed in ${elapsed}ms: matches=${totalMatches}, returned=${items.length}`);
+    this.logger.log(`Search completed in ${elapsed}ms: mode=${searchMode}, matches=${totalMatches}, returned=${items.length}`);
 
     return {
       query: params.q || '',
@@ -145,6 +175,7 @@ export class SearchService {
       hasMore,
       nextCursor,
       executionTimeMs: elapsed,
+      mode: searchMode,
       items,
     };
   }

@@ -23,6 +23,8 @@ export interface SearchParams {
   page?: number;
   limit?: number;
   orderBy?: 'relevance' | 'timestamp_asc' | 'timestamp_desc';
+  mode?: 'exact' | 'hybrid' | 'semantic';
+  minRelevance?: number;
 }
 
 export interface SearchResultItem {
@@ -40,6 +42,7 @@ export interface SearchResultItem {
   metadata?: Record<string, any>;
   highlight?: string;
   score?: number;
+  semanticScore?: number;
 }
 
 export interface SearchResponse {
@@ -51,5 +54,6 @@ export interface SearchResponse {
   hasMore: boolean;
   nextCursor: string | null;
   executionTimeMs: number;
+  mode?: 'exact' | 'hybrid' | 'semantic';
   items: SearchResultItem[];
 }

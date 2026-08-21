@@ -1,11 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SearchService } from './search.service';
 import { QueryParserService } from './query-parser.service';
+import { SemanticVectorService } from './semantic-vector.service';
 import { PrismaService } from '../prisma/prisma.service';
 
 describe('TextBoard V1 Search Engine', () => {
   let searchService: SearchService;
   let queryParser: QueryParserService;
+  let semanticVector: SemanticVectorService;
   let mockPrisma: any;
 
   beforeEach(async () => {
@@ -47,12 +49,14 @@ describe('TextBoard V1 Search Engine', () => {
       providers: [
         SearchService,
         QueryParserService,
+        SemanticVectorService,
         { provide: PrismaService, useValue: mockPrisma },
       ],
     }).compile();
 
     searchService = module.get<SearchService>(SearchService);
     queryParser = module.get<QueryParserService>(QueryParserService);
+    semanticVector = module.get<SemanticVectorService>(SemanticVectorService);
   });
 
   describe('Query Parser', () => {
@@ -79,12 +83,30 @@ describe('TextBoard V1 Search Engine', () => {
     });
   });
 
+  describe('Semantic Vector Service', () => {
+    it('should generate 384-dimensional normalized vectors and compute cosine similarity', () => {
+      const vec1 = semanticVector.generateEmbedding('Quarterly financial budget meeting');
+      const vec2 = semanticVector.generateEmbedding('Quarterly budget financial review');
+      const vec3 = semanticVector.generateEmbedding('Pizza topping cheese pineapple');
+
+      expect(vec1.length).toBe(384);
+      expect(vec2.length).toBe(384);
+
+      const simHigh = semanticVector.calculateCosineSimilarity(vec1, vec2);
+      const simLow = semanticVector.calculateCosineSimilarity(vec1, vec3);
+
+      expect(simHigh).toBeGreaterThan(simLow);
+      expect(simHigh).toBeGreaterThan(0.6);
+    });
+  });
+
   describe('Search Execution & Highlighting', () => {
-    it('should execute faceted search and return highlighted snippets', async () => {
+    it('should execute faceted search and return highlighted snippets and semantic scores', async () => {
       const response = await searchService.search({
         q: 'meeting person:Ali',
         datasetId: 'ds_1',
         limit: 10,
+        mode: 'hybrid',
       });
 
       expect(response.totalMatches).toBe(2);
@@ -92,6 +114,7 @@ describe('TextBoard V1 Search Engine', () => {
       expect(response.items[0].actor).toBe('Ali');
       expect(response.items[0].highlight).toContain('<mark>meeting</mark>');
       expect(response.items[0].score).toBeGreaterThan(1.0);
+      expect(response.items[0].semanticScore).toBeDefined();
       expect(response.executionTimeMs).toBeDefined();
 
       expect(mockPrisma.timelineEvent.findMany).toHaveBeenCalledWith(
