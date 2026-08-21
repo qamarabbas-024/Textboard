@@ -10,12 +10,12 @@ import { Response } from 'express';
 import { ExportService } from './export.service';
 import { ChatExportOptions } from './types';
 
-@Controller('api/v1/datasets/:id/export/pdf')
+@Controller('api/v1/datasets/:id/export')
 export class ExportController {
   constructor(protected readonly exportService: ExportService) {}
 
-  @Post()
-  async startExport(
+  @Post('pdf')
+  async startPdfExport(
     @Param('id') datasetId: string,
     @Body() body: ChatExportOptions,
   ) {
@@ -40,28 +40,44 @@ export class ExportController {
     });
   }
 
-  @Get(':jobId')
+  @Get('pdf/:jobId')
   async getJobProgress(@Param('jobId') jobId: string) {
     return this.exportService.getJobStatus(jobId);
   }
 
-  @Get(':jobId/status')
+  @Get('pdf/:jobId/status')
   async getStatus(@Param('jobId') jobId: string) {
     return this.exportService.getJobStatus(jobId);
   }
 
-  @Post(':jobId/cancel')
+  @Post('pdf/:jobId/cancel')
   async cancelJob(@Param('jobId') jobId: string) {
     return this.exportService.cancelExportJob(jobId);
   }
 
-  @Get(':jobId/download')
+  @Get('pdf/:jobId/download')
   async downloadPdf(@Param('jobId') jobId: string, @Res() res: Response) {
     const { stream, filename, size } = this.exportService.getJobDownloadStream(jobId);
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"`);
     res.setHeader('Content-Length', size);
     stream.pipe(res);
+  }
+
+  @Get('csv')
+  async downloadCsv(@Param('id') datasetId: string, @Res() res: Response) {
+    const { filename, content } = await this.exportService.exportDatasetCsv(datasetId);
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"`);
+    res.send(content);
+  }
+
+  @Get('json')
+  async downloadJson(@Param('id') datasetId: string, @Res() res: Response) {
+    const { filename, content } = await this.exportService.exportDatasetJson(datasetId);
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"`);
+    res.send(content);
   }
 }
 

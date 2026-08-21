@@ -1,18 +1,21 @@
 import { DataIntegrityVerifier } from './data-integrity-verifier';
 import { FontResolverService } from './font-resolver.service';
-import { ChatPdfRendererService } from './chat-pdf-renderer.service';
+import { EmojiRendererService } from './emoji-renderer.service';
+import { StreamPdfRendererService } from './stream-pdf-renderer.service';
 import * as fs from 'fs';
 import * as path from 'path';
 
 describe('Chat PDF Export & Integrity Verification Suite', () => {
   let fontResolver: FontResolverService;
-  let chatRenderer: ChatPdfRendererService;
+  let emojiRenderer: EmojiRendererService;
+  let chatRenderer: StreamPdfRendererService;
   const testOutputDir = path.resolve(process.cwd(), '.textboard', 'test_output');
 
   beforeAll(() => {
     fs.mkdirSync(testOutputDir, { recursive: true });
     fontResolver = new FontResolverService();
-    chatRenderer = new ChatPdfRendererService(fontResolver);
+    emojiRenderer = new EmojiRendererService();
+    chatRenderer = new StreamPdfRendererService(fontResolver, emojiRenderer);
   });
 
   afterAll(() => {
@@ -116,7 +119,7 @@ describe('Chat PDF Export & Integrity Verification Suite', () => {
     });
   });
 
-  describe('ChatPdfRendererService', () => {
+  describe('StreamPdfRendererService', () => {
     it('should render a multi-message PDF archive with date separators, groupings, and emojis', async () => {
       const testPdfPath = path.join(testOutputDir, 'test_chat_export.pdf');
       const verifier = new DataIntegrityVerifier('ds_test', 'exp_test');
@@ -140,18 +143,21 @@ describe('Chat PDF Export & Integrity Verification Suite', () => {
           timestamp: new Date('2025-08-14T10:42:00Z'),
           actor: 'Ali',
           content: 'Hey, are you coming tomorrow? 🚀',
+          eventType: 'message',
         },
         {
           id: 'ev_2',
           timestamp: new Date('2025-08-14T10:43:00Z'),
           actor: 'Fatima',
           content: 'Yeah 😂 Looking forward to it!',
+          eventType: 'message',
         },
         {
           id: 'ev_3',
           timestamp: new Date('2025-08-14T10:44:00Z'),
           actor: 'Fatima',
           content: 'Here is the document: <Media omitted>',
+          eventType: 'message',
           hasMedia: true,
         },
         {
@@ -159,6 +165,7 @@ describe('Chat PDF Export & Integrity Verification Suite', () => {
           timestamp: new Date('2025-08-15T08:12:00Z'),
           actor: 'Ali',
           content: 'مرحبا! Multilingual Urdu/Arabic proposal text\nWith multiple lines.',
+          eventType: 'message',
         },
       ];
 
@@ -179,6 +186,7 @@ describe('Chat PDF Export & Integrity Verification Suite', () => {
           fonts,
           !isSameActorAsPrev,
           verifier,
+          'Ali',
         );
       }
 

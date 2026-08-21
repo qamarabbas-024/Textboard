@@ -525,4 +525,79 @@ export class ExportService {
       this.logger.warn(`Failed to delete file ${filePath}: ${err.message}`);
     }
   }
+
+  /**
+   * Exports normalized dataset as CSV format.
+   */
+  async exportDatasetCsv(datasetId: string): Promise<{ filename: string; content: string }> {
+    const dataset = await this.prisma.dataset.findUnique({ where: { id: datasetId } });
+    if (!dataset) throw new NotFoundException(`Dataset ${datasetId} not found`);
+
+    const events = await this.prisma.timelineEvent.findMany({
+      where: { datasetId },
+      orderBy: { timestamp: 'asc' },
+    });
+
+    const headers = ['id', 'timestamp', 'actor', 'eventType', 'content', 'wordCount', 'charLength', 'hasUrls', 'hasEmojis'];
+    const rows = events.map((ev) => [
+      ev.id,
+      ev.timestamp.toISOString(),
+      `"${(ev.actor || '').replace(/"/g, '""')}"`,
+      ev.eventType,
+      `"${(ev.content || '').replace(/"/g, '""')}"`,
+      ev.wordCount || 0,
+      ev.charLength || 0,
+      Boolean(ev.hasUrls),
+      Boolean(ev.hasEmojis),
+    ]);
+
+    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const sanitizedName = dataset.name.replace(/[^a-zA-Z0-9_\-]/g, '_');
+    return {
+      filename: `${sanitizedName}_export.csv`,
+      content: csvContent,
+    };
+  }
+
+  /**
+   * Exports normalized dataset as structured JSON.
+   */
+  async exportDatasetJson(datasetId: string): Promise<{ filename: string; content: string }> {
+    const dataset = await this.prisma.dataset.findUnique({ where: { id: datasetId } });
+    if (!dataset) throw new NotFoundException(`Dataset ${datasetId} not found`);
+
+    const events = await this.prisma.timelineEvent.findMany({
+      where: { datasetId },
+      orderBy: { timestamp: 'asc' },
+    });
+
+    const exportObj = {
+      dataset: {
+        id: dataset.id,
+        name: dataset.name,
+        sourceType: dataset.sourceType,
+        totalEvents: events.length,
+        exportedAt: new Date().toISOString(),
+      },
+      events: events.map((ev) => ({
+        id: ev.id,
+        timestamp: ev.timestamp,
+        actor: ev.actor,
+        eventType: ev.eventType,
+        content: ev.content,
+        wordCount: ev.wordCount,
+        charLength: ev.charLength,
+        hasUrls: ev.hasUrls,
+        hasEmojis: ev.hasEmojis,
+        metadata: ev.metadata,
+      })),
+    };
+
+    const sanitizedName = dataset.name.replace(/[^a-zA-Z0-9_\-]/g, '_');
+    return {
+      filename: `${sanitizedName}_export.json`,
+      content: JSON.stringify(exportObj, null, 2),
+    };
+  }
 }
+
