@@ -117,14 +117,34 @@ export function ExploreView({
             })}
           </div>
 
-          <button
-            onClick={() => setIsExportOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white/[0.06] hover:bg-cyan-500/20 text-neutral-200 hover:text-cyan-300 border border-white/[0.12] hover:border-cyan-500/40 text-xs font-semibold transition-all whitespace-nowrap shadow-xs"
-            title="Export Visual PDF Archive"
-          >
-            <span>📄</span>
-            <span>EXPORT PDF</span>
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setIsExportOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white/[0.06] hover:bg-cyan-500/20 text-neutral-200 hover:text-cyan-300 border border-white/[0.12] hover:border-cyan-500/40 text-xs font-semibold transition-all whitespace-nowrap shadow-xs"
+              title="Export Visual PDF Archive"
+            >
+              <span>📄</span>
+              <span>PDF</span>
+            </button>
+            <a
+              href={`/api/v1/datasets/${activeDataset.id}/export/csv`}
+              download
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white/[0.06] hover:bg-cyan-500/20 text-neutral-200 hover:text-cyan-300 border border-white/[0.12] hover:border-cyan-500/40 text-xs font-semibold transition-all whitespace-nowrap shadow-xs"
+              title="Export Raw CSV"
+            >
+              <span>📊</span>
+              <span>CSV</span>
+            </a>
+            <a
+              href={`/api/v1/datasets/${activeDataset.id}/export/json`}
+              download
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white/[0.06] hover:bg-cyan-500/20 text-neutral-200 hover:text-cyan-300 border border-white/[0.12] hover:border-cyan-500/40 text-xs font-semibold transition-all whitespace-nowrap shadow-xs"
+              title="Export Structured JSON"
+            >
+              <span>📦</span>
+              <span>JSON</span>
+            </a>
+          </div>
         </div>
       </div>
 

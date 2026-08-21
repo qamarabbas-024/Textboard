@@ -280,8 +280,26 @@ export function DataView({
                         title="Export Visual PDF Archive"
                       >
                         <span>📄</span>
-                        <span>Export PDF</span>
+                        <span>PDF</span>
                       </button>
+                      <a
+                        href={`/api/v1/datasets/${ds.id}/export/csv`}
+                        download
+                        className="px-2.5 py-1 rounded bg-white/[0.06] hover:bg-white/[0.12] text-neutral-200 border border-white/[0.15] transition-colors inline-flex items-center gap-1"
+                        title="Export Raw CSV"
+                      >
+                        <span>📊</span>
+                        <span>CSV</span>
+                      </a>
+                      <a
+                        href={`/api/v1/datasets/${ds.id}/export/json`}
+                        download
+                        className="px-2.5 py-1 rounded bg-white/[0.06] hover:bg-white/[0.12] text-neutral-200 border border-white/[0.15] transition-colors inline-flex items-center gap-1"
+                        title="Export Structured JSON"
+                      >
+                        <span>📦</span>
+                        <span>JSON</span>
+                      </a>
                       <button
                         onClick={() => onExploreDataset(ds.id)}
                         className="px-3 py-1 rounded bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 transition-colors"
