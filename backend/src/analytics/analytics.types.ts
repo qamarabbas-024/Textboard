@@ -145,6 +145,32 @@ export interface Insight {
   supportingData: Record<string, any>;
 }
 
+export interface OnThisDayMemory {
+  year: number;
+  yearsAgo: number;
+  dateStr: string;
+  messageCount: number;
+  participants: string[];
+  topEmoji?: string;
+  sampleMessages: Array<{
+    id: string;
+    actor: string;
+    timestamp: Date;
+    content: string;
+  }>;
+}
+
+export interface RelationshipPair {
+  actorA: string;
+  actorB: string;
+  totalExchanges: number;
+  aToBInitiations: number;
+  bToAInitiations: number;
+  avgResponseSecsAtoB: number;
+  avgResponseSecsBtoA: number;
+  balanceRatio: number; // 0.5 is perfectly equal
+}
+
 export interface FullDatasetAnalytics {
   datasetId: string;
   datasetName: string;
@@ -154,6 +180,8 @@ export interface FullDatasetAnalytics {
   activityAnalytics: ActivityAnalytics;
   textAnalytics: TextAnalytics;
   insights: Insight[];
+  onThisDay?: OnThisDayMemory[];
+  relationships?: RelationshipPair[];
   computedAt: Date;
   executionTimeMs: number;
 }

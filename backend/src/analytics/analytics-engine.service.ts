@@ -6,7 +6,9 @@ import { EmojiAnalyticsService } from './services/emoji-analytics.service';
 import { ActivityAnalyticsService } from './services/activity-analytics.service';
 import { TextAnalyticsService } from './services/text-analytics.service';
 import { InsightsGeneratorService } from './services/insights-generator.service';
-import { FullDatasetAnalytics } from './analytics.types';
+import { OnThisDayService } from './services/on-this-day.service';
+import { RelationshipMatrixService } from './services/relationship-matrix.service';
+import { FullDatasetAnalytics, OnThisDayMemory, RelationshipPair } from './analytics.types';
 
 @Injectable()
 export class AnalyticsEngineService {
@@ -21,6 +23,8 @@ export class AnalyticsEngineService {
     private readonly activityAnalytics: ActivityAnalyticsService,
     private readonly textAnalytics: TextAnalyticsService,
     private readonly insightsGenerator: InsightsGeneratorService,
+    private readonly onThisDayService: OnThisDayService,
+    private readonly relationshipMatrixService: RelationshipMatrixService,
   ) {}
 
   /**
@@ -98,6 +102,8 @@ export class AnalyticsEngineService {
     const emojiStats = this.emojiAnalytics.computeEmojiAnalytics(events);
     const activityStats = this.activityAnalytics.computeActivityAnalytics(events);
     const textStats = this.textAnalytics.computeTextAnalytics(events);
+    const onThisDayMemories = this.onThisDayService.computeMemories(events);
+    const relationships = this.relationshipMatrixService.computeRelationships(events);
 
     // 4. Generate deterministic, traceable insights
     const insights = this.insightsGenerator.generateInsights(
@@ -119,6 +125,8 @@ export class AnalyticsEngineService {
       activityAnalytics: activityStats,
       textAnalytics: textStats,
       insights,
+      onThisDay: onThisDayMemories,
+      relationships,
       computedAt: new Date(),
       executionTimeMs: elapsed,
     };
@@ -136,6 +144,22 @@ export class AnalyticsEngineService {
     });
 
     return result;
+  }
+
+  /**
+   * Directly get "On This Day" historical memories for a dataset.
+   */
+  async getOnThisDay(datasetId: string, targetDate?: Date): Promise<OnThisDayMemory[]> {
+    const full = await this.getDatasetAnalytics(datasetId);
+    return full.onThisDay || [];
+  }
+
+  /**
+   * Directly get relationship dynamics for a dataset.
+   */
+  async getRelationships(datasetId: string): Promise<RelationshipPair[]> {
+    const full = await this.getDatasetAnalytics(datasetId);
+    return full.relationships || [];
   }
 
   /**

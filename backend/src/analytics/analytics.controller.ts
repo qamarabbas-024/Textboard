@@ -85,6 +85,22 @@ export class AnalyticsController {
   }
 
   /**
+   * Get "On This Day" historical memory retrospective.
+   */
+  @Get(':datasetId/on-this-day')
+  async getOnThisDay(@Param('datasetId') datasetId: string) {
+    return this.analyticsEngine.getOnThisDay(datasetId);
+  }
+
+  /**
+   * Get pairwise relationship dynamics, initiation counts, and response latency.
+   */
+  @Get(':datasetId/relationships')
+  async getRelationships(@Param('datasetId') datasetId: string) {
+    return this.analyticsEngine.getRelationships(datasetId);
+  }
+
+  /**
    * Invalidate cache and force recompute all analytics.
    */
   @Post(':datasetId/refresh')
