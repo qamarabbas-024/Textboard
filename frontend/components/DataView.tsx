@@ -148,6 +148,7 @@ export function DataView({
             <span className="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Signal</span>
             <span className="px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">Slack</span>
             <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">CSV / XLSX</span>
+            <span className="px-2 py-0.5 rounded bg-rose-500/10 text-rose-300 border border-rose-500/20 font-bold">.ZIP Archives</span>
           </div>
         </div>
 
@@ -187,7 +188,7 @@ export function DataView({
               }
             }}
             className="hidden"
-            accept=".txt,.csv,.tsv,.json,.jsonl,.ndjson,.xlsx,.xls,.log"
+            accept=".txt,.csv,.tsv,.json,.jsonl,.ndjson,.xlsx,.xls,.log,.zip,.signal,.imessage"
           />
 
           <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center mx-auto text-cyan-400">
