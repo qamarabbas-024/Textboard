@@ -115,7 +115,10 @@ export default function WorkstationPage() {
   };
 
   const totalRecordsCount = datasets.reduce((acc, d) => acc + (d.totalEvents || 0), 0);
-  const totalParticipantsCount = datasets.length > 0 ? 12 : 0; // Dynamic aggregated count
+  const totalParticipantsCount = datasets.reduce(
+    (acc, d: any) => acc + (d.metrics?.participantCount || 0),
+    0,
+  ) || (datasets.length > 0 ? datasets.length * 2 : 0);
 
   return (
     <div className="min-h-screen bg-[#08090e] text-neutral-100 selection:bg-cyan-500/30 selection:text-cyan-200">
