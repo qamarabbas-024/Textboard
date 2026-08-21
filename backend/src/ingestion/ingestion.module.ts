@@ -14,6 +14,7 @@ import { XlsxStreamParser } from './parsers/xlsx-stream-parser';
 import { ImessageStreamParser } from './parsers/imessage-stream-parser';
 import { SignalStreamParser } from './parsers/signal-stream-parser';
 import { SlackStreamParser } from './parsers/slack-stream-parser';
+import { ZipStreamParser } from './parsers/zip-stream-parser';
 import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
@@ -33,6 +34,7 @@ import { PrismaModule } from '../prisma/prisma.module';
     ImessageStreamParser,
     SignalStreamParser,
     SlackStreamParser,
+    ZipStreamParser,
   ],
   exports: [
     IngestionService,
@@ -46,6 +48,7 @@ import { PrismaModule } from '../prisma/prisma.module';
     ImessageStreamParser,
     SignalStreamParser,
     SlackStreamParser,
+    ZipStreamParser,
   ],
 })
 export class IngestionModule {}
