@@ -7,6 +7,7 @@ import {
   RefreshCwIcon,
   LinkIcon,
   SmileIcon,
+  SparklesIcon,
 } from './Icons';
 
 interface DatasetItem {
@@ -28,11 +29,13 @@ export function SearchView({
 }: SearchViewProps) {
   const [query, setQuery] = useState('');
   const [datasetFilter, setDatasetFilter] = useState<string>(selectedDatasetId || '');
+  const [searchMode, setSearchMode] = useState<'hybrid' | 'semantic' | 'exact'>('hybrid');
   const [results, setResults] = useState<any[]>([]);
   const [totalMatches, setTotalMatches] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
+  const [executionTimeMs, setExecutionTimeMs] = useState<number | null>(null);
 
   useEffect(() => {
     if (selectedDatasetId) {
@@ -46,6 +49,7 @@ export function SearchView({
       const url = new URL('/api/v1/search', window.location.origin);
       if (query.trim()) url.searchParams.set('q', query.trim());
       if (datasetFilter) url.searchParams.set('datasetId', datasetFilter);
+      url.searchParams.set('mode', searchMode);
       url.searchParams.set('page', String(targetPage));
       url.searchParams.set('limit', '25');
 
@@ -55,6 +59,7 @@ export function SearchView({
         setResults(data.items || []);
         setTotalMatches(data.totalMatches || 0);
         setHasMore(data.hasMore || false);
+        setExecutionTimeMs(data.executionTimeMs || null);
         setPage(targetPage);
       }
     } catch (err) {
@@ -114,49 +119,84 @@ export function SearchView({
           </button>
         </div>
 
-        {/* Quick Filter Token Chips */}
-        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-white/[0.05] text-[11px]">
-          <span className="text-neutral-500 flex items-center gap-1">
-            <FilterIcon className="w-3 h-3" /> SYNTAX TOKENS:
-          </span>
-          <button
-            onClick={() => insertToken('person:Ali')}
-            className="px-2 py-0.5 rounded bg-white/[0.04] hover:bg-white/[0.08] text-neutral-300 border border-white/[0.06] transition-colors"
-          >
-            person:Name
-          </button>
-          <button
-            onClick={() => insertToken('after:2024-01-01')}
-            className="px-2 py-0.5 rounded bg-white/[0.04] hover:bg-white/[0.08] text-neutral-300 border border-white/[0.06] transition-colors"
-          >
-            after:YYYY-MM-DD
-          </button>
-          <button
-            onClick={() => insertToken('emoji:😂')}
-            className="px-2 py-0.5 rounded bg-white/[0.04] hover:bg-white/[0.08] text-neutral-300 border border-white/[0.06] transition-colors"
-          >
-            emoji:Emoji
-          </button>
-          <button
-            onClick={() => insertToken('has:urls')}
-            className="px-2 py-0.5 rounded bg-white/[0.04] hover:bg-white/[0.08] text-neutral-300 border border-white/[0.06] transition-colors"
-          >
-            has:urls
-          </button>
-          <button
-            onClick={() => insertToken('has:media')}
-            className="px-2 py-0.5 rounded bg-white/[0.04] hover:bg-white/[0.08] text-neutral-300 border border-white/[0.06] transition-colors"
-          >
-            has:media
-          </button>
+        {/* Search Mode Switches */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-white/[0.05] text-xs">
+          <div className="flex items-center gap-1.5">
+            <span className="text-neutral-500 text-[11px] mr-1">ENGINE:</span>
+            <button
+              onClick={() => setSearchMode('hybrid')}
+              className={`px-2.5 py-1 rounded text-xs transition-all flex items-center gap-1 ${
+                searchMode === 'hybrid'
+                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold shadow-[0_0_10px_rgba(34,211,238,0.2)]'
+                  : 'bg-white/[0.03] text-neutral-400 border border-white/[0.06] hover:text-neutral-200'
+              }`}
+            >
+              <span>⚡</span>
+              <span>HYBRID</span>
+            </button>
+            <button
+              onClick={() => setSearchMode('semantic')}
+              className={`px-2.5 py-1 rounded text-xs transition-all flex items-center gap-1 ${
+                searchMode === 'semantic'
+                  ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 font-bold shadow-[0_0_10px_rgba(168,85,247,0.2)]'
+                  : 'bg-white/[0.03] text-neutral-400 border border-white/[0.06] hover:text-neutral-200'
+              }`}
+            >
+              <span>🧠</span>
+              <span>SEMANTIC VECTOR AI</span>
+            </button>
+            <button
+              onClick={() => setSearchMode('exact')}
+              className={`px-2.5 py-1 rounded text-xs transition-all flex items-center gap-1 ${
+                searchMode === 'exact'
+                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold shadow-[0_0_10px_rgba(16,185,129,0.2)]'
+                  : 'bg-white/[0.03] text-neutral-400 border border-white/[0.06] hover:text-neutral-200'
+              }`}
+            >
+              <span>🔍</span>
+              <span>EXACT KEYWORDS</span>
+            </button>
+          </div>
+
+          {/* Quick Syntax Chips */}
+          <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+            <span className="text-neutral-500 flex items-center gap-1">
+              <FilterIcon className="w-3 h-3" /> SYNTAX:
+            </span>
+            <button
+              onClick={() => insertToken('person:Ali')}
+              className="px-2 py-0.5 rounded bg-white/[0.04] hover:bg-white/[0.08] text-neutral-300 border border-white/[0.06] transition-colors"
+            >
+              person:Name
+            </button>
+            <button
+              onClick={() => insertToken('after:2024-01-01')}
+              className="px-2 py-0.5 rounded bg-white/[0.04] hover:bg-white/[0.08] text-neutral-300 border border-white/[0.06] transition-colors"
+            >
+              after:YYYY-MM-DD
+            </button>
+            <button
+              onClick={() => insertToken('emoji:😂')}
+              className="px-2 py-0.5 rounded bg-white/[0.04] hover:bg-white/[0.08] text-neutral-300 border border-white/[0.06] transition-colors"
+            >
+              emoji:Emoji
+            </button>
+          </div>
         </div>
       </section>
 
       {/* Results Header */}
       <div className="flex items-center justify-between px-2 text-xs text-neutral-400">
-        <span>
-          MATCHES FOUND: <strong className="text-neutral-100">{totalMatches.toLocaleString()}</strong>
-        </span>
+        <div className="flex items-center gap-3">
+          <span>
+            MATCHES FOUND: <strong className="text-neutral-100">{totalMatches.toLocaleString()}</strong>
+          </span>
+          {executionTimeMs !== null && (
+            <span className="text-[11px] text-cyan-400 font-bold">
+              ⚡ {executionTimeMs}ms query latency
+            </span>
+          )}
+        </div>
         {results.length > 0 && (
           <span>
             PAGE <strong className="text-cyan-400">{page}</strong> (Showing {results.length} records)
@@ -187,6 +227,12 @@ export function SearchView({
                 </div>
 
                 <div className="flex items-center gap-2 text-[11px] text-neutral-400">
+                  {item.semanticScore !== undefined && (
+                    <span className="px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 font-bold border border-purple-500/30 flex items-center gap-1">
+                      <SparklesIcon className="w-3 h-3 text-purple-400" />
+                      {Math.round(item.semanticScore * 100)}% Concept Match
+                    </span>
+                  )}
                   {item.hasUrls && (
                     <span className="flex items-center gap-1 text-cyan-400">
                       <LinkIcon className="w-3 h-3" /> Link
@@ -198,20 +244,18 @@ export function SearchView({
                     </span>
                   )}
                   {item.score && (
-                    <span className="px-1.5 py-0.5 rounded bg-white/[0.06] text-neutral-300">
-                      Score {item.score}
+                    <span className="text-neutral-500">
+                      Rank: {item.score}
                     </span>
                   )}
                 </div>
               </div>
 
-              {/* Highlighted Snippet */}
+              {/* Highlighted snippet */}
               <div
                 className="text-xs text-neutral-200 font-sans leading-relaxed pt-1"
                 dangerouslySetInnerHTML={{
-                  __html:
-                    item.highlight ||
-                    item.content.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
+                  __html: item.highlight || item.content,
                 }}
               />
             </div>
@@ -219,23 +263,23 @@ export function SearchView({
         )}
       </section>
 
-      {/* Pagination Controls */}
-      {totalMatches > 25 && (
-        <div className="flex items-center justify-center gap-3 pt-4">
+      {/* Pagination Bar */}
+      {results.length > 0 && (
+        <div className="flex items-center justify-between pt-4 border-t border-white/[0.06] text-xs">
           <button
+            onClick={() => executeSearch(Math.max(1, page - 1))}
             disabled={page <= 1 || isLoading}
-            onClick={() => executeSearch(page - 1)}
-            className="px-4 py-1.5 rounded bg-white/[0.06] hover:bg-white/[0.1] text-xs text-neutral-200 disabled:opacity-30 transition-colors"
+            className="px-4 py-2 rounded bg-white/[0.04] hover:bg-white/[0.08] text-neutral-300 disabled:opacity-30 disabled:hover:bg-white/[0.04] transition-colors"
           >
-            Previous
+            ← Previous Page
           </button>
-          <span className="text-xs text-neutral-400">Page {page}</span>
+          <span className="text-neutral-500">Page {page}</span>
           <button
-            disabled={!hasMore || isLoading}
             onClick={() => executeSearch(page + 1)}
-            className="px-4 py-1.5 rounded bg-white/[0.06] hover:bg-white/[0.1] text-xs text-neutral-200 disabled:opacity-30 transition-colors"
+            disabled={!hasMore || isLoading}
+            className="px-4 py-2 rounded bg-white/[0.04] hover:bg-white/[0.08] text-neutral-300 disabled:opacity-30 disabled:hover:bg-white/[0.04] transition-colors"
           >
-            Next
+            Next Page →
           </button>
         </div>
       )}
