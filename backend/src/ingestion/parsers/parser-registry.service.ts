@@ -4,6 +4,9 @@ import { TxtStreamParser } from './txt-stream-parser';
 import { CsvStreamParser } from './csv-stream-parser';
 import { JsonStreamParser } from './json-stream-parser';
 import { XlsxStreamParser } from './xlsx-stream-parser';
+import { ImessageStreamParser } from './imessage-stream-parser';
+import { SignalStreamParser } from './signal-stream-parser';
+import { SlackStreamParser } from './slack-stream-parser';
 
 @Injectable()
 export class ParserRegistryService {
@@ -14,11 +17,18 @@ export class ParserRegistryService {
     private readonly csvParser: CsvStreamParser,
     private readonly jsonParser: JsonStreamParser,
     private readonly xlsxParser: XlsxStreamParser,
+    private readonly imessageParser: ImessageStreamParser,
+    private readonly signalParser: SignalStreamParser,
+    private readonly slackParser: SlackStreamParser,
   ) {
-    this.registerParser(txtParser);
+    // Specific platform parsers first
+    this.registerParser(imessageParser);
+    this.registerParser(signalParser);
+    this.registerParser(slackParser);
     this.registerParser(csvParser);
     this.registerParser(jsonParser);
     this.registerParser(xlsxParser);
+    this.registerParser(txtParser); // General fallback
   }
 
   registerParser(parser: IStreamParser) {

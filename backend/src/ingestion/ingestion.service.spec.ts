@@ -12,6 +12,10 @@ import { JsonStreamParser } from './parsers/json-stream-parser';
 import { XlsxStreamParser } from './parsers/xlsx-stream-parser';
 import { Readable } from 'stream';
 
+import { ImessageStreamParser } from './parsers/imessage-stream-parser';
+import { SignalStreamParser } from './parsers/signal-stream-parser';
+import { SlackStreamParser } from './parsers/slack-stream-parser';
+
 describe('IngestionService (V1 Streaming Pipeline)', () => {
   let service: IngestionService;
   let mockPrisma: any;
@@ -78,6 +82,9 @@ describe('IngestionService (V1 Streaming Pipeline)', () => {
         CsvStreamParser,
         JsonStreamParser,
         XlsxStreamParser,
+        ImessageStreamParser,
+        SignalStreamParser,
+        SlackStreamParser,
         NormalizationService,
       ],
     }).compile();
