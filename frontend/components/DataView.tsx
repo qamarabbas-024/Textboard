@@ -141,9 +141,14 @@ export function DataView({
               STREAMING INGESTION ENGINE (ZERO BUFFERING)
             </h2>
           </div>
-          <span className="text-[11px] text-neutral-500">
-            SUPPORTS: .TXT, .CSV, .JSON, .JSONL, .XLSX, .LOG
-          </span>
+          <div className="flex flex-wrap items-center gap-1.5 text-[10px]">
+            <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">WhatsApp</span>
+            <span className="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">Telegram</span>
+            <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">Apple iMessage</span>
+            <span className="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Signal</span>
+            <span className="px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">Slack</span>
+            <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">CSV / XLSX</span>
+          </div>
         </div>
 
         {errorMsg && (
