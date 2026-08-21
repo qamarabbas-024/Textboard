@@ -9,6 +9,7 @@ import {
   TerminalIcon,
   ClockIcon,
 } from './Icons';
+import { OnThisDayView } from './OnThisDayView';
 
 interface DatasetSummary {
   id: string;
@@ -163,7 +164,17 @@ export function HomeView({
         )}
       </section>
 
-      {/* 3. Recent Datasets Grid */}
+      {/* 3. Memory Time Machine (On This Day in History) */}
+      {activeDataset && (
+        <section>
+          <OnThisDayView
+            datasetId={activeDataset.id}
+            onExploreDate={() => onNavigateTo('EXPLORE')}
+          />
+        </section>
+      )}
+
+      {/* 4. Recent Datasets Grid */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

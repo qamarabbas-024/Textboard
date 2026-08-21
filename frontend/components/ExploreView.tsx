@@ -12,6 +12,8 @@ import {
 import { StreamTimelineView } from './StreamTimelineView';
 import { ActivityHeatmap } from './ActivityHeatmap';
 import { PdfExportModal } from './PdfExportModal';
+import { RelationshipMatrix } from './RelationshipMatrix';
+import { OnThisDayView } from './OnThisDayView';
 
 export type ExploreSubTab = 'timeline' | 'people' | 'activity' | 'emoji' | 'topics' | 'links';
 
@@ -190,6 +192,11 @@ export function ExploreView({
               </div>
             ))}
           </div>
+
+          {/* Pairwise Relationship Dynamics & Interaction Flow */}
+          <div className="mt-6">
+            <RelationshipMatrix relationships={analytics.relationships} />
+          </div>
         </section>
       )}
 
@@ -264,6 +271,11 @@ export function ExploreView({
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Memory Time Machine inside Activity Tab */}
+          <div className="mt-6">
+            <OnThisDayView datasetId={activeDataset.id} />
           </div>
         </section>
       )}
