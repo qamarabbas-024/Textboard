@@ -216,11 +216,26 @@ export class SearchService {
     if (start > 0) snippet = '...' + snippet;
     if (end < content.length) snippet = snippet + '...';
 
-    // Wrap matches in <mark>
+    // HTML-escape raw text to prevent XSS before injecting highlight tags
+    snippet = snippet
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+
+    // Wrap matches safely in <mark>
     for (const term of searchTerms) {
-      const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const regex = new RegExp(`(${escaped})`, 'gi');
-      snippet = snippet.replace(regex, '<mark>$1</mark>');
+      const escapedTerm = term
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;')
+        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+      const regex = new RegExp(`(${escapedTerm})`, 'gi');
+      snippet = snippet.replace(regex, '<mark class="bg-amber-500/30 text-amber-200 px-0.5 rounded font-medium">$1</mark>');
     }
 
     return snippet;

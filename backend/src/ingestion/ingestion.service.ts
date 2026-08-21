@@ -150,13 +150,23 @@ export class IngestionService {
     const fs = await import('fs');
     const path = await import('path');
 
-    if (!fs.existsSync(filepath)) {
+    if (!filepath || typeof filepath !== 'string') {
+      throw new BadRequestException('A valid filepath string is required.');
+    }
+
+    const resolvedPath = path.resolve(filepath);
+    if (!fs.existsSync(resolvedPath)) {
       throw new BadRequestException(`File does not exist: ${filepath}`);
     }
 
-    const filename = path.basename(filepath);
+    const stat = fs.statSync(resolvedPath);
+    if (!stat.isFile()) {
+      throw new BadRequestException(`Specified path is not a file: ${filepath}`);
+    }
+
+    const filename = path.basename(resolvedPath);
     const mimeType = 'text/plain';
-    const readStream = fs.createReadStream(filepath);
+    const readStream = fs.createReadStream(resolvedPath);
 
     return this.submitIngestJob(readStream, filename, mimeType, options);
   }

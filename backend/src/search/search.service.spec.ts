@@ -112,7 +112,7 @@ describe('TextBoard V1 Search Engine', () => {
       expect(response.totalMatches).toBe(2);
       expect(response.items.length).toBe(2);
       expect(response.items[0].actor).toBe('Ali');
-      expect(response.items[0].highlight).toContain('<mark>meeting</mark>');
+      expect(response.items[0].highlight).toMatch(/<mark[^>]*>meeting<\/mark>/);
       expect(response.items[0].score).toBeGreaterThan(1.0);
       expect(response.items[0].semanticScore).toBeDefined();
       expect(response.executionTimeMs).toBeDefined();
