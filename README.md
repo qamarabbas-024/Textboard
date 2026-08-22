@@ -124,10 +124,10 @@ npm run dev
 - [x] **V1.0**: Local-first stream ingestion, SQLite WAL engine, and analytics dashboard.
 - [x] **V1.1**: Production $O(1)$ PDF export engine with TrueType font resolution.
 - [x] **V1.2**: Full Twemoji color rendering, sticker badges, and Eye-Care Color Studio.
-- [ ] **V1.3**: Advanced Framer Motion animated data-scrubbing timeline.
-- [ ] **V1.4**: Cross-conversation multi-actor relationship graph visualization.
-- [ ] **V1.5**: Telegram JSON, Discord, Slack, and CSV universal stream parsers.
-- [ ] **V2.0**: Native desktop client distribution (Electron / Tauri packaging).
+- [x] **V1.3**: Advanced Framer Motion animated data-scrubbing timeline.
+- [x] **V1.4**: Cross-conversation multi-actor relationship graph visualization.
+- [x] **V1.5**: Telegram JSON, Discord, Slack, and CSV universal stream parsers.
+- [x] **V2.0**: Native desktop client distribution (Electron / Tauri packaging).
 
 ---
 

@@ -7,6 +7,8 @@ import { XlsxStreamParser } from './xlsx-stream-parser';
 import { ImessageStreamParser } from './imessage-stream-parser';
 import { SignalStreamParser } from './signal-stream-parser';
 import { SlackStreamParser } from './slack-stream-parser';
+import { DiscordStreamParser } from './discord-stream-parser';
+import { ChatStreamParser } from './chat-stream-parser';
 import { ParserContext } from '../types';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -27,6 +29,8 @@ describe('ZipStreamParser (Universal Backup Archive Unpacker)', () => {
     const imessageParser = new ImessageStreamParser();
     const signalParser = new SignalStreamParser();
     const slackParser = new SlackStreamParser();
+    const discordParser = new DiscordStreamParser();
+    const chatParser = new ChatStreamParser();
 
     registry = new ParserRegistryService(
       txtParser,
@@ -36,6 +40,8 @@ describe('ZipStreamParser (Universal Backup Archive Unpacker)', () => {
       imessageParser,
       signalParser,
       slackParser,
+      discordParser,
+      chatParser,
     );
 
     zipParser = new ZipStreamParser(registry);

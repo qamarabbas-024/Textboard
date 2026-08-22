@@ -9,9 +9,11 @@ coverage/
 
 # Production & Build outputs
 dist/
+dist-desktop/
 build/
 .next/
 out/
+*.tsbuildinfo
 
 # Environment Variables
 .env

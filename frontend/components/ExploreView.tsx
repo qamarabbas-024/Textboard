@@ -10,12 +10,14 @@ import {
   RefreshCwIcon,
 } from './Icons';
 import { StreamTimelineView } from './StreamTimelineView';
+import { AnimatedScrubberTimeline } from './AnimatedScrubberTimeline';
+import { RelationshipGraphView } from './RelationshipGraphView';
 import { ActivityHeatmap } from './ActivityHeatmap';
 import { PdfExportModal } from './PdfExportModal';
 import { RelationshipMatrix } from './RelationshipMatrix';
 import { OnThisDayView } from './OnThisDayView';
 
-export type ExploreSubTab = 'timeline' | 'people' | 'activity' | 'emoji' | 'topics' | 'links';
+export type ExploreSubTab = 'timeline' | 'network' | 'people' | 'activity' | 'emoji' | 'topics' | 'links';
 
 interface DatasetItem {
   id: string;
@@ -39,6 +41,11 @@ export function ExploreView({
   const [analytics, setAnalytics] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const [scrubbedDate, setScrubbedDate] = useState<string | null>(null);
+  const [selectedRange, setSelectedRange] = useState<{ start: string | null; end: string | null }>({
+    start: null,
+    end: null,
+  });
 
   const activeDataset = datasets.find((d) => d.id === selectedDatasetId) || datasets[0] || null;
 
@@ -62,6 +69,7 @@ export function ExploreView({
 
   const subTabs: Array<{ id: ExploreSubTab; label: string; icon: React.ReactNode }> = [
     { id: 'timeline', label: 'TIMELINE', icon: <ClockIcon className="w-4 h-4" /> },
+    { id: 'network', label: 'NETWORK', icon: <UsersIcon className="w-4 h-4" /> },
     { id: 'people', label: 'PEOPLE', icon: <UsersIcon className="w-4 h-4" /> },
     { id: 'activity', label: 'ACTIVITY', icon: <ActivityIcon className="w-4 h-4" /> },
     { id: 'emoji', label: 'EMOJI', icon: <SmileIcon className="w-4 h-4" /> },
@@ -152,8 +160,36 @@ export function ExploreView({
 
       {/* Main Content Area */}
       {subTab === 'timeline' && (
-        <section className="rounded-xl border border-white/[0.08] bg-[#10141d]/80 p-4">
-          <StreamTimelineView datasetId={activeDataset.id} />
+        <section className="space-y-4">
+          <AnimatedScrubberTimeline
+            datasetId={activeDataset.id}
+            selectedRange={selectedRange}
+            onRangeSelect={setSelectedRange}
+            onDateScrub={(date) => {
+              setScrubbedDate(date);
+              setSelectedRange({
+                start: new Date(date).toISOString(),
+                end: new Date(new Date(date).getTime() + 86400000 * 7).toISOString(),
+              });
+            }}
+          />
+          <div className="rounded-xl border border-white/[0.08] bg-[#10141d]/80 p-4">
+            <StreamTimelineView
+              datasetId={activeDataset.id}
+              selectedRange={selectedRange}
+            />
+          </div>
+        </section>
+      )}
+
+      {subTab === 'network' && (
+        <section className="space-y-4">
+          <RelationshipGraphView
+            datasetId={activeDataset.id}
+            datasets={datasets}
+            relationships={analytics?.relationships}
+            people={analytics?.messageAnalytics?.byPerson}
+          />
         </section>
       )}
 

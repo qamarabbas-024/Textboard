@@ -14,6 +14,8 @@ import { XlsxStreamParser } from './parsers/xlsx-stream-parser';
 import { ImessageStreamParser } from './parsers/imessage-stream-parser';
 import { SignalStreamParser } from './parsers/signal-stream-parser';
 import { SlackStreamParser } from './parsers/slack-stream-parser';
+import { DiscordStreamParser } from './parsers/discord-stream-parser';
+import { ChatStreamParser } from './parsers/chat-stream-parser';
 import { ZipStreamParser } from './parsers/zip-stream-parser';
 import { PrismaModule } from '../prisma/prisma.module';
 
@@ -34,6 +36,8 @@ import { PrismaModule } from '../prisma/prisma.module';
     ImessageStreamParser,
     SignalStreamParser,
     SlackStreamParser,
+    DiscordStreamParser,
+    ChatStreamParser,
     ZipStreamParser,
   ],
   exports: [
@@ -48,6 +52,8 @@ import { PrismaModule } from '../prisma/prisma.module';
     ImessageStreamParser,
     SignalStreamParser,
     SlackStreamParser,
+    DiscordStreamParser,
+    ChatStreamParser,
     ZipStreamParser,
   ],
 })

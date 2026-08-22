@@ -144,8 +144,9 @@ export function DataView({
           <div className="flex flex-wrap items-center gap-1.5 text-[10px]">
             <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">WhatsApp</span>
             <span className="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">Telegram</span>
+            <span className="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Discord</span>
             <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">Apple iMessage</span>
-            <span className="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Signal</span>
+            <span className="px-2 py-0.5 rounded bg-teal-500/10 text-teal-300 border border-teal-500/20">Signal</span>
             <span className="px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">Slack</span>
             <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">CSV / XLSX</span>
             <span className="px-2 py-0.5 rounded bg-rose-500/10 text-rose-300 border border-rose-500/20 font-bold">.ZIP Archives</span>

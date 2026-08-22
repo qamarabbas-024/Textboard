@@ -15,6 +15,8 @@ import { Readable } from 'stream';
 import { ImessageStreamParser } from './parsers/imessage-stream-parser';
 import { SignalStreamParser } from './parsers/signal-stream-parser';
 import { SlackStreamParser } from './parsers/slack-stream-parser';
+import { DiscordStreamParser } from './parsers/discord-stream-parser';
+import { ChatStreamParser } from './parsers/chat-stream-parser';
 
 describe('IngestionService (V1 Streaming Pipeline)', () => {
   let service: IngestionService;
@@ -39,6 +41,10 @@ describe('IngestionService (V1 Streaming Pipeline)', () => {
       },
       timelineEvent: {
         count: jest.fn().mockResolvedValue(2),
+        create: jest.fn().mockResolvedValue({ id: 'evt_100' }),
+      },
+      metric: {
+        upsert: jest.fn().mockResolvedValue({ id: 'm_100' }),
       },
     };
 
@@ -85,6 +91,8 @@ describe('IngestionService (V1 Streaming Pipeline)', () => {
         ImessageStreamParser,
         SignalStreamParser,
         SlackStreamParser,
+        DiscordStreamParser,
+        ChatStreamParser,
         NormalizationService,
       ],
     }).compile();

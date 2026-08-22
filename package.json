@@ -1,8 +1,40 @@
 {
+  "name": "textboard",
+  "version": "2.0.0",
+  "description": "The Local-First Visual Intelligence & Communication Stream Analytics Workstation",
+  "main": "electron/main.js",
+  "author": "Qamar Abbas",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "electron:dev": "electron .",
+    "electron:build": "electron-builder",
+    "dev:backend": "cd backend && npm run start:dev",
+    "dev:frontend": "cd frontend && npm run dev"
+  },
   "dependencies": {
     "adm-zip": "^0.6.0"
   },
   "devDependencies": {
-    "@types/adm-zip": "^0.5.8"
+    "@types/adm-zip": "^0.5.8",
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.qamarabbas.textboard",
+    "productName": "Textboard",
+    "directories": {
+      "output": "dist-desktop"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "files": [
+      "electron/**/*",
+      "package.json"
+    ]
   }
 }
