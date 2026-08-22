@@ -3,136 +3,181 @@
 @tailwind utilities;
 
 /* =========================================================================
-   TEXTBOARD DESIGN SYSTEM - COHESIVE MULTI-THEME TOKEN ARCHITECTURE
+   TEXTBOARD 3D NEXT-GEN DESIGN SYSTEM & LUMINOUS MULTI-THEME ENGINE
    ========================================================================= */
 
-/* 1. Cyber Obsidian (Default - Deep Titanium & Neon Cyan) */
+/* 1. Cyber Neon Hyperdrive (Default - Void Abyss & Electric Cyan / Violet) */
 :root,
 [data-theme="obsidian"],
 [data-theme="cyberpunk"] {
-  --bg-base: #07090e;
-  --bg-surface: #0f141f;
-  --bg-surface-raised: #151c2b;
-  --bg-surface-active: #1d273b;
-  --border-subtle: rgba(255, 255, 255, 0.08);
+  --bg-base: #04060c;
+  --bg-surface: #0a0f1d;
+  --bg-surface-raised: #10172c;
+  --bg-surface-active: #182342;
+  --border-subtle: rgba(0, 240, 255, 0.12);
   --border-highlight: #00f0ff;
-  --text-main: #f1f5f9;
+  --border-secondary: #a855f7;
+  --text-main: #f8fafc;
   --text-muted: #94a3b8;
-  --text-dim: #64748b;
+  --text-dim: #475569;
   --accent: #00f0ff;
-  --accent-glow: 0 0 16px rgba(0, 240, 255, 0.25);
-  --stat-highlight: #34d399;
+  --accent-secondary: #a855f7;
+  --accent-glow: 0 0 24px rgba(0, 240, 255, 0.35);
+  --accent-glow-lg: 0 0 40px rgba(0, 240, 255, 0.2);
+  --stat-highlight: #38bdf8;
   --btn-primary-bg: #00f0ff;
-  --btn-primary-text: #050811;
+  --btn-primary-text: #020617;
   --btn-primary-hover: #38f8ff;
-  --card-bg: rgba(15, 20, 31, 0.85);
-  --card-border: rgba(255, 255, 255, 0.09);
-  --input-bg: rgba(7, 9, 14, 0.85);
-  --input-border: rgba(255, 255, 255, 0.12);
-  --font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --radius: 0.5rem;
+  --card-bg: rgba(10, 15, 29, 0.8);
+  --card-border: rgba(0, 240, 255, 0.15);
+  --input-bg: rgba(4, 6, 12, 0.85);
+  --input-border: rgba(0, 240, 255, 0.2);
+  --font-family: var(--font-outfit), system-ui, sans-serif;
+  --chart-primary: #00f0ff;
+  --chart-secondary: #a855f7;
+  --chart-tertiary: #38bdf8;
+  --chart-quaternary: #fb7185;
+  --chart-grid: rgba(255, 255, 255, 0.06);
+  --radius: 0.75rem;
 }
 
-/* 2. Solar Editorial Warm Cream (High-Legibility Warm Light Mode) */
+/* 2. Tokyo Syndicate 2077 (Pitch Carbon & Neon Hot Pink / Cyber Gold) */
+[data-theme="tokyo"],
+[data-theme="magenta"] {
+  --bg-base: #08060d;
+  --bg-surface: #120d1f;
+  --bg-surface-raised: #1c1430;
+  --bg-surface-active: #291c45;
+  --border-subtle: rgba(255, 0, 85, 0.16);
+  --border-highlight: #ff0055;
+  --border-secondary: #ffe600;
+  --text-main: #fff1f2;
+  --text-muted: #fda4af;
+  --text-dim: #881337;
+  --accent: #ff0055;
+  --accent-secondary: #ffe600;
+  --accent-glow: 0 0 24px rgba(255, 0, 85, 0.4);
+  --accent-glow-lg: 0 0 40px rgba(255, 0, 85, 0.25);
+  --stat-highlight: #ffe600;
+  --btn-primary-bg: #ff0055;
+  --btn-primary-text: #ffffff;
+  --btn-primary-hover: #ff3377;
+  --card-bg: rgba(18, 13, 31, 0.82);
+  --card-border: rgba(255, 0, 85, 0.2);
+  --input-bg: rgba(8, 6, 13, 0.88);
+  --input-border: rgba(255, 0, 85, 0.25);
+  --font-family: var(--font-outfit), system-ui, sans-serif;
+  --chart-primary: #ff0055;
+  --chart-secondary: #ffe600;
+  --chart-tertiary: #00f0ff;
+  --chart-quaternary: #c084fc;
+  --chart-grid: rgba(255, 0, 85, 0.08);
+  --radius: 0.75rem;
+}
+
+/* 3. Emerald Quantum Hologram (Obsidian Abyss & Bioluminescent Mint Emerald) */
+[data-theme="matrix"],
+[data-theme="emerald"] {
+  --bg-base: #020804;
+  --bg-surface: #06150b;
+  --bg-surface-raised: #0b2313;
+  --bg-surface-active: #11351d;
+  --border-subtle: rgba(0, 255, 136, 0.15);
+  --border-highlight: #00ff88;
+  --border-secondary: #a3e635;
+  --text-main: #ecfdf5;
+  --text-muted: #6ee7b7;
+  --text-dim: #065f46;
+  --accent: #00ff88;
+  --accent-secondary: #a3e635;
+  --accent-glow: 0 0 24px rgba(0, 255, 136, 0.4);
+  --accent-glow-lg: 0 0 40px rgba(0, 255, 136, 0.22);
+  --stat-highlight: #a3e635;
+  --btn-primary-bg: #00ff88;
+  --btn-primary-text: #020804;
+  --btn-primary-hover: #33ff9f;
+  --card-bg: rgba(6, 21, 11, 0.85);
+  --card-border: rgba(0, 255, 136, 0.22);
+  --input-bg: rgba(2, 8, 4, 0.88);
+  --input-border: rgba(0, 255, 136, 0.28);
+  --font-family: var(--font-mono), monospace;
+  --chart-primary: #00ff88;
+  --chart-secondary: #a3e635;
+  --chart-tertiary: #38bdf8;
+  --chart-quaternary: #facc15;
+  --chart-grid: rgba(0, 255, 136, 0.08);
+  --radius: 0.625rem;
+}
+
+/* 4. Nebula Sunset Vaporwave (Cosmic Indigo & Sunset Coral / Electric Peach) */
+[data-theme="nebula"],
+[data-theme="sunset"] {
+  --bg-base: #09091e;
+  --bg-surface: #121334;
+  --bg-surface-raised: #1c1e4d;
+  --bg-surface-active: #272a6b;
+  --border-subtle: rgba(255, 107, 107, 0.15);
+  --border-highlight: #ff6b6b;
+  --border-secondary: #ff9f43;
+  --text-main: #fdf2f8;
+  --text-muted: #cbd5e1;
+  --text-dim: #64748b;
+  --accent: #ff6b6b;
+  --accent-secondary: #ff9f43;
+  --accent-glow: 0 0 24px rgba(255, 107, 107, 0.35);
+  --accent-glow-lg: 0 0 40px rgba(255, 107, 107, 0.2);
+  --stat-highlight: #ff9f43;
+  --btn-primary-bg: #ff6b6b;
+  --btn-primary-text: #ffffff;
+  --btn-primary-hover: #ff8585;
+  --card-bg: rgba(18, 19, 52, 0.82);
+  --card-border: rgba(255, 107, 107, 0.2);
+  --input-bg: rgba(9, 9, 30, 0.88);
+  --input-border: rgba(255, 107, 107, 0.25);
+  --font-family: var(--font-outfit), system-ui, sans-serif;
+  --chart-primary: #ff6b6b;
+  --chart-secondary: #ff9f43;
+  --chart-tertiary: #c084fc;
+  --chart-quaternary: #00f0ff;
+  --chart-grid: rgba(255, 107, 107, 0.08);
+  --radius: 0.875rem;
+}
+
+/* 5. Executive Diamond Luxury Light (Crisp Pure Titanium & Royal Sapphire) */
+[data-theme="diamond"],
+[data-theme="slate"],
 [data-theme="solar"],
 [data-theme="cream"],
 [data-theme="light"] {
-  --bg-base: #faf6ee;
-  --bg-surface: #f2ebd9;
-  --bg-surface-raised: #e8deca;
-  --bg-surface-active: #ddcfb6;
-  --border-subtle: #d8cbba;
-  --border-highlight: #c25934;
-  --text-main: #1c1815;
-  --text-muted: #5c5249;
-  --text-dim: #8c7e72;
-  --accent: #c25934;
-  --accent-glow: 0 2px 10px rgba(194, 89, 52, 0.2);
-  --stat-highlight: #1b7a6b;
-  --btn-primary-bg: #c25934;
-  --btn-primary-text: #ffffff;
-  --btn-primary-hover: #a84b2a;
-  --card-bg: #ffffff;
-  --card-border: #d8cbba;
-  --input-bg: #ffffff;
-  --input-border: #c8baa6;
-  --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-  --radius: 0.5rem;
-}
-
-/* 3. Deep Matrix CRT (Monochrome Phosphor Terminal) */
-[data-theme="matrix"] {
-  --bg-base: #020502;
-  --bg-surface: #060e06;
-  --bg-surface-raised: #0b1a0b;
-  --bg-surface-active: #102610;
-  --border-subtle: #123312;
-  --border-highlight: #00ff66;
-  --text-main: #00ff66;
-  --text-muted: #00bb4a;
-  --text-dim: #00772e;
-  --accent: #00ff66;
-  --accent-glow: 0 0 16px rgba(0, 255, 102, 0.35);
-  --stat-highlight: #55ff99;
-  --btn-primary-bg: #00ff66;
-  --btn-primary-text: #020502;
-  --btn-primary-hover: #33ff85;
-  --card-bg: #060e06;
-  --card-border: #143814;
-  --input-bg: #020502;
-  --input-border: #184218;
-  --font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  --radius: 0.25rem;
-}
-
-/* 4. Midnight Slate (Modern Indigo-Slate Command Deck) */
-[data-theme="slate"] {
-  --bg-base: #0b0f19;
-  --bg-surface: #141b2b;
-  --bg-surface-raised: #1c263c;
-  --bg-surface-active: #25324e;
-  --border-subtle: #243048;
+  --bg-base: #0f172a;
+  --bg-surface: #1e293b;
+  --bg-surface-raised: #334155;
+  --bg-surface-active: #475569;
+  --border-subtle: rgba(56, 189, 248, 0.16);
   --border-highlight: #38bdf8;
+  --border-secondary: #818cf8;
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
   --text-dim: #64748b;
   --accent: #38bdf8;
-  --accent-glow: 0 0 16px rgba(56, 189, 248, 0.25);
+  --accent-secondary: #818cf8;
+  --accent-glow: 0 0 24px rgba(56, 189, 248, 0.35);
+  --accent-glow-lg: 0 0 40px rgba(56, 189, 248, 0.2);
   --stat-highlight: #34d399;
   --btn-primary-bg: #38bdf8;
-  --btn-primary-text: #0b0f19;
+  --btn-primary-text: #0f172a;
   --btn-primary-hover: #60cbf9;
-  --card-bg: rgba(20, 27, 43, 0.85);
-  --card-border: #243048;
-  --input-bg: #0b0f19;
-  --input-border: #2c3b57;
-  --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --radius: 0.625rem;
-}
-
-/* 5. Nordic Frost (Minimal Ice-Blue & Arctic Silver) */
-[data-theme="nordic"] {
-  --bg-base: #0a111e;
-  --bg-surface: #121c2e;
-  --bg-surface-raised: #19273f;
-  --bg-surface-active: #213352;
-  --border-subtle: rgba(147, 197, 253, 0.12);
-  --border-highlight: #93c5fd;
-  --text-main: #f0f6fc;
-  --text-muted: #94a3b8;
-  --text-dim: #64748b;
-  --accent: #93c5fd;
-  --accent-glow: 0 0 16px rgba(147, 197, 253, 0.25);
-  --stat-highlight: #6ee7b7;
-  --btn-primary-bg: #93c5fd;
-  --btn-primary-text: #0a111e;
-  --btn-primary-hover: #b9d7fe;
-  --card-bg: rgba(18, 28, 46, 0.85);
-  --card-border: rgba(147, 197, 253, 0.14);
-  --input-bg: #0a111e;
-  --input-border: rgba(147, 197, 253, 0.18);
-  --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --radius: 0.5rem;
+  --card-bg: rgba(30, 41, 59, 0.85);
+  --card-border: rgba(56, 189, 248, 0.2);
+  --input-bg: rgba(15, 23, 42, 0.9);
+  --input-border: rgba(56, 189, 248, 0.25);
+  --font-family: var(--font-outfit), system-ui, sans-serif;
+  --chart-primary: #38bdf8;
+  --chart-secondary: #818cf8;
+  --chart-tertiary: #34d399;
+  --chart-quaternary: #f472b6;
+  --chart-grid: rgba(56, 189, 248, 0.08);
+  --radius: 0.75rem;
 }
 
 body {
@@ -140,7 +185,72 @@ body {
   color: var(--text-main);
   font-family: var(--font-family);
   min-height: 100vh;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.04) 0%, transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(168, 85, 247, 0.04) 0%, transparent 40%);
+}
+
+/* Custom 3D Glassmorphism Utilities */
+.glass-card-3d {
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--card-border);
+  box-shadow: 
+    0 10px 30px -10px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card-3d:hover {
+  border-color: var(--border-highlight);
+  box-shadow: 
+    0 16px 36px -12px rgba(0, 0, 0, 0.6),
+    0 0 20px rgba(0, 240, 255, 0.15),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.glass-panel {
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--card-border);
+}
+
+.neon-border-glow {
+  border: 1px solid var(--border-highlight);
+  box-shadow: var(--accent-glow);
+}
+
+.text-gradient-cyan {
+  background: linear-gradient(135deg, #00f0ff 0%, #a855f7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, #ffe600 0%, #ff0055 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-emerald {
+  background: linear-gradient(135deg, #00ff88 0%, #a3e635 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Animated Pulse Waves */
+@keyframes pulse-glow-ring {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; filter: drop-shadow(0 0 12px var(--accent)); }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow-ring 3s infinite ease-in-out;
 }
 
 /* Scrollbars */
@@ -150,24 +260,15 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(0, 0, 0, 0.2);
 }
 
 ::-webkit-scrollbar-thumb {
   background: var(--border-subtle);
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-dim);
+  background: var(--accent);
 }
 
-/* Scanline Overlay Utility */
-.workstation-scanline {
-  background: linear-gradient(
-    rgba(8, 9, 14, 0) 50%, 
-    rgba(0, 0, 0, 0.2) 50%
-  );
-  background-size: 100% 4px;
-  pointer-events: none;
-}

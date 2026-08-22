@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-export type AppTheme = 'obsidian' | 'slate' | 'matrix' | 'solar' | 'nordic';
+export type AppTheme = 'cyberpunk' | 'tokyo' | 'matrix' | 'nebula' | 'diamond';
 
 export const THEMES: Array<{
   id: AppTheme;
@@ -10,52 +11,58 @@ export const THEMES: Array<{
   badge: string;
   desc: string;
   icon: string;
+  gradient: string;
   dotColor: string;
 }> = [
   {
-    id: 'obsidian',
-    label: 'Obsidian Neon',
-    badge: 'CYBER',
-    desc: 'Deep titanium obsidian with glowing cyan & emerald accents',
+    id: 'cyberpunk',
+    label: 'Cyber Hyperdrive',
+    badge: 'NEON',
+    desc: 'Electric Cyan & Hyper Violet with void deep abyss',
     icon: '⚡',
+    gradient: 'from-cyan-400 to-purple-600',
     dotColor: '#00f0ff',
   },
   {
-    id: 'slate',
-    label: 'Midnight Slate',
-    badge: 'SLATE',
-    desc: 'Modern indigo command deck with ice-blue highlights',
-    icon: '🌌',
-    dotColor: '#38bdf8',
+    id: 'tokyo',
+    label: 'Tokyo Syndicate',
+    badge: '2077',
+    desc: 'Hot Neon Magenta & Cyber Gold with carbon darks',
+    icon: '🌆',
+    gradient: 'from-rose-500 to-amber-400',
+    dotColor: '#ff0055',
   },
   {
     id: 'matrix',
-    label: 'Hacker Matrix',
-    badge: 'CRT',
-    desc: 'Pure terminal black with phosphor green scanline vibes',
-    icon: '🟩',
-    dotColor: '#00ff66',
+    label: 'Emerald Quantum',
+    badge: 'HOLO',
+    desc: 'Bioluminescent Mint & Emerald hologram matrix',
+    icon: '🟢',
+    gradient: 'from-emerald-400 to-lime-300',
+    dotColor: '#00ff88',
   },
   {
-    id: 'solar',
-    label: 'Solar Warm Paper',
-    badge: 'LIGHT',
-    desc: 'High-legibility warm cream editorial canvas with terracotta',
-    icon: '☕',
-    dotColor: '#c25934',
+    id: 'nebula',
+    label: 'Nebula Sunset',
+    badge: 'COSMIC',
+    desc: 'Cosmic Indigo & Sunset Coral vaporwave glass',
+    icon: '🌌',
+    gradient: 'from-rose-400 via-purple-500 to-indigo-600',
+    dotColor: '#ff6b6b',
   },
   {
-    id: 'nordic',
-    label: 'Nordic Frost',
-    badge: 'ARCTIC',
-    desc: 'Arctic silver & slate with frosted ice-blue borders',
-    icon: '❄️',
-    dotColor: '#93c5fd',
+    id: 'diamond',
+    label: 'Executive Diamond',
+    badge: 'LUXURY',
+    desc: 'Crisp Frosted Titanium & Royal Sapphire Blue',
+    icon: '💎',
+    gradient: 'from-sky-400 to-blue-600',
+    dotColor: '#38bdf8',
   },
 ];
 
 export function ThemeSwitcher() {
-  const [currentTheme, setCurrentTheme] = useState<AppTheme>('obsidian');
+  const [currentTheme, setCurrentTheme] = useState<AppTheme>('cyberpunk');
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -63,7 +70,7 @@ export function ThemeSwitcher() {
     if (saved && THEMES.some((t) => t.id === saved)) {
       setTheme(saved);
     } else {
-      setTheme('obsidian');
+      setTheme('cyberpunk');
     }
   }, []);
 
@@ -80,7 +87,7 @@ export function ThemeSwitcher() {
     <div className="relative inline-block text-left font-mono">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-theme-border bg-theme-surface hover:bg-theme-active text-xs font-semibold text-theme-text transition-all shadow-xs focus-visible:ring-2 focus-visible:ring-theme-accent focus-visible:outline-none"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-theme-border bg-theme-surface/80 hover:bg-theme-surface-raised text-xs font-semibold text-theme-text transition-all shadow-lg hover:border-cyan-400/50 backdrop-blur-md"
         title="Switch Visual Theme"
         aria-label="Select Visual Theme"
       >
@@ -89,60 +96,77 @@ export function ThemeSwitcher() {
           style={{ backgroundColor: activeThemeObj.dotColor }}
         />
         <span>{activeThemeObj.icon}</span>
-        <span className="hidden sm:inline">{activeThemeObj.label}</span>
+        <span className="hidden sm:inline font-bold">{activeThemeObj.label}</span>
         <span className="text-[10px] text-theme-dim">▼</span>
       </button>
 
-      {isOpen && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="absolute right-0 mt-2 w-64 rounded-xl border border-theme-border bg-theme-surface shadow-2xl p-2 z-50 animate-fadeIn">
-            <div className="text-[10px] uppercase tracking-wider text-theme-dim font-bold px-2 py-1 border-b border-theme-border mb-1 flex items-center justify-between">
-              <span>Select Theme</span>
-              <span className="text-[9px] text-theme-accent font-mono">5 STYLES</span>
-            </div>
-            <div className="space-y-1">
-              {THEMES.map((theme) => {
-                const isSelected = currentTheme === theme.id;
-                return (
-                  <button
-                    key={theme.id}
-                    onClick={() => {
-                      setTheme(theme.id);
-                      setIsOpen(false);
-                    }}
-                    className={`w-full flex items-center justify-between p-2 rounded-lg text-left text-xs transition-all ${
-                      isSelected
-                        ? 'bg-theme-active text-theme-accent border border-theme-border-hi shadow-xs'
-                        : 'text-theme-text hover:bg-theme-raised border border-transparent'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="w-2.5 h-2.5 rounded-full inline-block shrink-0"
-                        style={{ backgroundColor: theme.dotColor }}
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+            <motion.div
+              initial={{ opacity: 0, y: -8, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+              className="absolute right-0 mt-2 w-72 rounded-2xl border border-theme-border/80 bg-theme-surface/95 shadow-2xl p-2.5 z-50 backdrop-blur-2xl"
+            >
+              <div className="text-[10px] uppercase tracking-wider text-theme-dim font-bold px-2 py-1 border-b border-theme-border/40 mb-1.5 flex items-center justify-between">
+                <span>Select Workstation Theme</span>
+                <span className="text-cyan-400 font-bold">{THEMES.length} Palettes</span>
+              </div>
+
+              <div className="space-y-1">
+                {THEMES.map((theme) => {
+                  const isActive = currentTheme === theme.id;
+                  return (
+                    <button
+                      key={theme.id}
+                      onClick={() => {
+                        setTheme(theme.id);
+                        setIsOpen(false);
+                      }}
+                      className={`w-full text-left p-2 rounded-xl transition-all flex items-start gap-2.5 ${
+                        isActive
+                          ? 'bg-theme-surface-raised border border-cyan-400/50 shadow-md'
+                          : 'hover:bg-theme-surface-raised/60 border border-transparent'
+                      }`}
+                    >
+                      <div
+                        className={`w-4 h-4 rounded-full mt-0.5 flex-shrink-0 bg-gradient-to-br ${theme.gradient} shadow-sm`}
                       />
-                      <div>
-                        <div className="font-bold flex items-center gap-1.5 text-theme-text">
-                          <span>{theme.icon}</span>
-                          <span>{theme.label}</span>
-                          <span className="text-[9px] px-1 py-0.2 rounded border border-theme-border text-theme-dim uppercase">
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span
+                            className={`text-xs font-bold font-mono ${
+                              isActive ? 'text-cyan-400' : 'text-theme-text'
+                            }`}
+                          >
+                            {theme.label}
+                          </span>
+                          <span
+                            className={`text-[9px] px-1.5 py-0.2 rounded font-mono font-bold ${
+                              isActive
+                                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/40'
+                                : 'bg-theme-surface text-theme-dim'
+                            }`}
+                          >
                             {theme.badge}
                           </span>
                         </div>
-                        <div className="text-[10px] text-theme-muted leading-tight mt-0.5">
+                        <p className="text-[10px] text-theme-muted mt-0.5 line-clamp-1">
                           {theme.desc}
-                        </div>
+                        </p>
                       </div>
-                    </div>
-                    {isSelected && <span className="text-theme-accent font-bold ml-1">✓</span>}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </>
-      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

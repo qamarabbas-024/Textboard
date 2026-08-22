@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import {
   HomeIcon,
@@ -8,7 +10,6 @@ import {
   AlertCircleIcon,
   LayersIcon,
   GitCompareIcon,
-  CpuIcon,
   RefreshCwIcon,
 } from './Icons';
 import { ThemeSwitcher } from './ThemeSwitcher';
@@ -58,25 +59,27 @@ export function WorkstationNav({
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-theme-border bg-theme-surface/95 backdrop-blur-md transition-colors duration-150">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-2">
+    <header className="sticky top-0 z-40 w-full border-b border-theme-border/60 bg-theme-surface/80 backdrop-blur-2xl transition-colors duration-200">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
         {/* Brand & System Mode */}
         <div className="flex items-center gap-3 shrink-0">
-          <div className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 rounded-sm bg-theme-accent shadow-theme-glow" />
-            <span className="font-mono text-xs sm:text-sm font-bold tracking-wider text-theme-text uppercase">
-              TEXTBOARD <span className="text-theme-accent text-[11px] font-normal">v3.0</span>
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => onSelectTab('HOME')}>
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-400 to-purple-600 flex items-center justify-center text-black font-black text-xs shadow-lg shadow-cyan-500/20">
+              ⚡
+            </div>
+            <span className="font-mono text-sm font-black tracking-wider text-white uppercase">
+              TEXTBOARD <span className="text-cyan-400 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/40">3.0</span>
             </span>
           </div>
 
-          <div className="hidden 2xl:flex items-center gap-1.5 px-2 py-0.5 rounded bg-theme-base border border-theme-border font-mono text-[11px] text-theme-muted">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            LOCAL-FIRST ENGINE
+          <div className="hidden 2xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/40 border border-theme-border font-mono text-[11px] text-theme-muted">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            100% LOCAL-FIRST
           </div>
         </div>
 
         {/* Primary Workstation Navigation Tabs */}
-        <nav className="flex items-center gap-0.5 sm:gap-1 overflow-x-auto py-1 max-w-full">
+        <nav className="flex items-center gap-1 overflow-x-auto py-1 max-w-full">
           {navItems.map((item) => {
             const isActive = currentTab === item.tab;
             return (
@@ -84,10 +87,10 @@ export function WorkstationNav({
                 key={item.tab}
                 onClick={() => onSelectTab(item.tab)}
                 aria-label={item.label}
-                className={`flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-lg font-mono text-xs tracking-wider transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-xs tracking-wider transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 cursor-pointer ${
                   isActive
-                    ? 'bg-theme-active text-theme-accent border border-theme-border-hi shadow-theme-glow font-bold'
-                    : 'text-theme-muted hover:text-theme-text hover:bg-theme-raised border border-transparent'
+                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/50 shadow-md font-bold'
+                    : 'text-theme-muted hover:text-white hover:bg-white/5 border border-transparent'
                 }`}
               >
                 {item.icon}
@@ -104,21 +107,21 @@ export function WorkstationNav({
           {activeJob ? (
             <button
               onClick={onOpenProcessingModal}
-              className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-theme-active border border-theme-accent text-theme-accent font-mono text-xs hover:opacity-90 transition-opacity animate-pulse focus-visible:ring-2 focus-visible:ring-theme-accent"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 font-mono text-xs hover:opacity-90 transition-opacity animate-pulse shadow-md"
               title="View Ingestion Progress"
             >
-              <RefreshCwIcon className="w-3.5 h-3.5 animate-spin text-theme-accent" />
+              <RefreshCwIcon className="w-3.5 h-3.5 animate-spin text-cyan-400" />
               <span className="hidden sm:inline">INGESTING</span>
               <span>({activeJob.progress}%)</span>
             </button>
           ) : (
             <div className="hidden xl:flex items-center gap-2.5 font-mono text-xs text-theme-dim">
               <span>
-                DATASETS: <strong className="text-theme-text">{datasetCount}</strong>
+                STREAMS: <strong className="text-white font-bold">{datasetCount}</strong>
               </span>
               <span className="text-theme-dim">|</span>
               <span>
-                RECORDS: <strong className="text-theme-text">{totalRecords.toLocaleString()}</strong>
+                RECORDS: <strong className="text-emerald-400 font-bold">{totalRecords.toLocaleString()}</strong>
               </span>
             </div>
           )}
@@ -127,3 +130,5 @@ export function WorkstationNav({
     </header>
   );
 }
+
+

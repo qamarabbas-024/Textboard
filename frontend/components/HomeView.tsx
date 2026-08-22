@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import {
   DatabaseIcon,
@@ -7,7 +9,9 @@ import {
   ArrowRightIcon,
   SearchIcon,
   TerminalIcon,
-  ClockIcon,
+  AlertCircleIcon,
+  LayersIcon,
+  GitCompareIcon,
 } from './Icons';
 import { OnThisDayView } from './OnThisDayView';
 import { Button } from './ui/Button';
@@ -35,7 +39,7 @@ interface HomeViewProps {
   datasets: DatasetSummary[];
   selectedDatasetId: string | null;
   onSelectDataset: (id: string) => void;
-  onNavigateTo: (tab: 'DATA' | 'EXPLORE' | 'SEARCH' | 'INSIGHTS') => void;
+  onNavigateTo: (tab: any) => void;
   insights: InsightItem[];
   totalRecordsCount: number;
   totalParticipantsCount: number;
@@ -53,69 +57,152 @@ export function HomeView({
   const activeDataset = datasets.find((d) => d.id === selectedDatasetId) || datasets[0] || null;
 
   return (
-    <div className="space-y-8 animate-fadeIn">
-      {/* 1. Telemetry HUD Banner */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-5 rounded-xl bg-theme-surface border border-theme-border relative overflow-hidden group hover:border-theme-border-hi transition-all shadow-xs">
-          <div className="flex items-center justify-between mb-3 text-theme-muted">
-            <span className="font-mono text-xs tracking-wider uppercase">DATASETS MOUNTED</span>
-            <DatabaseIcon className="w-4 h-4 text-theme-accent" />
+    <div className="space-y-8 animate-fadeIn font-mono">
+      {/* 1. Hero 3D Command Deck Banner */}
+      <section className="glass-card-3d p-8 rounded-3xl relative overflow-hidden">
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-2 max-w-2xl">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
+              <span className="text-xs font-bold uppercase tracking-widest text-cyan-400">
+                LOCAL-FIRST VISUAL INTELLIGENCE WORKSTATION
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+              High-Throughput Analytics &amp; Forensic Stream Engine
+            </h1>
+            <p className="text-xs sm:text-sm text-theme-muted font-sans leading-relaxed">
+              100% offline, zero-cloud data isolation. Analyze massive WhatsApp, Discord, Telegram, and CSV communication streams with deterministic precision.
+            </p>
           </div>
-          <div className="text-2xl font-bold font-mono text-theme-text">
+
+          {/* Quick Action Matrix */}
+          <div className="flex flex-wrap items-center gap-2.5">
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => onNavigateTo('DATA')}
+              leftIcon={<DatabaseIcon className="w-4 h-4" />}
+            >
+              Import Stream
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => onNavigateTo('EXPLORE')}
+              leftIcon={<ActivityIcon className="w-4 h-4" />}
+            >
+              Timeline Scrubber
+            </Button>
+            <Button
+              variant="accent-outline"
+              size="sm"
+              onClick={() => onNavigateTo('ANOMALIES')}
+              leftIcon={<AlertCircleIcon className="w-4 h-4" />}
+            >
+              Forensic Radar
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* 2. Telemetry HUD Cards */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="p-5 rounded-2xl glass-card-3d relative overflow-hidden group">
+          <div className="flex items-center justify-between mb-3 text-theme-muted">
+            <span className="text-xs tracking-wider uppercase font-bold">DATASETS MOUNTED</span>
+            <DatabaseIcon className="w-4 h-4 text-cyan-400" />
+          </div>
+          <div className="text-3xl font-black text-white">
             {datasets.length}
           </div>
-          <div className="mt-2 text-[11px] font-mono text-theme-dim">
+          <div className="mt-2 text-[11px] text-theme-dim">
             Local SQLite WAL Partition
           </div>
         </div>
 
-        <div className="p-5 rounded-xl bg-theme-surface border border-theme-border relative overflow-hidden group hover:border-theme-border-hi transition-all shadow-xs">
+        <div className="p-5 rounded-2xl glass-card-3d relative overflow-hidden group">
           <div className="flex items-center justify-between mb-3 text-theme-muted">
-            <span className="font-mono text-xs tracking-wider uppercase">NORMALIZED RECORDS</span>
+            <span className="text-xs tracking-wider uppercase font-bold">NORMALIZED RECORDS</span>
             <TerminalIcon className="w-4 h-4 text-emerald-400" />
           </div>
-          <div className="text-2xl font-bold font-mono text-theme-text">
+          <div className="text-3xl font-black text-emerald-300">
             {totalRecordsCount.toLocaleString()}
           </div>
-          <div className="mt-2 text-[11px] font-mono text-theme-dim">
-            Across all imported archives
+          <div className="mt-2 text-[11px] text-theme-dim">
+            Streamed in constant O(1) memory
           </div>
         </div>
 
-        <div className="p-5 rounded-xl bg-theme-surface border border-theme-border relative overflow-hidden group hover:border-theme-border-hi transition-all shadow-xs">
+        <div className="p-5 rounded-2xl glass-card-3d relative overflow-hidden group">
           <div className="flex items-center justify-between mb-3 text-theme-muted">
-            <span className="font-mono text-xs tracking-wider uppercase">IDENTIFIED ACTORS</span>
+            <span className="text-xs tracking-wider uppercase font-bold">IDENTIFIED ACTORS</span>
             <UsersIcon className="w-4 h-4 text-purple-400" />
           </div>
-          <div className="text-2xl font-bold font-mono text-theme-text">
+          <div className="text-3xl font-black text-purple-300">
             {totalParticipantsCount.toLocaleString()}
           </div>
-          <div className="mt-2 text-[11px] font-mono text-theme-dim">
-            Distinct resolved entities
+          <div className="mt-2 text-[11px] text-theme-dim">
+            Distinct resolved communication identities
           </div>
         </div>
 
-        <div className="p-5 rounded-xl bg-theme-surface border border-theme-border relative overflow-hidden group hover:border-theme-border-hi transition-all shadow-xs">
+        <div className="p-5 rounded-2xl glass-card-3d relative overflow-hidden group">
           <div className="flex items-center justify-between mb-3 text-theme-muted">
-            <span className="font-mono text-xs tracking-wider uppercase">ACTIVE FOCUS</span>
+            <span className="text-xs tracking-wider uppercase font-bold">ACTIVE STREAM FOCUS</span>
             <ActivityIcon className="w-4 h-4 text-amber-400" />
           </div>
-          <div className="text-sm font-semibold font-mono text-theme-text truncate">
-            {activeDataset ? activeDataset.name : 'No Dataset Selected'}
+          <div className="text-sm font-bold text-white truncate">
+            {activeDataset ? activeDataset.name : 'No Stream Mounted'}
           </div>
-          <div className="mt-2 text-[11px] font-mono text-theme-accent truncate">
+          <div className="mt-2 text-[11px] text-cyan-400 truncate font-bold">
             {activeDataset ? `${activeDataset.totalEvents.toLocaleString()} records` : 'Import a file to start'}
           </div>
         </div>
       </section>
 
-      {/* 2. Key Verifiable Insights Feed */}
+      {/* 3. Workstation Navigation Launchpad Hub */}
+      <section className="glass-card-3d p-6 rounded-2xl space-y-4">
+        <div className="flex items-center gap-2 border-b border-theme-border/50 pb-3">
+          <LayersIcon className="w-4 h-4 text-cyan-400" />
+          <h2 className="text-xs font-bold tracking-wider text-white uppercase">
+            WORKSTATION INTELLIGENCE MODULES
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          {[
+            { tab: 'DATA', label: 'Ingestion', icon: '📥', desc: 'Universal Stream Parsers' },
+            { tab: 'EXPLORE', label: 'Timeline', icon: '📊', desc: 'Virtualized Scrubber' },
+            { tab: 'SEARCH', label: 'Full Search', icon: '🔍', desc: 'Sub-ms Indexed Search' },
+            { tab: 'INSIGHTS', label: 'Telemetry', icon: '✨', desc: 'Behavioral & Diurnal Radar' },
+            { tab: 'ANOMALIES', label: 'Anomalies', icon: '🚨', desc: 'Forensic Threat Waves' },
+            { tab: 'TOPICS', label: 'Clustering', icon: '🧠', desc: 'Semantic Discussion Trees' },
+          ].map((mod) => (
+            <button
+              key={mod.tab}
+              onClick={() => onNavigateTo(mod.tab)}
+              className="p-4 rounded-xl bg-black/40 border border-theme-border/60 hover:border-cyan-400/50 hover:bg-theme-surface-active/60 transition-all text-left group cursor-pointer"
+            >
+              <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">
+                {mod.icon}
+              </div>
+              <div className="text-xs font-bold text-white group-hover:text-cyan-300">
+                {mod.label}
+              </div>
+              <div className="text-[10px] text-theme-dim mt-0.5 line-clamp-1">{mod.desc}</div>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* 4. Verifiable Insights Carousel */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <SparklesIcon className="w-4 h-4 text-theme-accent" />
-            <h2 className="font-mono text-xs font-semibold tracking-wider text-theme-text uppercase">
-              DETERMINISTIC INSIGHTS (VERIFIABLE)
+            <SparklesIcon className="w-4 h-4 text-cyan-400" />
+            <h2 className="text-xs font-bold tracking-wider text-white uppercase">
+              DETERMINISTIC INSIGHTS (TRACEABLE)
             </h2>
           </div>
           <Button
@@ -129,7 +216,7 @@ export function HomeView({
         </div>
 
         {insights.length === 0 ? (
-          <div className="p-8 rounded-xl border border-theme-border bg-theme-surface/50 text-center font-mono text-xs text-theme-dim">
+          <div className="p-8 rounded-2xl glass-card-3d text-center text-xs text-theme-dim">
             Select or import a dataset to generate verifiable personal intelligence.
           </div>
         ) : (
@@ -137,28 +224,30 @@ export function HomeView({
             {insights.slice(0, 3).map((insight) => (
               <div
                 key={insight.id}
-                className="p-5 rounded-xl border border-theme-border bg-theme-surface hover:border-theme-border-hi transition-all flex flex-col justify-between shadow-xs"
+                className="p-5 rounded-2xl glass-card-3d flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-theme-active text-theme-accent border border-theme-border-hi uppercase tracking-wider">
+                    <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 uppercase tracking-wider font-bold">
                       {insight.category}
                     </span>
-                    <span className="font-mono text-[10px] text-theme-dim">
+                    <span className="text-[10px] text-theme-dim">
                       {Math.round(insight.confidence * 100)}% CONFIDENCE
                     </span>
                   </div>
-                  <h3 className="font-semibold text-theme-text text-sm mb-2">{insight.title}</h3>
-                  <p className="text-xs text-theme-muted leading-relaxed font-sans">{insight.summary}</p>
+                  <h3 className="font-bold text-white text-sm mb-2">{insight.title}</h3>
+                  <p className="text-xs text-theme-muted leading-relaxed font-sans">
+                    {insight.summary}
+                  </p>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-theme-border flex items-center justify-between text-[11px] font-mono text-theme-dim">
+                <div className="mt-4 pt-3 border-t border-theme-border/50 flex items-center justify-between text-[11px] text-theme-dim">
                   <span className="truncate">
                     {Object.entries(insight.supportingData)[0]
                       ? `${Object.entries(insight.supportingData)[0][0]}: ${Object.entries(insight.supportingData)[0][1]}`
                       : 'Audited'}
                   </span>
-                  <span className="text-theme-accent font-bold">Traceable</span>
+                  <span className="text-cyan-400 font-bold">Traceable</span>
                 </div>
               </div>
             ))}
@@ -166,7 +255,7 @@ export function HomeView({
         )}
       </section>
 
-      {/* 3. Memory Time Machine (On This Day in History) */}
+      {/* 5. Memory Time Machine (On This Day in History) */}
       {activeDataset && (
         <section>
           <OnThisDayView
@@ -176,13 +265,13 @@ export function HomeView({
         </section>
       )}
 
-      {/* 4. Recent Datasets Grid */}
+      {/* 6. Registered Datasets Grid */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <DatabaseIcon className="w-4 h-4 text-theme-muted" />
-            <h2 className="font-mono text-xs font-semibold tracking-wider text-theme-text uppercase">
-              REGISTERED DATASETS
+            <h2 className="text-xs font-bold tracking-wider text-white uppercase">
+              REGISTERED DATASETS ({datasets.length})
             </h2>
           </div>
           <Button
@@ -191,93 +280,81 @@ export function HomeView({
             onClick={() => onNavigateTo('DATA')}
             rightIcon={<ArrowRightIcon className="w-3.5 h-3.5" />}
           >
-            Manage & Import
+            Manage &amp; Ingest
           </Button>
         </div>
 
         {datasets.length === 0 ? (
-          <div className="p-12 rounded-xl border border-dashed border-theme-border bg-theme-surface/40 text-center font-mono space-y-4">
-            <DatabaseIcon className="w-8 h-8 text-theme-dim mx-auto" />
-            <p className="text-xs text-theme-muted">No datasets imported yet.</p>
+          <div className="p-12 rounded-2xl glass-card-3d text-center space-y-4">
+            <DatabaseIcon className="w-10 h-10 text-theme-dim mx-auto animate-pulse" />
+            <div className="space-y-1">
+              <h3 className="text-sm font-bold text-white">No Communication Streams Ingested</h3>
+              <p className="text-xs text-theme-muted font-sans">
+                Drag and drop a WhatsApp export (.zip/.txt), Discord JSON, or CSV into the Data tab to start.
+              </p>
+            </div>
             <Button
               variant="primary"
-              size="md"
+              size="sm"
               onClick={() => onNavigateTo('DATA')}
             >
-              Import Your First Archive
+              Go to Data Ingestion
             </Button>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-theme-border bg-theme-surface font-mono text-xs shadow-xs">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-theme-border bg-theme-base/40 text-theme-muted text-[11px] tracking-wider">
-                  <th className="p-4">DATASET NAME</th>
-                  <th className="p-4">TYPE</th>
-                  <th className="p-4">RECORDS</th>
-                  <th className="p-4">DATE SPAN</th>
-                  <th className="p-4 text-right">ACTIONS</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-theme-border">
-                {datasets.map((ds) => {
-                  const isSelected = ds.id === selectedDatasetId;
-                  return (
-                    <tr
-                      key={ds.id}
-                      className={`hover:bg-theme-raised transition-colors ${
-                        isSelected ? 'bg-theme-active/30' : ''
-                      }`}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {datasets.map((dataset) => {
+              const isSelected = dataset.id === selectedDatasetId;
+              return (
+                <div
+                  key={dataset.id}
+                  onClick={() => onSelectDataset(dataset.id)}
+                  className={`p-5 rounded-2xl glass-card-3d cursor-pointer flex flex-col justify-between space-y-3 ${
+                    isSelected ? 'border-cyan-400 shadow-xl ring-1 ring-cyan-400/40' : ''
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 uppercase font-bold">
+                        {dataset.sourceType}
+                      </span>
+                      <span className="text-[10px] text-theme-dim">
+                        {new Date(dataset.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+
+                    <h3 className="font-bold text-white text-sm truncate">{dataset.name}</h3>
+                    <p className="text-xs text-theme-muted mt-1">
+                      {dataset.totalEvents.toLocaleString()} records ingested
+                    </p>
+                  </div>
+
+                  <div className="pt-3 border-t border-theme-border/50 flex items-center justify-between text-xs">
+                    <span className="text-theme-dim text-[11px]">
+                      {dataset.startDate && dataset.endDate
+                        ? `${new Date(dataset.startDate).toLocaleDateString()} - ${new Date(dataset.endDate).toLocaleDateString()}`
+                        : 'Continuous timeline'}
+                    </span>
+                    <Button
+                      variant={isSelected ? 'accent-outline' : 'ghost'}
+                      size="xs"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectDataset(dataset.id);
+                        onNavigateTo('EXPLORE');
+                      }}
                     >
-                      <td className="p-4 font-medium text-theme-text flex items-center gap-2">
-                        {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-theme-accent" />}
-                        <span>{ds.name}</span>
-                      </td>
-                      <td className="p-4 text-theme-muted uppercase text-[11px]">
-                        {ds.sourceType}
-                      </td>
-                      <td className="p-4 text-theme-accent font-semibold">
-                        {ds.totalEvents.toLocaleString()}
-                      </td>
-                      <td className="p-4 text-theme-muted text-[11px]">
-                        {ds.startDate && ds.endDate
-                          ? `${new Date(ds.startDate).toLocaleDateString()} - ${new Date(
-                              ds.endDate,
-                            ).toLocaleDateString()}`
-                          : 'Recorded'}
-                      </td>
-                      <td className="p-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            variant={isSelected ? 'accent-outline' : 'secondary'}
-                            size="xs"
-                            onClick={() => {
-                              onSelectDataset(ds.id);
-                              onNavigateTo('EXPLORE');
-                            }}
-                          >
-                            Explore
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="xs"
-                            onClick={() => {
-                              onSelectDataset(ds.id);
-                              onNavigateTo('SEARCH');
-                            }}
-                          >
-                            Search
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                      Explore
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </section>
     </div>
   );
 }
+
+

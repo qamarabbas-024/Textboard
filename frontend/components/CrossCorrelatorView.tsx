@@ -3,13 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import {
   UsersIcon,
-  ActivityIcon,
   SmileIcon,
   FileTextIcon,
   RefreshCwIcon,
-  LinkIcon,
 } from './Icons';
 import { Button } from './ui/Button';
+import CorrelationLissajousChart from './charts/CorrelationLissajousChart';
 
 interface DatasetItem {
   id: string;
@@ -21,7 +20,7 @@ interface CrossCorrelatorViewProps {
   datasets: DatasetItem[];
 }
 
-export function CrossCorrelatorView({ datasets }: CrossCorrelatorViewProps) {
+export default function CrossCorrelatorView({ datasets }: CrossCorrelatorViewProps) {
   const [datasetIdA, setDatasetIdA] = useState<string>(datasets[0]?.id || '');
   const [datasetIdB, setDatasetIdB] = useState<string>(datasets[1]?.id || datasets[0]?.id || '');
   const [correlationData, setCorrelationData] = useState<any>(null);
@@ -60,7 +59,7 @@ export function CrossCorrelatorView({ datasets }: CrossCorrelatorViewProps) {
 
   if (datasets.length < 2) {
     return (
-      <div className="p-12 text-center font-mono text-xs text-theme-dim rounded-xl border border-theme-border bg-theme-surface shadow-xs">
+      <div className="p-12 text-center font-mono text-xs text-theme-dim rounded-2xl glass-card-3d">
         Multi-stream correlation requires at least 2 datasets. Ingest an additional communication stream in the Data tab to compare.
       </div>
     );
@@ -75,18 +74,18 @@ export function CrossCorrelatorView({ datasets }: CrossCorrelatorViewProps) {
   return (
     <div className="space-y-6 animate-fadeIn font-mono">
       {/* Header & Dataset Selectors */}
-      <section className="p-6 rounded-xl border border-theme-border bg-theme-surface shadow-xs space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-theme-border pb-4">
+      <section className="glass-card-3d p-6 rounded-2xl space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-theme-border/50 pb-4">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-sm font-bold text-theme-text uppercase tracking-wider">
+              <h2 className="text-sm font-bold text-white uppercase tracking-wider">
                 CROSS-DATASET MULTI-STREAM CORRELATOR
               </h2>
-              <span className="px-2 py-0.5 rounded bg-cyan-500/15 text-theme-accent text-[10px] font-bold border border-theme-border-hi">
+              <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 text-[10px] font-bold border border-cyan-400/40">
                 V2.2 CORRELATION
               </span>
             </div>
-            <p className="text-xs text-theme-dim mt-0.5">
+            <p className="text-xs text-theme-muted mt-0.5">
               Side-by-side comparative analysis of timeline overlaps, behavioral synchronicity, and lexical diffs
             </p>
           </div>
@@ -102,186 +101,215 @@ export function CrossCorrelatorView({ datasets }: CrossCorrelatorViewProps) {
           </Button>
         </div>
 
-        {/* Stream Selector Matrix */}
+        {/* Dual Stream Pickers */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-4 rounded-lg bg-theme-base border border-theme-border space-y-2">
-            <span className="text-[10px] text-theme-accent uppercase font-bold block">
-              STREAM A (PRIMARY REFERENCE)
+          {/* Stream A Card */}
+          <div className="p-4 rounded-xl bg-black/40 border border-cyan-400/40 space-y-2">
+            <span className="text-[10px] text-cyan-400 uppercase font-bold block">
+              PRIMARY STREAM (A)
             </span>
             <select
               value={datasetIdA}
               onChange={(e) => setDatasetIdA(e.target.value)}
-              className="w-full bg-theme-surface border border-theme-border rounded-lg px-3 py-2 text-xs text-theme-text font-semibold focus:outline-none focus:border-theme-accent"
+              className="w-full bg-theme-surface border border-theme-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400"
             >
               {datasets.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.name} ({d.totalEvents.toLocaleString()} records)
+                <option key={d.id} value={d.id} className="bg-slate-900 text-white">
+                  {d.name} ({d.totalEvents.toLocaleString()} msgs)
                 </option>
               ))}
             </select>
-            {dsA && (
-              <div className="text-[11px] text-theme-dim flex justify-between pt-1">
-                <span>Type: {dsA.sourceType.toUpperCase()}</span>
-                <span>{dsA.totalEvents.toLocaleString()} total messages</span>
-              </div>
-            )}
           </div>
 
-          <div className="p-4 rounded-lg bg-theme-base border border-theme-border space-y-2">
-            <span className="text-[10px] text-emerald-400 uppercase font-bold block">
-              STREAM B (COMPARISON TARGET)
+          {/* Stream B Card */}
+          <div className="p-4 rounded-xl bg-black/40 border border-rose-500/40 space-y-2">
+            <span className="text-[10px] text-rose-400 uppercase font-bold block">
+              COMPARISON STREAM (B)
             </span>
             <select
               value={datasetIdB}
               onChange={(e) => setDatasetIdB(e.target.value)}
-              className="w-full bg-theme-surface border border-theme-border rounded-lg px-3 py-2 text-xs text-theme-text font-semibold focus:outline-none focus:border-theme-accent"
+              className="w-full bg-theme-surface border border-theme-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-rose-500"
             >
               {datasets.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.name} ({d.totalEvents.toLocaleString()} records)
+                <option key={d.id} value={d.id} className="bg-slate-900 text-white">
+                  {d.name} ({d.totalEvents.toLocaleString()} msgs)
                 </option>
               ))}
             </select>
-            {dsB && (
-              <div className="text-[11px] text-theme-dim flex justify-between pt-1">
-                <span>Type: {dsB.sourceType.toUpperCase()}</span>
-                <span>{dsB.totalEvents.toLocaleString()} total messages</span>
-              </div>
-            )}
           </div>
         </div>
       </section>
 
-      {/* Correlation Telemetry KPI Grid */}
-      {temporal && (
-        <section className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="p-4 rounded-xl border border-theme-border bg-theme-surface shadow-xs">
-            <span className="text-[10px] text-theme-dim block uppercase font-semibold">Temporal Overlap</span>
-            <span className="text-2xl font-bold text-theme-accent mt-1 block">
-              {temporal.overlapDays} Days
-            </span>
-            <span className="text-[10px] text-theme-dim mt-0.5 block">
-              {temporal.overlapPercentage}% duration overlap
-            </span>
-          </div>
+      {/* 1. Dual-Stream Lissajous & Synchronicity Waveform Chart */}
+      <CorrelationLissajousChart
+        streamAName={dsA?.name || 'Stream A'}
+        streamBName={dsB?.name || 'Stream B'}
+        hourlyScheduleA={temporal?.hourlyScheduleA || []}
+        hourlyScheduleB={temporal?.hourlyScheduleB || []}
+        synchronicityScore={temporal?.synchronicityScore || 0.85}
+        height={210}
+      />
 
-          <div className="p-4 rounded-xl border border-theme-border bg-theme-surface shadow-xs">
-            <span className="text-[10px] text-theme-dim block uppercase font-semibold">Concurrent Active Days</span>
-            <span className="text-2xl font-bold text-emerald-400 mt-1 block">
-              {temporal.concurrentActiveDays} Days
-            </span>
-            <span className="text-[10px] text-theme-dim mt-0.5 block">
-              Both channels active on same dates
-            </span>
-          </div>
+      {/* 2. Temporal & Behavioral Alignment Telemetry Cards */}
+      <section className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="p-4 rounded-2xl glass-card-3d">
+          <span className="text-[10px] text-theme-muted uppercase font-bold block">
+            Overlap Duration
+          </span>
+          <span className="text-2xl font-bold text-cyan-300 mt-1 block">
+            {temporal?.overlapDays || 0} <small className="text-xs font-normal text-theme-dim">days</small>
+          </span>
+          <span className="text-[10px] text-theme-dim mt-1 block">
+            {temporal?.overlapPercentage?.toFixed(1) || 0}% temporal overlap
+          </span>
+        </div>
 
-          <div className="p-4 rounded-xl border border-theme-border bg-theme-surface shadow-xs">
-            <span className="text-[10px] text-theme-dim block uppercase font-semibold">Hourly Synchronicity</span>
-            <span className="text-2xl font-bold text-theme-text mt-1 block">
-              {temporal.hourlySynchronicity > 0 ? `+${temporal.hourlySynchronicity}` : temporal.hourlySynchronicity}
-            </span>
-            <span className="text-[10px] text-theme-dim mt-0.5 block">
-              {temporal.hourlySynchronicity >= 0.7
-                ? 'High Schedule Alignment'
-                : temporal.hourlySynchronicity >= 0.4
-                ? 'Moderate Schedule Match'
-                : 'Independent Time Patterns'}
-            </span>
-          </div>
+        <div className="p-4 rounded-2xl glass-card-3d">
+          <span className="text-[10px] text-theme-muted uppercase font-bold block">
+            Concurrent Dates
+          </span>
+          <span className="text-2xl font-bold text-white mt-1 block">
+            {temporal?.concurrentActiveDates || 0}
+          </span>
+          <span className="text-[10px] text-theme-dim mt-1 block">
+            Simultaneous active days
+          </span>
+        </div>
 
-          <div className="p-4 rounded-xl border border-theme-border bg-theme-surface shadow-xs">
-            <span className="text-[10px] text-theme-dim block uppercase font-semibold">Matched Participants</span>
-            <span className="text-2xl font-bold text-purple-400 mt-1 block">
-              {participants.length}
-            </span>
-            <span className="text-[10px] text-theme-dim mt-0.5 block">
-              Shared cross-platform identities
-            </span>
-          </div>
-        </section>
-      )}
+        <div className="p-4 rounded-2xl glass-card-3d">
+          <span className="text-[10px] text-theme-muted uppercase font-bold block">
+            Schedule Synchronicity
+          </span>
+          <span className="text-2xl font-bold text-amber-400 mt-1 block">
+            {((temporal?.synchronicityScore || 0) * 100).toFixed(0)}%
+          </span>
+          <span className="text-[10px] text-theme-dim mt-1 block">
+            Pearson hourly alignment
+          </span>
+        </div>
 
-      {/* Lexical Comparison Diff Grid */}
-      {lexical && (
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Shared vs Distinct Vocabulary */}
-          <div className="p-5 rounded-xl border border-theme-border bg-theme-surface space-y-4 shadow-xs">
-            <h3 className="text-xs font-semibold text-theme-text uppercase tracking-wider flex items-center gap-2">
-              <FileTextIcon className="w-4 h-4 text-theme-accent" />
-              <span>SHARED HIGH-FREQUENCY VOCABULARY</span>
+        <div className="p-4 rounded-2xl glass-card-3d">
+          <span className="text-[10px] text-theme-muted uppercase font-bold block">
+            Shared Vocabulary
+          </span>
+          <span className="text-2xl font-bold text-emerald-400 mt-1 block">
+            {lexical?.sharedWords?.length || 0} <small className="text-xs font-normal text-theme-dim">terms</small>
+          </span>
+          <span className="text-[10px] text-theme-dim mt-1 block">
+            Common lexical terms
+          </span>
+        </div>
+      </section>
+
+      {/* 3. Lexical Diff Matrix */}
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Shared Keywords */}
+        <div className="glass-card-3d p-5 rounded-2xl space-y-3">
+          <div className="flex items-center gap-2 border-b border-theme-border/50 pb-2">
+            <FileTextIcon className="w-4 h-4 text-emerald-400" />
+            <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+              Shared High-Frequency Words
             </h3>
-            <div className="flex flex-wrap gap-1.5">
-              {lexical.sharedKeywords.slice(0, 25).map((w: any) => (
+          </div>
+          <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto">
+            {lexical?.sharedWords?.length === 0 ? (
+              <span className="text-xs text-theme-dim">No overlapping high-frequency terms.</span>
+            ) : (
+              lexical?.sharedWords?.map((w: string) => (
                 <span
-                  key={w.word}
-                  className="px-2.5 py-1 rounded-lg bg-theme-base border border-theme-border text-xs text-theme-text"
+                  key={w}
+                  className="px-2.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 text-xs font-mono border border-emerald-400/40"
                 >
-                  {w.word}{' '}
-                  <span className="text-theme-dim text-[10px]">
-                    (A: {w.countA} | B: {w.countB})
-                  </span>
+                  #{w}
                 </span>
-              ))}
-            </div>
+              ))
+            )}
           </div>
+        </div>
 
-          {/* Shared Emojis */}
-          <div className="p-5 rounded-xl border border-theme-border bg-theme-surface space-y-4 shadow-xs">
-            <h3 className="text-xs font-semibold text-theme-text uppercase tracking-wider flex items-center gap-2">
-              <SmileIcon className="w-4 h-4 text-theme-accent" />
-              <span>SHARED EMOJI EXPRESSIONS</span>
+        {/* Unique to Stream A */}
+        <div className="glass-card-3d p-5 rounded-2xl space-y-3">
+          <div className="flex items-center gap-2 border-b border-theme-border/50 pb-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400" />
+            <h3 className="text-xs font-bold text-white uppercase tracking-wider truncate">
+              Unique to {dsA?.name || 'Stream A'}
             </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {lexical.sharedEmojis.map((e: any) => (
-                <div
-                  key={e.emoji}
-                  className="p-2.5 rounded-lg bg-theme-base border border-theme-border text-center"
-                >
-                  <div className="text-2xl mb-1">{e.emoji}</div>
-                  <div className="text-[10px] text-theme-dim">
-                    A: <strong className="text-theme-text">{e.countA}</strong> | B: <strong className="text-theme-text">{e.countB}</strong>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
-        </section>
-      )}
+          <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto">
+            {lexical?.uniqueWordsA?.slice(0, 15).map((w: string) => (
+              <span
+                key={w}
+                className="px-2.5 py-0.5 rounded-lg bg-cyan-500/20 text-cyan-300 text-xs font-mono border border-cyan-400/40"
+              >
+                #{w}
+              </span>
+            ))}
+          </div>
+        </div>
 
-      {/* Participant Overlap Table */}
-      {participants.length > 0 && (
-        <section className="p-5 rounded-xl border border-theme-border bg-theme-surface space-y-4 shadow-xs">
-          <h3 className="text-xs font-semibold text-theme-text uppercase tracking-wider flex items-center gap-2">
-            <UsersIcon className="w-4 h-4 text-theme-accent" />
-            <span>CROSS-STREAM PARTICIPANT OVERLAP ({participants.length})</span>
+        {/* Unique to Stream B */}
+        <div className="glass-card-3d p-5 rounded-2xl space-y-3">
+          <div className="flex items-center gap-2 border-b border-theme-border/50 pb-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+            <h3 className="text-xs font-bold text-white uppercase tracking-wider truncate">
+              Unique to {dsB?.name || 'Stream B'}
+            </h3>
+          </div>
+          <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto">
+            {lexical?.uniqueWordsB?.slice(0, 15).map((w: string) => (
+              <span
+                key={w}
+                className="px-2.5 py-0.5 rounded-lg bg-rose-500/20 text-rose-300 text-xs font-mono border border-rose-500/40"
+              >
+                #{w}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Participant Volume Overlap Table */}
+      <section className="glass-card-3d p-6 rounded-2xl space-y-4">
+        <div className="flex items-center gap-2 border-b border-theme-border/50 pb-3">
+          <UsersIcon className="w-4 h-4 text-cyan-400" />
+          <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+            Cross-Stream Actor Volume Mapping ({participants.length} matches)
           </h3>
+        </div>
 
+        {participants.length === 0 ? (
+          <div className="p-8 text-center text-xs text-theme-dim">
+            No cross-stream participant identities matched.
+          </div>
+        ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs">
+            <table className="w-full text-left text-xs font-mono">
               <thead>
-                <tr className="border-b border-theme-border text-theme-muted text-[11px]">
-                  <th className="py-2.5 px-3">PARTICIPANT</th>
-                  <th className="py-2.5 px-3">STREAM A VOLUME</th>
-                  <th className="py-2.5 px-3">STREAM B VOLUME</th>
-                  <th className="py-2.5 px-3">COMBINED TOTAL</th>
+                <tr className="border-b border-theme-border/50 text-theme-muted">
+                  <th className="pb-2">Actor Identity</th>
+                  <th className="pb-2 text-cyan-400">{dsA?.name || 'Stream A'} Msgs</th>
+                  <th className="pb-2 text-rose-400">{dsB?.name || 'Stream B'} Msgs</th>
+                  <th className="pb-2">Total Volume</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-theme-border">
+              <tbody className="divide-y divide-theme-border/30">
                 {participants.map((p: any) => (
-                  <tr key={p.name} className="hover:bg-theme-raised transition-colors">
-                    <td className="py-2.5 px-3 font-semibold text-theme-text">{p.name}</td>
-                    <td className="py-2.5 px-3 text-theme-accent">{p.messageCountA.toLocaleString()} msgs</td>
-                    <td className="py-2.5 px-3 text-emerald-400">{p.messageCountB.toLocaleString()} msgs</td>
-                    <td className="py-2.5 px-3 font-bold text-theme-text">
-                      {(p.messageCountA + p.messageCountB).toLocaleString()} msgs
+                  <tr key={p.name} className="hover:bg-theme-surface-active/50">
+                    <td className="py-2.5 font-bold text-white">{p.name}</td>
+                    <td className="py-2.5 text-cyan-300">{p.countA.toLocaleString()}</td>
+                    <td className="py-2.5 text-rose-300">{p.countB.toLocaleString()}</td>
+                    <td className="py-2.5 font-bold text-white">
+                      {(p.countA + p.countB).toLocaleString()}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </section>
-      )}
+        )}
+      </section>
     </div>
   );
 }
+export { CrossCorrelatorView };

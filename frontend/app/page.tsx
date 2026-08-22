@@ -12,6 +12,7 @@ import { TopicClusterView } from '../components/TopicClusterView';
 import { CrossCorrelatorView } from '../components/CrossCorrelatorView';
 import { ProcessingModal, IngestionJobState } from '../components/ProcessingModal';
 import { BootSequence } from '../components/BootSequence';
+import BackgroundEffect from '../components/BackgroundEffect';
 
 interface DatasetItem {
   id: string;
@@ -128,8 +129,11 @@ export default function WorkstationPage() {
   const activeDataset = datasets.find((d) => d.id === selectedDatasetId) || datasets[0];
 
   return (
-    <div className="min-h-screen bg-theme-base text-theme-text selection:bg-theme-accent/30 selection:text-theme-text transition-colors duration-200">
-      {/* 0. High-Tech Terminal Boot Diagnostics (Initial Visit) */}
+    <div className="min-h-screen bg-theme-base text-theme-text font-mono relative selection:bg-cyan-500/30 selection:text-cyan-200">
+      {/* 3D Perspective Grid & Particle Background */}
+      <BackgroundEffect />
+
+      {/* Boot Sequence Animation */}
       {!isBootComplete && (
         <BootSequence onComplete={() => setIsBootComplete(true)} />
       )}

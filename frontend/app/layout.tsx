@@ -1,9 +1,22 @@
 import type { Metadata } from 'next';
+import { Outfit, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 
+const outfit = Outfit({
+  subsets: ['latin'],
+  variable: '--font-outfit',
+  display: 'swap',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  display: 'swap',
+});
+
 export const metadata: Metadata = {
-  title: 'Textboard',
-  description: 'Multipurpose data dashboard application',
+  title: 'TextBoard — Visual Intelligence & Forensic Analytics Workstation',
+  description: 'Ultra-high-performance 3D visual intelligence workstation for massive communication streams.',
 };
 
 export default function RootLayout({
@@ -12,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${outfit.variable} ${jetbrainsMono.variable}`}>
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -52,7 +65,8 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body>{children}</body>
+      <body className="antialiased overflow-x-hidden">{children}</body>
     </html>
   );
 }
+

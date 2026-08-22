@@ -6,11 +6,10 @@ import {
   MessageSquareIcon,
   UsersIcon,
   ClockIcon,
-  FileTextIcon,
   RefreshCwIcon,
-  TerminalIcon,
 } from './Icons';
 import { Button } from './ui/Button';
+import TopicBubbleChart, { TopicBubble } from './charts/TopicBubbleChart';
 
 interface TopicCluster {
   id: string;
@@ -94,43 +93,51 @@ export function TopicClusterView({ datasetId, datasetName, onExploreDate }: Topi
 
   const selectedCluster = clusters.find((c) => c.id === selectedClusterId) || clusters[0];
 
+  const topicBubbles: TopicBubble[] = clusters.map((c) => ({
+    id: c.id,
+    category: c.category,
+    label: c.name,
+    count: c.messageCount,
+    keywords: c.topKeywords.map((k) => k.word),
+  }));
+
   return (
     <div className="space-y-6 animate-fadeIn font-mono">
       {/* Header & Mode Switcher */}
-      <section className="p-6 rounded-xl border border-theme-border bg-theme-surface shadow-xs space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-theme-border pb-4">
+      <section className="glass-card-3d p-6 rounded-2xl space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-theme-border/50 pb-4">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-sm font-bold text-theme-text uppercase tracking-wider">
+              <h2 className="text-sm font-bold text-white uppercase tracking-wider">
                 SEMANTIC TOPIC CLUSTERING &amp; THREAD RECONSTRUCTION
               </h2>
-              <span className="px-2 py-0.5 rounded bg-purple-500/15 text-purple-400 text-[10px] font-bold border border-purple-500/30">
+              <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/40">
                 V3.0 ENGINE
               </span>
             </div>
-            <p className="text-xs text-theme-dim mt-0.5">
+            <p className="text-xs text-theme-muted mt-0.5">
               Deterministic topic extraction, keyword co-occurrence vectors, and temporal thread grouping
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <div className="flex items-center bg-theme-base p-1 rounded-lg border border-theme-border text-xs">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center bg-black/50 p-1 rounded-xl border border-theme-border text-xs">
               <button
                 onClick={() => setActiveTab('TOPICS')}
-                className={`px-3 py-1.5 rounded-md font-semibold tracking-wider transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-lg font-bold tracking-wider transition-all cursor-pointer ${
                   activeTab === 'TOPICS'
-                    ? 'bg-theme-active text-theme-accent border border-theme-border-hi'
-                    : 'text-theme-muted hover:text-theme-text'
+                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 shadow-sm'
+                    : 'text-theme-muted hover:text-white'
                 }`}
               >
                 THEMATIC CLUSTERS
               </button>
               <button
                 onClick={() => setActiveTab('THREADS')}
-                className={`px-3 py-1.5 rounded-md font-semibold tracking-wider transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-lg font-bold tracking-wider transition-all cursor-pointer ${
                   activeTab === 'THREADS'
-                    ? 'bg-theme-active text-theme-accent border border-theme-border-hi'
-                    : 'text-theme-muted hover:text-theme-text'
+                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 shadow-sm'
+                    : 'text-theme-muted hover:text-white'
                 }`}
               >
                 SMART THREADS ({threads.length})
@@ -150,6 +157,17 @@ export function TopicClusterView({ datasetId, datasetName, onExploreDate }: Topi
         </div>
       </section>
 
+      {/* 1. Thematic Topic Bubble Chart Diagram */}
+      {topicBubbles.length > 0 && (
+        <TopicBubbleChart
+          topics={topicBubbles}
+          title="Thematic Conversation Cluster Bubbles"
+          subtitle="Click on any cluster to inspect its keyword matrix and message stream"
+          onSelectTopic={(t) => setSelectedClusterId(t.id)}
+          height={240}
+        />
+      )}
+
       {/* Mode 1: Thematic Topic Clusters */}
       {activeTab === 'TOPICS' && (
         <div className="space-y-6">
@@ -161,32 +179,30 @@ export function TopicClusterView({ datasetId, datasetName, onExploreDate }: Topi
                 <div
                   key={cluster.id}
                   onClick={() => setSelectedClusterId(cluster.id)}
-                  className={`p-5 rounded-xl border transition-all cursor-pointer space-y-3 ${
-                    isSelected
-                      ? 'bg-theme-raised border-theme-accent shadow-theme-glow'
-                      : 'bg-theme-surface border-theme-border hover:border-theme-border-hi'
+                  className={`p-5 rounded-2xl glass-card-3d cursor-pointer space-y-3 ${
+                    isSelected ? 'border-cyan-400 shadow-xl ring-1 ring-cyan-400/40' : ''
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2.5">
                       <span className="text-2xl">{cluster.icon}</span>
                       <div>
-                        <h3 className="font-bold text-xs text-theme-text">{cluster.name}</h3>
-                        <span className="text-[10px] text-theme-dim uppercase font-semibold">
+                        <h3 className="font-bold text-xs text-white">{cluster.name}</h3>
+                        <span className="text-[10px] text-theme-muted uppercase font-semibold">
                           {cluster.percentage}% of Archive
                         </span>
                       </div>
                     </div>
 
-                    <span className="px-2 py-0.5 rounded bg-theme-base border border-theme-border text-theme-accent font-bold text-xs">
+                    <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-bold text-xs border border-cyan-400/40">
                       {cluster.messageCount.toLocaleString()} msgs
                     </span>
                   </div>
 
                   {/* Progress Bar */}
-                  <div className="w-full bg-theme-base rounded-full h-1.5 overflow-hidden">
+                  <div className="w-full bg-black/50 rounded-full h-1.5 overflow-hidden">
                     <div
-                      className="bg-theme-accent h-1.5 rounded-full transition-all"
+                      className="bg-gradient-to-r from-cyan-400 to-purple-500 h-1.5 rounded-full transition-all"
                       style={{ width: `${Math.min(100, Math.max(5, cluster.percentage))}%` }}
                     />
                   </div>
@@ -196,9 +212,9 @@ export function TopicClusterView({ datasetId, datasetName, onExploreDate }: Topi
                     {cluster.topKeywords.slice(0, 4).map((kw) => (
                       <span
                         key={kw.word}
-                        className="px-2 py-0.5 rounded bg-theme-base border border-theme-border text-[10px] text-theme-muted"
+                        className="px-2 py-0.5 rounded-md bg-black/40 border border-theme-border/60 text-[10px] text-theme-muted"
                       >
-                        {kw.word}
+                        #{kw.word}
                       </span>
                     ))}
                   </div>
@@ -207,69 +223,83 @@ export function TopicClusterView({ datasetId, datasetName, onExploreDate }: Topi
             })}
           </div>
 
-          {/* Selected Cluster Deep-Dive */}
+          {/* Selected Cluster Deep Dive Panel */}
           {selectedCluster && (
-            <div className="p-6 rounded-xl border border-theme-border bg-theme-surface space-y-6 shadow-xs">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-theme-border pb-4">
+            <div className="glass-card-3d p-6 rounded-2xl space-y-6">
+              <div className="flex items-center justify-between border-b border-theme-border/50 pb-4">
                 <div className="flex items-center gap-3">
                   <span className="text-3xl">{selectedCluster.icon}</span>
                   <div>
-                    <h3 className="text-base font-bold text-theme-text">{selectedCluster.name}</h3>
-                    <p className="text-xs text-theme-dim">
-                      {selectedCluster.messageCount.toLocaleString()} messages ({selectedCluster.percentage}% of stream)
+                    <h3 className="text-base font-bold text-white">
+                      {selectedCluster.name} Deep Intelligence
+                    </h3>
+                    <p className="text-xs text-theme-muted">
+                      Category: {selectedCluster.category} • {selectedCluster.percentage}% total volume
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-theme-dim">Dominant Actors:</span>
-                  <div className="flex items-center gap-1.5">
-                    {selectedCluster.topParticipants.slice(0, 3).map((p) => (
-                      <span
-                        key={p.actor}
-                        className="px-2 py-0.5 rounded bg-theme-base border border-theme-border text-[11px] text-theme-text"
+                <span className="text-xs text-cyan-400 font-bold">
+                  {selectedCluster.messageCount.toLocaleString()} messages
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Keywords Cloud */}
+                <div className="space-y-2">
+                  <span className="text-xs font-bold text-white uppercase tracking-wider block">
+                    Top Keywords by Weight
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedCluster.topKeywords.map((kw) => (
+                      <div
+                        key={kw.word}
+                        className="px-3 py-1 rounded-xl bg-cyan-500/10 border border-cyan-400/30 flex items-center gap-1.5 text-xs font-mono"
                       >
-                        {p.actor} ({p.count})
-                      </span>
+                        <span className="text-cyan-300 font-bold">#{kw.word}</span>
+                        <span className="text-[10px] text-theme-dim">({kw.weight}x)</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Key Participants */}
+                <div className="space-y-2">
+                  <span className="text-xs font-bold text-white uppercase tracking-wider block">
+                    Active Participants
+                  </span>
+                  <div className="space-y-1.5">
+                    {selectedCluster.topParticipants.map((p) => (
+                      <div
+                        key={p.actor}
+                        className="flex items-center justify-between p-2 rounded-xl bg-black/40 border border-theme-border/60 text-xs font-mono"
+                      >
+                        <span className="text-white font-bold">{p.actor}</span>
+                        <span className="text-cyan-400 font-bold">{p.count} messages</span>
+                      </div>
                     ))}
                   </div>
                 </div>
               </div>
 
-              {/* Keyword Vector Cloud */}
-              <div>
-                <h4 className="text-xs font-semibold text-theme-dim uppercase tracking-wider mb-2">
-                  Topic Keyword Relevance Vector
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {selectedCluster.topKeywords.map((kw) => (
-                    <span
-                      key={kw.word}
-                      className="px-3 py-1 rounded-lg bg-theme-base border border-theme-border text-xs text-theme-text font-medium"
-                    >
-                      <strong className="text-theme-accent">{kw.word}</strong>
-                      <span className="text-[10px] text-theme-dim ml-1.5">({kw.weight})</span>
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Sample Messages in this Cluster */}
-              <div>
-                <h4 className="text-xs font-semibold text-theme-dim uppercase tracking-wider mb-2">
+              {/* Sample Messages Carousel */}
+              <div className="space-y-2 pt-2 border-t border-theme-border/50">
+                <span className="text-xs font-bold text-white uppercase tracking-wider block">
                   Sample Discussion Excerpts
-                </h4>
+                </span>
                 <div className="space-y-2">
                   {selectedCluster.sampleMessages.map((msg) => (
                     <div
                       key={msg.id}
-                      className="p-3 rounded-lg bg-theme-base border border-theme-border text-xs space-y-1"
+                      className="p-3 rounded-xl bg-black/50 border border-theme-border/60 text-xs font-mono flex flex-col sm:flex-row sm:items-center justify-between gap-2"
                     >
-                      <div className="flex items-center justify-between text-[11px] text-theme-dim">
-                        <strong className="text-theme-accent">{msg.actor || 'Unknown'}</strong>
-                        <span>{new Date(msg.timestamp).toLocaleString()}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-cyan-400 font-bold">{msg.actor || 'Participant'}:</span>
+                        <span className="text-theme-text font-sans">&ldquo;{msg.content}&rdquo;</span>
                       </div>
-                      <p className="text-theme-text font-sans">{msg.content}</p>
+                      <span className="text-[10px] text-theme-dim shrink-0">
+                        {new Date(msg.timestamp).toLocaleString()}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -279,12 +309,12 @@ export function TopicClusterView({ datasetId, datasetName, onExploreDate }: Topi
         </div>
       )}
 
-      {/* Mode 2: Reconstructed Conversation Threads */}
+      {/* Mode 2: Smart Conversation Threads */}
       {activeTab === 'THREADS' && (
         <div className="space-y-4">
           {threads.length === 0 ? (
-            <div className="p-12 text-center text-xs text-theme-dim rounded-xl border border-theme-border bg-theme-surface">
-              {isLoading ? 'Reconstructing discussion threads...' : 'No multi-message threads identified in this archive.'}
+            <div className="p-12 rounded-2xl glass-card-3d text-center text-xs text-theme-dim">
+              No reconstructed discussion threads found.
             </div>
           ) : (
             threads.map((thread) => {
@@ -292,66 +322,58 @@ export function TopicClusterView({ datasetId, datasetName, onExploreDate }: Topi
               return (
                 <div
                   key={thread.id}
-                  className="p-5 rounded-xl border border-theme-border bg-theme-surface hover:border-theme-border-hi transition-all space-y-3 shadow-xs"
+                  className="glass-card-3d p-5 rounded-2xl space-y-4"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded bg-theme-active border border-theme-border-hi text-theme-accent font-bold text-[10px]">
-                        THREAD ({thread.messageCount} MSGS)
-                      </span>
-                      <span className="px-2 py-0.5 rounded bg-theme-base border border-theme-border text-theme-muted text-[11px]">
-                        Duration: <strong className="text-theme-text">{thread.durationMinutes} mins</strong>
-                      </span>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-bold text-white font-mono">
+                          {thread.topicTitle}
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 text-[10px] font-bold border border-cyan-400/40">
+                          {thread.messageCount} msgs
+                        </span>
+                        <span className="text-[10px] text-theme-muted font-mono flex items-center gap-1">
+                          <ClockIcon className="w-3 h-3" />
+                          {thread.durationMinutes} min session
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-xs text-theme-dim font-mono">
+                        <span>Initiator: <strong className="text-cyan-400">{thread.initiator}</strong></span>
+                        <span>•</span>
+                        <span>{new Date(thread.startTime).toLocaleString()}</span>
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-2 text-[11px] text-theme-dim">
-                      <ClockIcon className="w-3.5 h-3.5" />
-                      <span>{new Date(thread.startTime).toLocaleString()}</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="font-bold text-theme-text text-sm mb-1">{thread.topicTitle}</h3>
-                    <div className="flex items-center gap-2 text-xs text-theme-dim">
-                      <span>Initiated by: <strong className="text-theme-text">{thread.initiator}</strong></span>
-                      <span>•</span>
-                      <span>Participants: {thread.participants.join(', ')}</span>
-                    </div>
-                  </div>
-
-                  {/* Thread Action Bar */}
-                  <div className="flex items-center justify-between pt-2 border-t border-theme-border">
                     <Button
-                      variant="ghost"
+                      variant={isExpanded ? 'accent-outline' : 'secondary'}
                       size="xs"
                       onClick={() => setExpandedThreadId(isExpanded ? null : thread.id)}
                     >
-                      {isExpanded ? 'Hide Discussion Excerpts ▲' : 'View Discussion Excerpts ▼'}
+                      {isExpanded ? 'Collapse' : 'Read Thread'}
                     </Button>
-
-                    {onExploreDate && (
-                      <Button
-                        variant="secondary"
-                        size="xs"
-                        onClick={() => onExploreDate(thread.startTime)}
-                      >
-                        Explore in Timeline →
-                      </Button>
-                    )}
                   </div>
 
-                  {/* Expanded Messages */}
                   {isExpanded && (
-                    <div className="p-4 rounded-lg bg-theme-base border border-theme-border space-y-2.5 animate-fadeIn">
-                      {thread.sampleMessages.map((msg) => (
-                        <div key={msg.id} className="p-2.5 rounded bg-theme-surface border border-theme-border text-xs space-y-1">
-                          <div className="flex items-center justify-between text-[10px] text-theme-dim">
-                            <strong className="text-theme-accent">{msg.actor || 'User'}</strong>
-                            <span>{new Date(msg.timestamp).toLocaleTimeString()}</span>
+                    <div className="pt-3 border-t border-theme-border/50 space-y-2">
+                      <div className="text-[11px] text-theme-muted uppercase tracking-wider font-bold">
+                        Participants: {thread.participants.join(', ')}
+                      </div>
+                      <div className="space-y-1.5">
+                        {thread.sampleMessages.map((m) => (
+                          <div
+                            key={m.id}
+                            className="p-2.5 rounded-xl bg-black/60 border border-theme-border/60 text-xs font-mono flex items-start gap-2"
+                          >
+                            <span className="text-cyan-400 font-bold shrink-0">{m.actor || 'Actor'}:</span>
+                            <span className="text-theme-text font-sans flex-1">{m.content}</span>
+                            <span className="text-[10px] text-theme-dim shrink-0">
+                              {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
                           </div>
-                          <p className="text-theme-text font-sans">{msg.content}</p>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
