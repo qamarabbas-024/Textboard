@@ -9,6 +9,7 @@ import {
   SmileIcon,
   SparklesIcon,
 } from './Icons';
+import { Button } from './ui/Button';
 
 interface DatasetItem {
   id: string;
@@ -82,24 +83,24 @@ export function SearchView({
   return (
     <div className="space-y-6 animate-fadeIn font-mono">
       {/* Search Input Bar */}
-      <section className="p-6 rounded-xl border border-white/[0.08] bg-[#10141d]/80 space-y-4">
+      <section className="p-6 rounded-xl border border-theme-border bg-theme-surface space-y-4 shadow-xs">
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <div className="relative flex-1 w-full">
-            <SearchIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+            <SearchIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-theme-dim" />
             <input
               type="text"
               placeholder='Search messages... e.g. "budget" person:Ali after:2025-01-01 emoji:🎉 has:urls'
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="w-full bg-[#151b26] border border-white/[0.12] rounded-lg pl-10 pr-4 py-2.5 text-xs text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-cyan-500/60 transition-colors shadow-inner"
+              className="w-full bg-theme-base border border-theme-border rounded-lg pl-10 pr-4 py-2.5 text-xs text-theme-text placeholder:text-theme-dim focus:outline-none focus:border-theme-accent focus:ring-1 focus:ring-theme-accent transition-colors shadow-inner"
             />
           </div>
 
           <select
             value={datasetFilter}
             onChange={(e) => setDatasetFilter(e.target.value)}
-            className="w-full sm:w-auto bg-[#151b26] border border-white/[0.12] rounded-lg px-3 py-2.5 text-xs text-neutral-300 focus:outline-none focus:border-cyan-500/50"
+            className="w-full sm:w-auto bg-theme-base border border-theme-border rounded-lg px-3 py-2.5 text-xs text-theme-text focus:outline-none focus:border-theme-accent focus:ring-1 focus:ring-theme-accent"
           >
             <option value="">ALL DATASETS</option>
             {datasets.map((d) => (
@@ -109,75 +110,65 @@ export function SearchView({
             ))}
           </select>
 
-          <button
+          <Button
+            variant="primary"
+            size="md"
             onClick={() => executeSearch(1)}
-            disabled={isLoading}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-neutral-950 font-bold text-xs transition-colors shadow-[0_0_15px_rgba(34,211,238,0.3)] disabled:opacity-50"
+            isLoading={isLoading}
+            leftIcon={<SearchIcon className="w-4 h-4" />}
+            className="w-full sm:w-auto"
           >
-            {isLoading ? <RefreshCwIcon className="w-4 h-4 animate-spin" /> : <SearchIcon className="w-4 h-4" />}
-            <span>SEARCH</span>
-          </button>
+            SEARCH
+          </Button>
         </div>
 
         {/* Search Mode Switches */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-white/[0.05] text-xs">
-          <div className="flex items-center gap-1.5">
-            <span className="text-neutral-500 text-[11px] mr-1">ENGINE:</span>
-            <button
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-theme-border text-xs">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-theme-dim text-[11px] mr-1">ENGINE:</span>
+            <Button
+              variant={searchMode === 'hybrid' ? 'accent-outline' : 'ghost'}
+              size="xs"
               onClick={() => setSearchMode('hybrid')}
-              className={`px-2.5 py-1 rounded text-xs transition-all flex items-center gap-1 ${
-                searchMode === 'hybrid'
-                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold shadow-[0_0_10px_rgba(34,211,238,0.2)]'
-                  : 'bg-white/[0.03] text-neutral-400 border border-white/[0.06] hover:text-neutral-200'
-              }`}
             >
-              <span>⚡</span>
-              <span>HYBRID</span>
-            </button>
-            <button
+              ⚡ HYBRID
+            </Button>
+            <Button
+              variant={searchMode === 'semantic' ? 'accent-outline' : 'ghost'}
+              size="xs"
               onClick={() => setSearchMode('semantic')}
-              className={`px-2.5 py-1 rounded text-xs transition-all flex items-center gap-1 ${
-                searchMode === 'semantic'
-                  ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 font-bold shadow-[0_0_10px_rgba(168,85,247,0.2)]'
-                  : 'bg-white/[0.03] text-neutral-400 border border-white/[0.06] hover:text-neutral-200'
-              }`}
             >
-              <span>🧠</span>
-              <span>SEMANTIC VECTOR AI</span>
-            </button>
-            <button
+              🧠 SEMANTIC VECTOR AI
+            </Button>
+            <Button
+              variant={searchMode === 'exact' ? 'accent-outline' : 'ghost'}
+              size="xs"
               onClick={() => setSearchMode('exact')}
-              className={`px-2.5 py-1 rounded text-xs transition-all flex items-center gap-1 ${
-                searchMode === 'exact'
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold shadow-[0_0_10px_rgba(16,185,129,0.2)]'
-                  : 'bg-white/[0.03] text-neutral-400 border border-white/[0.06] hover:text-neutral-200'
-              }`}
             >
-              <span>🔍</span>
-              <span>EXACT KEYWORDS</span>
-            </button>
+              🔍 EXACT KEYWORDS
+            </Button>
           </div>
 
           {/* Quick Syntax Chips */}
           <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
-            <span className="text-neutral-500 flex items-center gap-1">
+            <span className="text-theme-dim flex items-center gap-1">
               <FilterIcon className="w-3 h-3" /> SYNTAX:
             </span>
             <button
               onClick={() => insertToken('person:Ali')}
-              className="px-2 py-0.5 rounded bg-white/[0.04] hover:bg-white/[0.08] text-neutral-300 border border-white/[0.06] transition-colors"
+              className="px-2 py-0.5 rounded bg-theme-base hover:bg-theme-raised text-theme-muted hover:text-theme-text border border-theme-border transition-colors cursor-pointer"
             >
               person:Name
             </button>
             <button
               onClick={() => insertToken('after:2024-01-01')}
-              className="px-2 py-0.5 rounded bg-white/[0.04] hover:bg-white/[0.08] text-neutral-300 border border-white/[0.06] transition-colors"
+              className="px-2 py-0.5 rounded bg-theme-base hover:bg-theme-raised text-theme-muted hover:text-theme-text border border-theme-border transition-colors cursor-pointer"
             >
               after:YYYY-MM-DD
             </button>
             <button
               onClick={() => insertToken('emoji:😂')}
-              className="px-2 py-0.5 rounded bg-white/[0.04] hover:bg-white/[0.08] text-neutral-300 border border-white/[0.06] transition-colors"
+              className="px-2 py-0.5 rounded bg-theme-base hover:bg-theme-raised text-theme-muted hover:text-theme-text border border-theme-border transition-colors cursor-pointer"
             >
               emoji:Emoji
             </button>
@@ -186,20 +177,20 @@ export function SearchView({
       </section>
 
       {/* Results Header */}
-      <div className="flex items-center justify-between px-2 text-xs text-neutral-400">
+      <div className="flex items-center justify-between px-2 text-xs text-theme-muted">
         <div className="flex items-center gap-3">
           <span>
-            MATCHES FOUND: <strong className="text-neutral-100">{totalMatches.toLocaleString()}</strong>
+            MATCHES FOUND: <strong className="text-theme-text">{totalMatches.toLocaleString()}</strong>
           </span>
           {executionTimeMs !== null && (
-            <span className="text-[11px] text-cyan-400 font-bold">
+            <span className="text-[11px] text-theme-accent font-bold">
               ⚡ {executionTimeMs}ms query latency
             </span>
           )}
         </div>
         {results.length > 0 && (
           <span>
-            PAGE <strong className="text-cyan-400">{page}</strong> (Showing {results.length} records)
+            PAGE <strong className="text-theme-accent">{page}</strong> (Showing {results.length} records)
           </span>
         )}
       </div>
@@ -207,26 +198,26 @@ export function SearchView({
       {/* Results List */}
       <section className="space-y-3">
         {results.length === 0 && !isLoading ? (
-          <div className="p-12 rounded-xl border border-white/[0.06] bg-[#10141d]/40 text-center text-xs text-neutral-500">
+          <div className="p-12 rounded-xl border border-theme-border bg-theme-surface/50 text-center text-xs text-theme-dim">
             No search matches found. Try refining your keywords or filters.
           </div>
         ) : (
           results.map((item) => (
             <div
               key={item.id}
-              className="p-4 rounded-xl border border-white/[0.08] bg-[#10141d]/80 hover:border-cyan-500/30 transition-all space-y-2"
+              className="p-4 rounded-xl border border-theme-border bg-theme-surface hover:border-theme-border-hi transition-all space-y-2 shadow-xs"
             >
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 font-semibold border border-cyan-500/20">
+                  <span className="px-2 py-0.5 rounded bg-theme-active text-theme-accent font-semibold border border-theme-border-hi">
                     {item.actor || 'System'}
                   </span>
-                  <span className="text-neutral-500 text-[11px]">
+                  <span className="text-theme-dim text-[11px]">
                     {new Date(item.timestamp).toLocaleString()}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2 text-[11px] text-neutral-400">
+                <div className="flex items-center gap-2 text-[11px] text-theme-muted">
                   {item.semanticScore !== undefined && (
                     <span className="px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 font-bold border border-purple-500/30 flex items-center gap-1">
                       <SparklesIcon className="w-3 h-3 text-purple-400" />
@@ -234,17 +225,17 @@ export function SearchView({
                     </span>
                   )}
                   {item.hasUrls && (
-                    <span className="flex items-center gap-1 text-cyan-400">
+                    <span className="flex items-center gap-1 text-theme-accent font-semibold">
                       <LinkIcon className="w-3 h-3" /> Link
                     </span>
                   )}
                   {item.hasEmojis && (
-                    <span className="flex items-center gap-1 text-amber-400">
+                    <span className="flex items-center gap-1 text-amber-400 font-semibold">
                       <SmileIcon className="w-3 h-3" /> Emoji
                     </span>
                   )}
                   {item.score && (
-                    <span className="text-neutral-500">
+                    <span className="text-theme-dim">
                       Rank: {item.score}
                     </span>
                   )}
@@ -253,7 +244,7 @@ export function SearchView({
 
               {/* Highlighted snippet */}
               <div
-                className="text-xs text-neutral-200 font-sans leading-relaxed pt-1"
+                className="text-xs text-theme-text font-sans leading-relaxed pt-1"
                 dangerouslySetInnerHTML={{
                   __html: item.highlight || item.content,
                 }}
@@ -265,22 +256,24 @@ export function SearchView({
 
       {/* Pagination Bar */}
       {results.length > 0 && (
-        <div className="flex items-center justify-between pt-4 border-t border-white/[0.06] text-xs">
-          <button
+        <div className="flex items-center justify-between pt-4 border-t border-theme-border text-xs">
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={() => executeSearch(Math.max(1, page - 1))}
             disabled={page <= 1 || isLoading}
-            className="px-4 py-2 rounded bg-white/[0.04] hover:bg-white/[0.08] text-neutral-300 disabled:opacity-30 disabled:hover:bg-white/[0.04] transition-colors"
           >
             ← Previous Page
-          </button>
-          <span className="text-neutral-500">Page {page}</span>
-          <button
+          </Button>
+          <span className="text-theme-dim font-bold">Page {page}</span>
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={() => executeSearch(page + 1)}
             disabled={!hasMore || isLoading}
-            className="px-4 py-2 rounded bg-white/[0.04] hover:bg-white/[0.08] text-neutral-300 disabled:opacity-30 disabled:hover:bg-white/[0.04] transition-colors"
           >
             Next Page →
-          </button>
+          </Button>
         </div>
       )}
     </div>

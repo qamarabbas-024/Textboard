@@ -21,6 +21,13 @@ const config: Config = {
           dim: 'var(--text-dim)',
           accent: 'var(--accent)',
           highlight: 'var(--stat-highlight)',
+          card: 'var(--card-bg)',
+          'card-border': 'var(--card-border)',
+          input: 'var(--input-bg)',
+          'input-border': 'var(--input-border)',
+          'btn-primary': 'var(--btn-primary-bg)',
+          'btn-primary-text': 'var(--btn-primary-text)',
+          'btn-primary-hover': 'var(--btn-primary-hover)',
         },
       },
       borderRadius: {

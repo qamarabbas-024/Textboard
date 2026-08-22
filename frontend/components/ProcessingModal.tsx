@@ -7,6 +7,8 @@ import {
   TerminalIcon,
   ArrowRightIcon,
 } from './Icons';
+import { Button } from './ui/Button';
+import { IconButton } from './ui/IconButton';
 
 export interface IngestionJobState {
   jobId: string;
@@ -65,7 +67,7 @@ export function ProcessingModal({
   const steps = [
     { key: 'spooling', label: 'Spooling Stream' },
     { key: 'parsing', label: 'Streaming Parser' },
-    { key: 'normalizing', label: 'Entity & Metric Extraction' },
+    { key: 'normalizing', label: 'Entity Extraction' },
     { key: 'completed', label: 'Indexed & Ready' },
   ];
 
@@ -81,40 +83,41 @@ export function ProcessingModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
-      <div className="w-full max-w-xl rounded-xl border border-white/[0.12] bg-[#0e1118] p-6 shadow-[0_0_50px_rgba(0,0,0,0.8)] text-neutral-200 font-mono">
+      <div className="w-full max-w-xl rounded-xl border border-theme-border bg-theme-surface p-6 shadow-2xl text-theme-text font-mono">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/[0.08] pb-4 mb-6">
+        <div className="flex items-center justify-between border-b border-theme-border pb-4 mb-6">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
+            <div className="p-2 rounded-lg bg-theme-active border border-theme-border-hi text-theme-accent">
               <TerminalIcon className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-semibold text-neutral-100 text-sm tracking-wider uppercase">
+              <h3 className="font-semibold text-theme-text text-sm tracking-wider uppercase">
                 {isFinished ? 'INGESTION COMPLETE' : isFailed ? 'INGESTION FAILED' : 'STREAMING INGESTION'}
               </h3>
-              <p className="text-xs text-neutral-400">
-                JOB ID: <span className="text-cyan-400">{job.jobId.slice(0, 16)}...</span>
+              <p className="text-xs text-theme-dim">
+                JOB ID: <span className="text-theme-accent">{job.jobId.slice(0, 16)}...</span>
               </p>
             </div>
           </div>
 
-          <button
+          <IconButton
+            variant="ghost"
+            size="sm"
+            label="Close modal"
+            icon={<XIcon className="w-4 h-4" />}
             onClick={onClose}
-            className="p-1 rounded-md text-neutral-400 hover:text-neutral-200 hover:bg-white/[0.06] transition-colors"
-          >
-            <XIcon className="w-5 h-5" />
-          </button>
+          />
         </div>
 
         {/* Target File Info */}
-        <div className="grid grid-cols-2 gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/[0.06] text-xs mb-6">
+        <div className="grid grid-cols-2 gap-3 p-3 rounded-lg bg-theme-base border border-theme-border text-xs mb-6">
           <div>
-            <span className="text-neutral-500 block">SOURCE FILE</span>
-            <span className="text-neutral-200 font-medium truncate block">{job.filename || 'Direct Upload'}</span>
+            <span className="text-theme-dim block">SOURCE FILE</span>
+            <span className="text-theme-text font-medium truncate block">{job.filename || 'Direct Upload'}</span>
           </div>
           <div>
-            <span className="text-neutral-500 block">STATUS / ELAPSED</span>
-            <span className="text-cyan-300 font-medium">
+            <span className="text-theme-dim block">STATUS / ELAPSED</span>
+            <span className="text-theme-accent font-medium">
               {job.status} ({job.executionTimeMs ? `${job.executionTimeMs}ms` : `${elapsedSeconds}s`})
             </span>
           </div>
@@ -123,19 +126,19 @@ export function ProcessingModal({
         {/* Live Progress Bar */}
         <div className="space-y-2 mb-6">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-neutral-400 font-medium">
-              PROCESSED: <strong className="text-neutral-100">{job.processedRows.toLocaleString()}</strong> RECORDS
+            <span className="text-theme-muted font-medium">
+              PROCESSED: <strong className="text-theme-text">{job.processedRows.toLocaleString()}</strong> RECORDS
             </span>
-            <span className="font-bold text-cyan-400">{job.progress}%</span>
+            <span className="font-bold text-theme-accent">{job.progress}%</span>
           </div>
-          <div className="w-full h-2.5 rounded-full bg-white/[0.06] overflow-hidden p-0.5 border border-white/[0.08]">
+          <div className="w-full h-2.5 rounded-full bg-theme-base overflow-hidden p-0.5 border border-theme-border">
             <div
               className={`h-full rounded-full transition-all duration-300 ${
                 isFinished
                   ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]'
                   : isFailed
                   ? 'bg-rose-500'
-                  : 'bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.5)]'
+                  : 'bg-theme-accent shadow-theme-glow'
               }`}
               style={{ width: `${Math.max(4, job.progress)}%` }}
             />
@@ -150,12 +153,12 @@ export function ProcessingModal({
             return (
               <div
                 key={step.key}
-                className={`p-2 rounded border text-center transition-all ${
+                className={`p-2 rounded-lg border text-center transition-all ${
                   isCompleted
-                    ? 'bg-emerald-950/30 border-emerald-500/40 text-emerald-400'
+                    ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400 font-bold'
                     : isCurrent
-                    ? 'bg-cyan-950/40 border-cyan-500/50 text-cyan-300 shadow-[0_0_8px_rgba(34,211,238,0.2)]'
-                    : 'bg-white/[0.02] border-white/[0.05] text-neutral-600'
+                    ? 'bg-theme-active border-theme-border-hi text-theme-accent font-bold shadow-theme-glow'
+                    : 'bg-theme-base border-theme-border text-theme-dim'
                 }`}
               >
                 <div className="font-semibold mb-0.5">0{idx + 1}</div>
@@ -167,7 +170,7 @@ export function ProcessingModal({
 
         {/* Error Details if Failed */}
         {isFailed && job.errorMessage && (
-          <div className="p-3 rounded-lg bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs mb-6 flex items-start gap-2">
+          <div className="p-3 rounded-lg bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs mb-6 flex items-start gap-2">
             <AlertCircleIcon className="w-4 h-4 text-rose-400 mt-0.5 shrink-0" />
             <div>
               <strong>Ingestion Failed:</strong> {job.errorMessage}
@@ -176,33 +179,38 @@ export function ProcessingModal({
         )}
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-between border-t border-white/[0.08] pt-4">
+        <div className="flex items-center justify-between border-t border-theme-border pt-4">
           {isProcessing && onCancelJob && (
-            <button
+            <Button
+              variant="danger"
+              size="sm"
               onClick={() => onCancelJob(job.jobId)}
-              className="px-3.5 py-1.5 rounded bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/40 text-rose-300 text-xs transition-colors"
             >
               Cancel Import
-            </button>
+            </Button>
           )}
 
           {isFinished && job.datasetId && onExploreDataset && (
-            <button
+            <Button
+              variant="primary"
+              size="md"
+              className="ml-auto"
               onClick={() => onExploreDataset(job.datasetId!)}
-              className="ml-auto flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-neutral-950 font-semibold text-xs transition-colors shadow-[0_0_15px_rgba(34,211,238,0.4)]"
+              rightIcon={<ArrowRightIcon className="w-4 h-4" />}
             >
-              <span>Explore Dataset</span>
-              <ArrowRightIcon className="w-4 h-4" />
-            </button>
+              Explore Dataset
+            </Button>
           )}
 
           {!isProcessing && (!isFinished || !job.datasetId) && (
-            <button
+            <Button
+              variant="secondary"
+              size="sm"
+              className="ml-auto"
               onClick={onClose}
-              className="ml-auto px-4 py-1.5 rounded bg-white/[0.08] hover:bg-white/[0.12] text-neutral-200 text-xs transition-colors"
             >
               Close
-            </button>
+            </Button>
           )}
         </div>
       </div>

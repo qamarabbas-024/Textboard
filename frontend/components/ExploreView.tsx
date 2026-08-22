@@ -16,6 +16,7 @@ import { ActivityHeatmap } from './ActivityHeatmap';
 import { PdfExportModal } from './PdfExportModal';
 import { RelationshipMatrix } from './RelationshipMatrix';
 import { OnThisDayView } from './OnThisDayView';
+import { Button } from './ui/Button';
 
 export type ExploreSubTab = 'timeline' | 'network' | 'people' | 'activity' | 'emoji' | 'topics' | 'links';
 
@@ -61,7 +62,7 @@ export function ExploreView({
 
   if (!activeDataset) {
     return (
-      <div className="p-12 text-center font-mono text-xs text-neutral-500 rounded-xl border border-white/[0.08] bg-[#10141d]/80">
+      <div className="p-12 text-center font-mono text-xs text-theme-dim rounded-xl border border-theme-border bg-theme-surface shadow-xs">
         No dataset selected. Import or select a dataset to explore.
       </div>
     );
@@ -80,9 +81,9 @@ export function ExploreView({
   return (
     <div className="space-y-6 animate-fadeIn font-mono">
       {/* Dataset Selector & Context Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-white/[0.08] bg-[#10141d]/80">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-xl border border-theme-border bg-theme-surface shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+          <div className="w-8 h-8 rounded-lg bg-theme-active border border-theme-border-hi flex items-center justify-center text-theme-accent">
             <ActivityIcon className="w-4 h-4" />
           </div>
           <div>
@@ -90,7 +91,7 @@ export function ExploreView({
               <select
                 value={activeDataset.id}
                 onChange={(e) => onSelectDataset(e.target.value)}
-                className="bg-[#151b26] border border-white/[0.12] rounded px-2.5 py-1 text-xs text-neutral-100 font-semibold focus:outline-none focus:border-cyan-500/50"
+                className="bg-theme-base border border-theme-border rounded-lg px-2.5 py-1 text-xs text-theme-text font-semibold focus:outline-none focus:border-theme-accent focus:ring-1 focus:ring-theme-accent"
               >
                 {datasets.map((d) => (
                   <option key={d.id} value={d.id}>
@@ -99,25 +100,25 @@ export function ExploreView({
                 ))}
               </select>
             </div>
-            <span className="text-[11px] text-neutral-500">
+            <span className="text-[11px] text-theme-dim">
               Type: {activeDataset.sourceType.toUpperCase()} | Total Records: {activeDataset.totalEvents.toLocaleString()}
             </span>
           </div>
         </div>
 
         {/* Sub-Navigation Tabs & Actions */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
-          <div className="flex items-center gap-1">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between lg:justify-end gap-2 overflow-x-auto pb-1 sm:pb-0">
+          <div className="flex items-center gap-1 overflow-x-auto py-0.5">
             {subTabs.map((t) => {
               const isActive = subTab === t.id;
               return (
                 <button
                   key={t.id}
                   onClick={() => setSubTab(t.id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs tracking-wider transition-all whitespace-nowrap ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs tracking-wider transition-all whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent cursor-pointer ${
                     isActive
-                      ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-semibold shadow-[0_0_8px_rgba(34,211,238,0.15)]'
-                      : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/[0.04] border border-transparent'
+                      ? 'bg-theme-active text-theme-accent border border-theme-border-hi font-bold shadow-theme-glow'
+                      : 'text-theme-muted hover:text-theme-text hover:bg-theme-raised border border-transparent'
                   }`}
                 >
                   {t.icon}
@@ -127,32 +128,30 @@ export function ExploreView({
             })}
           </div>
 
-          <div className="flex items-center gap-1.5">
-            <button
+          <div className="flex items-center gap-1.5 shrink-0">
+            <Button
+              variant="secondary"
+              size="xs"
               onClick={() => setIsExportOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white/[0.06] hover:bg-cyan-500/20 text-neutral-200 hover:text-cyan-300 border border-white/[0.12] hover:border-cyan-500/40 text-xs font-semibold transition-all whitespace-nowrap shadow-xs"
               title="Export Visual PDF Archive"
             >
-              <span>📄</span>
-              <span>PDF</span>
-            </button>
+              📄 PDF
+            </Button>
             <a
               href={`/api/v1/datasets/${activeDataset.id}/export/csv`}
               download
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white/[0.06] hover:bg-cyan-500/20 text-neutral-200 hover:text-cyan-300 border border-white/[0.12] hover:border-cyan-500/40 text-xs font-semibold transition-all whitespace-nowrap shadow-xs"
+              className="inline-flex items-center justify-center font-semibold font-mono text-[10px] sm:text-[11px] px-2.5 py-1 rounded-md gap-1 bg-theme-surface hover:bg-theme-raised border border-theme-border text-theme-text transition-all"
               title="Export Raw CSV"
             >
-              <span>📊</span>
-              <span>CSV</span>
+              📊 CSV
             </a>
             <a
               href={`/api/v1/datasets/${activeDataset.id}/export/json`}
               download
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white/[0.06] hover:bg-cyan-500/20 text-neutral-200 hover:text-cyan-300 border border-white/[0.12] hover:border-cyan-500/40 text-xs font-semibold transition-all whitespace-nowrap shadow-xs"
+              className="inline-flex items-center justify-center font-semibold font-mono text-[10px] sm:text-[11px] px-2.5 py-1 rounded-md gap-1 bg-theme-surface hover:bg-theme-raised border border-theme-border text-theme-text transition-all"
               title="Export Structured JSON"
             >
-              <span>📦</span>
-              <span>JSON</span>
+              📦 JSON
             </a>
           </div>
         </div>
@@ -173,7 +172,7 @@ export function ExploreView({
               });
             }}
           />
-          <div className="rounded-xl border border-white/[0.08] bg-[#10141d]/80 p-4">
+          <div className="rounded-xl border border-theme-border bg-theme-surface p-4 shadow-xs">
             <StreamTimelineView
               datasetId={activeDataset.id}
               selectedRange={selectedRange}
@@ -199,30 +198,30 @@ export function ExploreView({
             {analytics.messageAnalytics?.byPerson.map((person: any, idx: number) => (
               <div
                 key={person.actor}
-                className="p-5 rounded-xl border border-white/[0.08] bg-[#10141d]/80 hover:border-cyan-500/40 transition-all space-y-3"
+                className="p-5 rounded-xl border border-theme-border bg-theme-surface hover:border-theme-border-hi transition-all space-y-3 shadow-xs"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-[11px] font-bold text-cyan-400">
+                    <span className="w-6 h-6 rounded-full bg-theme-active border border-theme-border-hi flex items-center justify-center text-[11px] font-bold text-theme-accent">
                       {idx + 1}
                     </span>
-                    <h3 className="font-bold text-neutral-100 text-sm truncate">{person.actor}</h3>
+                    <h3 className="font-bold text-theme-text text-sm truncate">{person.actor}</h3>
                   </div>
-                  <span className="text-cyan-400 text-xs font-bold">{person.percentage}%</span>
+                  <span className="text-theme-accent text-xs font-bold">{person.percentage}%</span>
                 </div>
 
-                <div className="w-full h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
-                  <div className="h-full bg-cyan-400 rounded-full" style={{ width: `${person.percentage}%` }} />
+                <div className="w-full h-1.5 rounded-full bg-theme-base overflow-hidden">
+                  <div className="h-full bg-theme-accent rounded-full" style={{ width: `${person.percentage}%` }} />
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 text-[11px] text-neutral-400 pt-2 border-t border-white/[0.05]">
+                <div className="grid grid-cols-2 gap-2 text-[11px] text-theme-dim pt-2 border-t border-theme-border">
                   <div>
-                    <span className="text-neutral-500 block">MESSAGES</span>
-                    <span className="text-neutral-200 font-semibold">{person.messageCount.toLocaleString()}</span>
+                    <span className="text-theme-muted block">MESSAGES</span>
+                    <span className="text-theme-text font-semibold">{person.messageCount.toLocaleString()}</span>
                   </div>
                   <div>
-                    <span className="text-neutral-500 block">AVG LENGTH</span>
-                    <span className="text-neutral-200 font-semibold">{person.avgChars} chars</span>
+                    <span className="text-theme-muted block">AVG LENGTH</span>
+                    <span className="text-theme-text font-semibold">{person.avgChars} chars</span>
                   </div>
                 </div>
               </div>
@@ -248,21 +247,21 @@ export function ExploreView({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Day of Week Breakdown */}
-            <div className="p-5 rounded-xl border border-white/[0.08] bg-[#10141d]/80 space-y-4">
-              <h3 className="text-xs font-semibold text-neutral-200 uppercase tracking-wider">
+            <div className="p-5 rounded-xl border border-theme-border bg-theme-surface space-y-4 shadow-xs">
+              <h3 className="text-xs font-semibold text-theme-text uppercase tracking-wider">
                 DAY OF WEEK DISTRIBUTION
               </h3>
               <div className="space-y-2">
                 {analytics.messageAnalytics?.byDayOfWeek.map((day: any) => (
                   <div key={day.dayName} className="space-y-1">
-                    <div className="flex items-center justify-between text-xs text-neutral-300">
+                    <div className="flex items-center justify-between text-xs text-theme-muted">
                       <span>{day.dayName}</span>
-                      <span className="text-neutral-400">
+                      <span className="text-theme-dim">
                         {day.count.toLocaleString()} ({day.percentage}%)
                       </span>
                     </div>
-                    <div className="w-full h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
-                      <div className="h-full bg-cyan-400 rounded-full" style={{ width: `${day.percentage}%` }} />
+                    <div className="w-full h-1.5 rounded-full bg-theme-base overflow-hidden">
+                      <div className="h-full bg-theme-accent rounded-full" style={{ width: `${day.percentage}%` }} />
                     </div>
                   </div>
                 ))}
@@ -270,40 +269,40 @@ export function ExploreView({
             </div>
 
             {/* Streaks & Gaps Overview */}
-            <div className="p-5 rounded-xl border border-white/[0.08] bg-[#10141d]/80 space-y-4">
-              <h3 className="text-xs font-semibold text-neutral-200 uppercase tracking-wider">
+            <div className="p-5 rounded-xl border border-theme-border bg-theme-surface space-y-4 shadow-xs">
+              <h3 className="text-xs font-semibold text-theme-text uppercase tracking-wider">
                 CONVERSATION CADENCE & STREAKS
               </h3>
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-lg bg-white/[0.02] border border-white/[0.05]">
-                  <span className="text-neutral-500 text-[11px] block">LONGEST STREAK</span>
-                  <span className="text-xl font-bold text-cyan-300">
+                <div className="p-4 rounded-lg bg-theme-base border border-theme-border">
+                  <span className="text-theme-muted text-[11px] block">LONGEST STREAK</span>
+                  <span className="text-xl font-bold text-theme-accent">
                     {analytics.activityAnalytics?.longestStreak?.days || 0} DAYS
                   </span>
-                  <span className="text-[10px] text-neutral-500 block mt-1">
+                  <span className="text-[10px] text-theme-dim block mt-1">
                     {analytics.activityAnalytics?.longestStreak?.startDate} to {analytics.activityAnalytics?.longestStreak?.endDate}
                   </span>
                 </div>
 
-                <div className="p-4 rounded-lg bg-white/[0.02] border border-white/[0.05]">
-                  <span className="text-neutral-500 text-[11px] block">LONGEST GAP</span>
-                  <span className="text-xl font-bold text-amber-300">
+                <div className="p-4 rounded-lg bg-theme-base border border-theme-border">
+                  <span className="text-theme-muted text-[11px] block">LONGEST GAP</span>
+                  <span className="text-xl font-bold text-amber-400">
                     {analytics.activityAnalytics?.longestGap?.days || 0} DAYS
                   </span>
-                  <span className="text-[10px] text-neutral-500 block mt-1">
+                  <span className="text-[10px] text-theme-dim block mt-1">
                     Quiet period between messages
                   </span>
                 </div>
               </div>
 
-              <div className="p-4 rounded-lg bg-white/[0.02] border border-white/[0.05] text-xs space-y-1">
-                <div className="flex justify-between text-neutral-400">
+              <div className="p-4 rounded-lg bg-theme-base border border-theme-border text-xs space-y-1">
+                <div className="flex justify-between text-theme-muted">
                   <span>TOTAL ACTIVE DAYS:</span>
-                  <strong className="text-neutral-200">{analytics.activityAnalytics?.totalActiveDays || 0}</strong>
+                  <strong className="text-theme-text">{analytics.activityAnalytics?.totalActiveDays || 0}</strong>
                 </div>
-                <div className="flex justify-between text-neutral-400">
+                <div className="flex justify-between text-theme-muted">
                   <span>AVG DAILY VOLUME:</span>
-                  <strong className="text-neutral-200">{analytics.activityAnalytics?.averageMessagesPerActiveDay || 0} msgs/day</strong>
+                  <strong className="text-theme-text">{analytics.activityAnalytics?.averageMessagesPerActiveDay || 0} msgs/day</strong>
                 </div>
               </div>
             </div>
@@ -318,19 +317,19 @@ export function ExploreView({
 
       {subTab === 'emoji' && analytics && (
         <section className="space-y-6">
-          <div className="p-5 rounded-xl border border-white/[0.08] bg-[#10141d]/80 space-y-4">
-            <h3 className="text-xs font-semibold text-neutral-200 uppercase tracking-wider">
+          <div className="p-5 rounded-xl border border-theme-border bg-theme-surface space-y-4 shadow-xs">
+            <h3 className="text-xs font-semibold text-theme-text uppercase tracking-wider">
               EMOJI LEADERBOARD (TOTAL: {analytics.emojiAnalytics?.totalEmojis?.toLocaleString()})
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-3">
               {analytics.emojiAnalytics?.topEmojis?.slice(0, 16).map((em: any, idx: number) => (
                 <div
                   key={em.emoji}
-                  className="p-3 rounded-lg border border-white/[0.06] bg-white/[0.02] text-center hover:border-cyan-500/40 transition-colors"
+                  className="p-3 rounded-lg border border-theme-border bg-theme-base text-center hover:border-theme-border-hi transition-colors"
                 >
                   <div className="text-2xl mb-1">{em.emoji}</div>
-                  <div className="text-xs font-bold text-neutral-200">{em.count.toLocaleString()}</div>
-                  <div className="text-[10px] text-neutral-500">#{idx + 1} ({em.percentage}%)</div>
+                  <div className="text-xs font-bold text-theme-text">{em.count.toLocaleString()}</div>
+                  <div className="text-[10px] text-theme-dim">#{idx + 1} ({em.percentage}%)</div>
                 </div>
               ))}
             </div>
@@ -341,32 +340,32 @@ export function ExploreView({
       {subTab === 'topics' && analytics && (
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Top Words */}
-          <div className="p-5 rounded-xl border border-white/[0.08] bg-[#10141d]/80 space-y-4">
-            <h3 className="text-xs font-semibold text-neutral-200 uppercase tracking-wider">
+          <div className="p-5 rounded-xl border border-theme-border bg-theme-surface space-y-4 shadow-xs">
+            <h3 className="text-xs font-semibold text-theme-text uppercase tracking-wider">
               FREQUENT KEYWORDS
             </h3>
             <div className="flex flex-wrap gap-2">
               {analytics.textAnalytics?.topWords?.slice(0, 40).map((w: any) => (
                 <span
                   key={w.word}
-                  className="px-2.5 py-1 rounded bg-white/[0.04] border border-white/[0.08] text-xs text-neutral-200 hover:border-cyan-500/40 hover:text-cyan-300 transition-colors"
+                  className="px-2.5 py-1 rounded-lg bg-theme-base border border-theme-border text-xs text-theme-text hover:border-theme-border-hi hover:text-theme-accent transition-colors"
                 >
-                  {w.word} <strong className="text-cyan-400 font-normal">({w.count})</strong>
+                  {w.word} <strong className="text-theme-accent font-normal">({w.count})</strong>
                 </span>
               ))}
             </div>
           </div>
 
           {/* Top Bigram Phrases */}
-          <div className="p-5 rounded-xl border border-white/[0.08] bg-[#10141d]/80 space-y-4">
-            <h3 className="text-xs font-semibold text-neutral-200 uppercase tracking-wider">
+          <div className="p-5 rounded-xl border border-theme-border bg-theme-surface space-y-4 shadow-xs">
+            <h3 className="text-xs font-semibold text-theme-text uppercase tracking-wider">
               RECURRING PHRASES (N-GRAMS)
             </h3>
             <div className="space-y-2">
               {analytics.textAnalytics?.topPhrases?.slice(0, 10).map((p: any) => (
-                <div key={p.phrase} className="flex items-center justify-between p-2.5 rounded bg-white/[0.02] border border-white/[0.04] text-xs">
-                  <span className="text-neutral-200 font-medium">{p.phrase}</span>
-                  <span className="text-cyan-400 font-semibold">{p.count} times</span>
+                <div key={p.phrase} className="flex items-center justify-between p-2.5 rounded-lg bg-theme-base border border-theme-border text-xs">
+                  <span className="text-theme-text font-medium">{p.phrase}</span>
+                  <span className="text-theme-accent font-semibold">{p.count} times</span>
                 </div>
               ))}
             </div>
@@ -375,28 +374,28 @@ export function ExploreView({
       )}
 
       {subTab === 'links' && analytics && (
-        <section className="p-5 rounded-xl border border-white/[0.08] bg-[#10141d]/80 space-y-4">
-          <h3 className="text-xs font-semibold text-neutral-200 uppercase tracking-wider">
+        <section className="p-5 rounded-xl border border-theme-border bg-theme-surface space-y-4 shadow-xs">
+          <h3 className="text-xs font-semibold text-theme-text uppercase tracking-wider">
             SHARED WEB URLS ({analytics.textAnalytics?.urls?.length || 0})
           </h3>
           <div className="space-y-2">
             {analytics.textAnalytics?.urls?.map((link: any, idx: number) => (
               <div
                 key={idx}
-                className="flex items-center justify-between p-3 rounded-lg bg-white/[0.02] border border-white/[0.05] hover:border-cyan-500/30 transition-colors text-xs"
+                className="flex items-center justify-between p-3 rounded-lg bg-theme-base border border-theme-border hover:border-theme-border-hi transition-colors text-xs"
               >
                 <div className="flex items-center gap-2 truncate mr-4">
-                  <LinkIcon className="w-4 h-4 text-cyan-400 shrink-0" />
+                  <LinkIcon className="w-4 h-4 text-theme-accent shrink-0" />
                   <a
                     href={link.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-neutral-200 hover:text-cyan-300 truncate underline"
+                    className="text-theme-text hover:text-theme-accent truncate underline"
                   >
                     {link.url}
                   </a>
                 </div>
-                <span className="px-2 py-0.5 rounded bg-white/[0.06] text-[11px] text-neutral-400 shrink-0">
+                <span className="px-2 py-0.5 rounded bg-theme-surface text-[11px] text-theme-dim shrink-0 border border-theme-border">
                   {link.domain}
                 </span>
               </div>

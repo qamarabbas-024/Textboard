@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 
-export type AppTheme = 'slate' | 'matrix' | 'cyberpunk' | 'nordic' | 'cream';
+export type AppTheme = 'obsidian' | 'slate' | 'matrix' | 'solar' | 'nordic';
 
-const THEMES: Array<{
+export const THEMES: Array<{
   id: AppTheme;
   label: string;
   badge: string;
@@ -13,55 +13,57 @@ const THEMES: Array<{
   dotColor: string;
 }> = [
   {
-    id: 'matrix',
-    label: 'Hacker Matrix',
-    badge: 'TERMINAL',
-    desc: 'Phosphor green, CRT scanlines, command-line vibes',
-    icon: '🟩',
-    dotColor: '#22c55e',
-  },
-  {
-    id: 'cyberpunk',
+    id: 'obsidian',
     label: 'Obsidian Neon',
-    badge: 'CYBERPUNK',
-    desc: 'Deep obsidian with glowing cyan & rose accents',
+    badge: 'CYBER',
+    desc: 'Deep titanium obsidian with glowing cyan & emerald accents',
     icon: '⚡',
-    dotColor: '#06b6d4',
+    dotColor: '#00f0ff',
   },
   {
     id: 'slate',
     label: 'Midnight Slate',
-    badge: 'DEFAULT',
-    desc: 'Modern dark glassmorphic command center',
+    badge: 'SLATE',
+    desc: 'Modern indigo command deck with ice-blue highlights',
     icon: '🌌',
     dotColor: '#38bdf8',
   },
   {
-    id: 'nordic',
-    label: 'Nordic Frost',
-    badge: 'MINIMAL',
-    desc: 'Ice blue & slate with titanium borders',
-    icon: '❄️',
-    dotColor: '#93c5fd',
+    id: 'matrix',
+    label: 'Hacker Matrix',
+    badge: 'CRT',
+    desc: 'Pure terminal black with phosphor green scanline vibes',
+    icon: '🟩',
+    dotColor: '#00ff66',
   },
   {
-    id: 'cream',
-    label: 'Eye-Care Warm',
-    badge: 'WARM',
-    desc: 'Low-strain warm cream reading canvas',
+    id: 'solar',
+    label: 'Solar Warm Paper',
+    badge: 'LIGHT',
+    desc: 'High-legibility warm cream editorial canvas with terracotta',
     icon: '☕',
-    dotColor: '#d97706',
+    dotColor: '#c25934',
+  },
+  {
+    id: 'nordic',
+    label: 'Nordic Frost',
+    badge: 'ARCTIC',
+    desc: 'Arctic silver & slate with frosted ice-blue borders',
+    icon: '❄️',
+    dotColor: '#93c5fd',
   },
 ];
 
 export function ThemeSwitcher() {
-  const [currentTheme, setCurrentTheme] = useState<AppTheme>('slate');
+  const [currentTheme, setCurrentTheme] = useState<AppTheme>('obsidian');
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem('textboard_app_theme') as AppTheme;
     if (saved && THEMES.some((t) => t.id === saved)) {
       setTheme(saved);
+    } else {
+      setTheme('obsidian');
     }
   }, []);
 
@@ -69,21 +71,18 @@ export function ThemeSwitcher() {
     setCurrentTheme(theme);
     localStorage.setItem('textboard_app_theme', theme);
     const root = document.documentElement;
-    if (theme === 'slate') {
-      root.removeAttribute('data-theme');
-    } else {
-      root.setAttribute('data-theme', theme);
-    }
+    root.setAttribute('data-theme', theme);
   };
 
-  const activeThemeObj = THEMES.find((t) => t.id === currentTheme) || THEMES[2];
+  const activeThemeObj = THEMES.find((t) => t.id === currentTheme) || THEMES[0];
 
   return (
     <div className="relative inline-block text-left font-mono">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/[0.12] bg-[#141a24]/90 hover:bg-white/[0.08] text-xs font-semibold text-neutral-200 transition-all shadow-xs"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-theme-border bg-theme-surface hover:bg-theme-active text-xs font-semibold text-theme-text transition-all shadow-xs focus-visible:ring-2 focus-visible:ring-theme-accent focus-visible:outline-none"
         title="Switch Visual Theme"
+        aria-label="Select Visual Theme"
       >
         <span
           className="w-2.5 h-2.5 rounded-full inline-block animate-pulse shadow-sm"
@@ -91,15 +90,16 @@ export function ThemeSwitcher() {
         />
         <span>{activeThemeObj.icon}</span>
         <span className="hidden sm:inline">{activeThemeObj.label}</span>
-        <span className="text-[10px] text-neutral-500">▼</span>
+        <span className="text-[10px] text-theme-dim">▼</span>
       </button>
 
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="absolute right-0 mt-2 w-64 rounded-xl border border-white/[0.15] bg-[#0d121c]/95 backdrop-blur-md shadow-2xl p-2 z-50 animate-fadeIn">
-            <div className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold px-2 py-1 border-b border-white/[0.08] mb-1">
-              Select Visual Theme
+          <div className="absolute right-0 mt-2 w-64 rounded-xl border border-theme-border bg-theme-surface shadow-2xl p-2 z-50 animate-fadeIn">
+            <div className="text-[10px] uppercase tracking-wider text-theme-dim font-bold px-2 py-1 border-b border-theme-border mb-1 flex items-center justify-between">
+              <span>Select Theme</span>
+              <span className="text-[9px] text-theme-accent font-mono">5 STYLES</span>
             </div>
             <div className="space-y-1">
               {THEMES.map((theme) => {
@@ -113,26 +113,29 @@ export function ThemeSwitcher() {
                     }}
                     className={`w-full flex items-center justify-between p-2 rounded-lg text-left text-xs transition-all ${
                       isSelected
-                        ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-xs'
-                        : 'text-neutral-300 hover:bg-white/[0.06] hover:text-white border border-transparent'
+                        ? 'bg-theme-active text-theme-accent border border-theme-border-hi shadow-xs'
+                        : 'text-theme-text hover:bg-theme-raised border border-transparent'
                     }`}
                   >
                     <div className="flex items-center gap-2">
                       <span
-                        className="w-2 h-2 rounded-full inline-block"
+                        className="w-2.5 h-2.5 rounded-full inline-block shrink-0"
                         style={{ backgroundColor: theme.dotColor }}
                       />
                       <div>
-                        <div className="font-bold flex items-center gap-1.5">
+                        <div className="font-bold flex items-center gap-1.5 text-theme-text">
                           <span>{theme.icon}</span>
                           <span>{theme.label}</span>
+                          <span className="text-[9px] px-1 py-0.2 rounded border border-theme-border text-theme-dim uppercase">
+                            {theme.badge}
+                          </span>
                         </div>
-                        <div className="text-[10px] text-neutral-400 leading-tight">
+                        <div className="text-[10px] text-theme-muted leading-tight mt-0.5">
                           {theme.desc}
                         </div>
                       </div>
                     </div>
-                    {isSelected && <span className="text-cyan-400 font-bold">✓</span>}
+                    {isSelected && <span className="text-theme-accent font-bold ml-1">✓</span>}
                   </button>
                 );
               })}

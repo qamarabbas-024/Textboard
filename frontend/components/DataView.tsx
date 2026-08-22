@@ -9,6 +9,7 @@ import {
 } from './Icons';
 import { IngestionJobState } from './ProcessingModal';
 import { PdfExportModal } from './PdfExportModal';
+import { Button } from './ui/Button';
 
 interface DatasetItem {
   id: string;
@@ -133,28 +134,28 @@ export function DataView({
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* 1. Multi-Format Streaming Ingestion Zone */}
-      <section className="p-6 rounded-xl border border-white/[0.08] bg-[#10141d]/80 font-mono">
-        <div className="flex items-center justify-between mb-4">
+      <section className="p-6 rounded-xl border border-theme-border bg-theme-surface font-mono shadow-xs">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-2">
-            <UploadIcon className="w-4 h-4 text-cyan-400" />
-            <h2 className="text-xs font-semibold tracking-wider text-neutral-200 uppercase">
+            <UploadIcon className="w-4 h-4 text-theme-accent" />
+            <h2 className="text-xs font-semibold tracking-wider text-theme-text uppercase">
               STREAMING INGESTION ENGINE (ZERO BUFFERING)
             </h2>
           </div>
           <div className="flex flex-wrap items-center gap-1.5 text-[10px]">
-            <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">WhatsApp</span>
-            <span className="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">Telegram</span>
-            <span className="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Discord</span>
-            <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">Apple iMessage</span>
-            <span className="px-2 py-0.5 rounded bg-teal-500/10 text-teal-300 border border-teal-500/20">Signal</span>
-            <span className="px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">Slack</span>
-            <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">CSV / XLSX</span>
-            <span className="px-2 py-0.5 rounded bg-rose-500/10 text-rose-300 border border-rose-500/20 font-bold">.ZIP Archives</span>
+            <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">WhatsApp</span>
+            <span className="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-bold">Telegram</span>
+            <span className="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-bold">Discord</span>
+            <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-bold">iMessage</span>
+            <span className="px-2 py-0.5 rounded bg-teal-500/10 text-teal-400 border border-teal-500/20 font-bold">Signal</span>
+            <span className="px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 font-bold">Slack</span>
+            <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold">CSV / XLSX</span>
+            <span className="px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 font-bold">.ZIP Archives</span>
           </div>
         </div>
 
         {errorMsg && (
-          <div className="p-3 mb-4 rounded-lg bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+          <div className="p-3 mb-4 rounded-lg bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs flex items-center gap-2">
             <AlertCircleIcon className="w-4 h-4 text-rose-400 shrink-0" />
             <span>{errorMsg}</span>
           </div>
@@ -176,8 +177,8 @@ export function DataView({
           onClick={() => fileInputRef.current?.click()}
           className={`p-8 rounded-lg border-2 border-dashed transition-all cursor-pointer text-center space-y-3 ${
             isDragging
-              ? 'border-cyan-400 bg-cyan-500/[0.08] shadow-[0_0_20px_rgba(34,211,238,0.2)]'
-              : 'border-white/[0.12] hover:border-cyan-500/40 bg-white/[0.02]'
+              ? 'border-theme-accent bg-theme-active shadow-theme-glow'
+              : 'border-theme-border hover:border-theme-border-hi bg-theme-base/40'
           }`}
         >
           <input
@@ -192,7 +193,7 @@ export function DataView({
             accept=".txt,.csv,.tsv,.json,.jsonl,.ndjson,.xlsx,.xls,.log,.zip,.signal,.imessage"
           />
 
-          <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center mx-auto text-cyan-400">
+          <div className="w-12 h-12 rounded-xl bg-theme-active border border-theme-border-hi flex items-center justify-center mx-auto text-theme-accent">
             {isUploading ? (
               <RefreshCwIcon className="w-6 h-6 animate-spin" />
             ) : (
@@ -201,19 +202,19 @@ export function DataView({
           </div>
 
           <div>
-            <p className="text-sm font-medium text-neutral-200">
+            <p className="text-sm font-medium text-theme-text">
               {isUploading ? 'Spooling Stream to Disk...' : 'Drop communication stream or tabular dataset here'}
             </p>
-            <p className="text-xs text-neutral-500 mt-1">
+            <p className="text-xs text-theme-dim mt-1">
               Supports large 100,000+ entry datasets without memory limits
             </p>
           </div>
         </div>
 
         {/* Local File Path Submission (Desktop-first) */}
-        <form onSubmit={handleLocalSubmit} className="mt-4 pt-4 border-t border-white/[0.06] flex items-center gap-2">
-          <div className="flex items-center gap-2 text-neutral-500 text-xs shrink-0">
-            <TerminalIcon className="w-4 h-4 text-neutral-400" />
+        <form onSubmit={handleLocalSubmit} className="mt-4 pt-4 border-t border-theme-border flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <div className="flex items-center gap-2 text-theme-dim text-xs shrink-0">
+            <TerminalIcon className="w-4 h-4 text-theme-muted" />
             <span>LOCAL PATH:</span>
           </div>
           <input
@@ -221,38 +222,40 @@ export function DataView({
             placeholder="C:\path\to\stream_export.txt or /var/log/data.csv"
             value={localPathInput}
             onChange={(e) => setLocalPathInput(e.target.value)}
-            className="flex-1 bg-white/[0.03] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-cyan-500/50"
+            className="flex-1 bg-theme-base border border-theme-border rounded-lg px-3 py-1.5 text-xs text-theme-text placeholder:text-theme-dim focus:outline-none focus:border-theme-accent focus:ring-1 focus:ring-theme-accent font-mono"
           />
-          <button
+          <Button
             type="submit"
-            disabled={isUploading || !localPathInput.trim()}
-            className="px-4 py-1.5 rounded-md bg-white/[0.08] hover:bg-cyan-500/20 hover:text-cyan-300 text-neutral-200 text-xs font-semibold transition-colors disabled:opacity-40"
+            size="sm"
+            variant="secondary"
+            isLoading={isUploading}
+            disabled={!localPathInput.trim()}
           >
             Import Path
-          </button>
+          </Button>
         </form>
       </section>
 
       {/* 2. Registered Datasets Table */}
-      <section className="p-6 rounded-xl border border-white/[0.08] bg-[#10141d]/80 font-mono">
+      <section className="p-6 rounded-xl border border-theme-border bg-theme-surface font-mono shadow-xs">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <DatabaseIcon className="w-4 h-4 text-cyan-400" />
-            <h2 className="text-xs font-semibold tracking-wider text-neutral-200 uppercase">
+            <DatabaseIcon className="w-4 h-4 text-theme-accent" />
+            <h2 className="text-xs font-semibold tracking-wider text-theme-text uppercase">
               LOCAL DATASET REPOSITORY ({datasets.length})
             </h2>
           </div>
         </div>
 
         {datasets.length === 0 ? (
-          <div className="p-8 text-center text-xs text-neutral-500">
+          <div className="p-8 text-center text-xs text-theme-dim">
             No datasets currently registered. Drop a file above to begin.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-white/[0.08] text-neutral-400 text-[11px]">
+                <tr className="border-b border-theme-border text-theme-muted text-[11px]">
                   <th className="py-3 px-4">DATASET</th>
                   <th className="py-3 px-4">SOURCE TYPE</th>
                   <th className="py-3 px-4">EVENT COUNT</th>
@@ -260,65 +263,67 @@ export function DataView({
                   <th className="py-3 px-4 text-right">ACTIONS</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/[0.05]">
+              <tbody className="divide-y divide-theme-border">
                 {datasets.map((ds) => (
-                  <tr key={ds.id} className="hover:bg-white/[0.02] transition-colors">
-                    <td className="py-3.5 px-4 font-medium text-neutral-100 flex items-center gap-2">
-                      <FileTextIcon className="w-4 h-4 text-neutral-500" />
+                  <tr key={ds.id} className="hover:bg-theme-raised transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-theme-text flex items-center gap-2">
+                      <FileTextIcon className="w-4 h-4 text-theme-dim" />
                       <span>{ds.name}</span>
                     </td>
-                    <td className="py-3.5 px-4 text-neutral-400 uppercase text-[11px]">
+                    <td className="py-3.5 px-4 text-theme-muted uppercase text-[11px]">
                       {ds.sourceType}
                     </td>
-                    <td className="py-3.5 px-4 text-cyan-300 font-semibold">
+                    <td className="py-3.5 px-4 text-theme-accent font-semibold">
                       {ds.totalEvents.toLocaleString()}
                     </td>
-                    <td className="py-3.5 px-4 text-neutral-400 text-[11px]">
+                    <td className="py-3.5 px-4 text-theme-muted text-[11px]">
                       {ds.startDate && ds.endDate
                         ? `${new Date(ds.startDate).toLocaleDateString()} - ${new Date(
                             ds.endDate,
                           ).toLocaleDateString()}`
                         : 'Recorded'}
                     </td>
-                    <td className="py-3.5 px-4 text-right space-x-2">
-                      <button
-                        onClick={() => setExportingDataset(ds)}
-                        className="px-2.5 py-1 rounded bg-white/[0.06] hover:bg-white/[0.12] text-neutral-200 border border-white/[0.15] transition-colors inline-flex items-center gap-1"
-                        title="Export Visual PDF Archive"
-                      >
-                        <span>📄</span>
-                        <span>PDF</span>
-                      </button>
-                      <a
-                        href={`/api/v1/datasets/${ds.id}/export/csv`}
-                        download
-                        className="px-2.5 py-1 rounded bg-white/[0.06] hover:bg-white/[0.12] text-neutral-200 border border-white/[0.15] transition-colors inline-flex items-center gap-1"
-                        title="Export Raw CSV"
-                      >
-                        <span>📊</span>
-                        <span>CSV</span>
-                      </a>
-                      <a
-                        href={`/api/v1/datasets/${ds.id}/export/json`}
-                        download
-                        className="px-2.5 py-1 rounded bg-white/[0.06] hover:bg-white/[0.12] text-neutral-200 border border-white/[0.15] transition-colors inline-flex items-center gap-1"
-                        title="Export Structured JSON"
-                      >
-                        <span>📦</span>
-                        <span>JSON</span>
-                      </a>
-                      <button
-                        onClick={() => onExploreDataset(ds.id)}
-                        className="px-3 py-1 rounded bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 transition-colors"
-                      >
-                        Explore
-                      </button>
-                      <button
-                        onClick={() => handleDelete(ds.id, ds.name)}
-                        className="px-2.5 py-1 rounded bg-rose-950/30 hover:bg-rose-900/50 text-rose-300 border border-rose-500/20 transition-colors"
-                      >
-                        Delete
-                      </button>
+                    <td className="py-3.5 px-4 text-right">
+                      <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                        <Button
+                          variant="secondary"
+                          size="xs"
+                          onClick={() => setExportingDataset(ds)}
+                          title="Export Visual PDF Archive"
+                        >
+                          📄 PDF
+                        </Button>
+                        <a
+                          href={`/api/v1/datasets/${ds.id}/export/csv`}
+                          download
+                          className="inline-flex items-center justify-center font-semibold font-mono text-[10px] sm:text-[11px] px-2 py-1 rounded-md gap-1 bg-theme-surface hover:bg-theme-raised border border-theme-border text-theme-text transition-all"
+                          title="Export Raw CSV"
+                        >
+                          📊 CSV
+                        </a>
+                        <a
+                          href={`/api/v1/datasets/${ds.id}/export/json`}
+                          download
+                          className="inline-flex items-center justify-center font-semibold font-mono text-[10px] sm:text-[11px] px-2 py-1 rounded-md gap-1 bg-theme-surface hover:bg-theme-raised border border-theme-border text-theme-text transition-all"
+                          title="Export Structured JSON"
+                        >
+                          📦 JSON
+                        </a>
+                        <Button
+                          variant="accent-outline"
+                          size="xs"
+                          onClick={() => onExploreDataset(ds.id)}
+                        >
+                          Explore
+                        </Button>
+                        <Button
+                          variant="danger"
+                          size="xs"
+                          onClick={() => handleDelete(ds.id, ds.name)}
+                        >
+                          Delete
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 ))}

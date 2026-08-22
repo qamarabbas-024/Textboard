@@ -7,6 +7,7 @@ import {
   CheckCircleIcon,
   DatabaseIcon,
 } from './Icons';
+import { Button } from './ui/Button';
 
 interface DatasetItem {
   id: string;
@@ -76,16 +77,16 @@ export function InsightsView({
   return (
     <div className="space-y-6 animate-fadeIn font-mono">
       {/* Header & Controls */}
-      <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-xl border border-white/[0.08] bg-[#10141d]/80">
+      <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-xl border border-theme-border bg-theme-surface shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+          <div className="w-8 h-8 rounded-lg bg-theme-active border border-theme-border-hi flex items-center justify-center text-theme-accent">
             <SparklesIcon className="w-4 h-4" />
           </div>
           <div>
-            <h2 className="font-semibold text-neutral-100 text-xs tracking-wider uppercase">
+            <h2 className="font-semibold text-theme-text text-xs tracking-wider uppercase">
               DETERMINISTIC INTELLIGENCE WALL
             </h2>
-            <p className="text-[11px] text-neutral-400">
+            <p className="text-[11px] text-theme-muted">
               Verifiable statistical insights with zero hallucination risk
             </p>
           </div>
@@ -96,7 +97,7 @@ export function InsightsView({
             <select
               value={activeDataset?.id || ''}
               onChange={(e) => onSelectDataset(e.target.value)}
-              className="bg-[#151b26] border border-white/[0.12] rounded px-3 py-1.5 text-xs text-neutral-200 focus:outline-none focus:border-cyan-500/50"
+              className="bg-theme-base border border-theme-border rounded-lg px-3 py-1.5 text-xs text-theme-text focus:outline-none focus:border-theme-accent focus:ring-1 focus:ring-theme-accent"
             >
               {datasets.map((d) => (
                 <option key={d.id} value={d.id}>
@@ -106,14 +107,15 @@ export function InsightsView({
             </select>
           )}
 
-          <button
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={() => fetchInsights(true)}
-            disabled={isLoading}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-white/[0.06] hover:bg-cyan-500/20 text-neutral-200 hover:text-cyan-300 text-xs transition-colors border border-white/[0.08]"
+            isLoading={isLoading}
+            leftIcon={<RefreshCwIcon className="w-3.5 h-3.5" />}
           >
-            <RefreshCwIcon className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-            <span>Recompute</span>
-          </button>
+            Recompute
+          </Button>
         </div>
       </section>
 
@@ -122,17 +124,14 @@ export function InsightsView({
         {categories.map((cat) => {
           const isActive = selectedCategory === cat;
           return (
-            <button
+            <Button
               key={cat}
+              variant={isActive ? 'accent-outline' : 'ghost'}
+              size="xs"
               onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1 rounded-md tracking-wider transition-all ${
-                isActive
-                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold shadow-[0_0_8px_rgba(34,211,238,0.2)]'
-                  : 'bg-white/[0.03] text-neutral-400 hover:text-neutral-200 border border-white/[0.05]'
-              }`}
             >
               {cat}
-            </button>
+            </Button>
           );
         })}
       </div>
@@ -140,7 +139,7 @@ export function InsightsView({
       {/* Insights Cards Grid */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filteredInsights.length === 0 ? (
-          <div className="col-span-2 p-12 rounded-xl border border-white/[0.06] bg-[#10141d]/40 text-center text-xs text-neutral-500">
+          <div className="col-span-2 p-12 rounded-xl border border-theme-border bg-theme-surface/50 text-center text-xs text-theme-dim shadow-xs">
             No insights found for the selected category.
           </div>
         ) : (
@@ -149,39 +148,39 @@ export function InsightsView({
             return (
               <div
                 key={ins.id}
-                className="p-5 rounded-xl border border-white/[0.08] bg-[#10141d]/80 hover:border-cyan-500/40 transition-all flex flex-col justify-between space-y-4"
+                className="p-5 rounded-xl border border-theme-border bg-theme-surface hover:border-theme-border-hi transition-all flex flex-col justify-between space-y-4 shadow-xs"
               >
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 uppercase tracking-wider">
+                    <span className="text-[10px] px-2 py-0.5 rounded bg-theme-active text-theme-accent border border-theme-border-hi uppercase tracking-wider font-bold">
                       {ins.category}
                     </span>
-                    <span className="text-[11px] text-neutral-500 font-mono">
+                    <span className="text-[11px] text-theme-dim font-mono">
                       {Math.round(ins.confidence * 100)}% CONFIDENCE
                     </span>
                   </div>
 
-                  <h3 className="font-bold text-neutral-100 text-sm mb-2">{ins.title}</h3>
-                  <p className="text-xs text-neutral-300 font-sans leading-relaxed">{ins.summary}</p>
+                  <h3 className="font-bold text-theme-text text-sm mb-2">{ins.title}</h3>
+                  <p className="text-xs text-theme-muted font-sans leading-relaxed">{ins.summary}</p>
                 </div>
 
                 {/* Traceable Supporting Data Inspector */}
-                <div className="pt-3 border-t border-white/[0.05]">
+                <div className="pt-3 border-t border-theme-border">
                   <button
                     onClick={() => setExpandedInsightId(isExpanded ? null : ins.id)}
-                    className="w-full flex items-center justify-between text-[11px] text-neutral-400 hover:text-cyan-300 transition-colors"
+                    className="w-full flex items-center justify-between text-[11px] text-theme-muted hover:text-theme-accent transition-colors cursor-pointer"
                   >
                     <span className="flex items-center gap-1.5">
-                      <TerminalIcon className="w-3.5 h-3.5 text-cyan-400" />
+                      <TerminalIcon className="w-3.5 h-3.5 text-theme-accent" />
                       <span>{isExpanded ? 'Hide Traceable Data' : 'Inspect Supporting Data'}</span>
                     </span>
-                    <span className="text-[10px] text-cyan-400">
+                    <span className="text-[10px] text-theme-accent font-bold">
                       {isExpanded ? '▲ COLLAPSE' : '▼ AUDIT'}
                     </span>
                   </button>
 
                   {isExpanded && (
-                    <div className="mt-3 p-3 rounded bg-black/50 border border-white/[0.08] text-[11px] text-cyan-300 overflow-x-auto">
+                    <div className="mt-3 p-3 rounded-lg bg-theme-base border border-theme-border text-[11px] text-theme-accent overflow-x-auto">
                       <pre>{JSON.stringify(ins.supportingData, null, 2)}</pre>
                     </div>
                   )}

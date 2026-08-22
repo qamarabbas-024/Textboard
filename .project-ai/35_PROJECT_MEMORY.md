@@ -1,0 +1,36 @@
+# TextBoard — Project Memory & Architecture Matrix
+
+## 1. Project Identity & Vision
+- **Product Name**: TextBoard (formerly Archive Terminal)
+- **Positioning**: Private, local-first intelligence workstation for large-scale communications streams, chat archives, logs, and tabular data.
+- **Key Guarantee**: 100% Zero-Cloud / Zero-Hallucination deterministic analysis with high-throughput streaming pipelines.
+
+## 2. Target Users & Personas
+- **Investigators / Forensic Analysts**: Needing strict, provable audit trails and deterministic metric generation.
+- **Power Users & Community Managers**: Analyzing massive WhatsApp, Discord, Telegram, and Slack exports (100k+ records) with zero browser freezing.
+- **Privacy-Conscious Professionals**: Demanding zero external API leakage, local SQLite storage, and offline capabilities.
+
+## 3. Universal Design System & Theme Engine
+- **Themes (5 Curated Palettes)**:
+  1. `obsidian` / `cyberpunk` (Default Cyber Titanium & Cyan)
+  2. `solar` / `cream` (Solar Warm Editorial Cream with Rust Accents)
+  3. `matrix` (Phosphor Green CRT Monochrome Terminal)
+  4. `slate` (Midnight Slate & Ice-Cyan Command Center)
+  5. `nordic` (Nordic Frost Silver & Arctic Blue)
+- **Token Hierarchy**:
+  - `bg-theme-base`, `bg-theme-surface`, `bg-theme-raised`, `bg-theme-active`
+  - `border-theme-border`, `border-theme-border-hi`
+  - `text-theme-text`, `text-theme-muted`, `text-theme-dim`, `text-theme-accent`
+- **Control System**:
+  - Universal `<Button>` (`primary`, `secondary`, `ghost`, `danger`, `accent-outline`)
+  - Universal `<IconButton>` with accessible ARIA labels and focus-visible rings.
+
+## 4. Ingestion & Analytical Pipeline
+- **Supported Stream Formats**: WhatsApp (iOS/Android), Telegram (JSON/HTML), Discord (JSON/TXT), Apple iMessage, Signal, Slack, CSV, TSV, JSON, JSONL/NDJSON, XLSX/XLS, Plain Text, and Universal Multi-file `.ZIP` archives.
+- **Ingestion Execution**: Constant O(1) memory streaming via `readline` and chunked sinks (`BatchedSinkService`), scaling to 100,000+ entries.
+- **PDF Export Engine**: Vectorized multi-page PDF generation with Eye-Care cream palettes, cryptographic SHA-256 manifests, and zero-missing/zero-duplicate verification.
+
+## 5. Security & Isolation
+- **Local PIN Convenience Lock**: SHA-based client session guard preventing shoulder-surfing without pretending to replace OS-level disk encryption.
+- **Offline Integrity**: SQLite WAL database at `backend/prisma/archive_local.db` with zero remote network dependencies.
+

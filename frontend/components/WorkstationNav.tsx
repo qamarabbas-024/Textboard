@@ -44,64 +44,67 @@ export function WorkstationNav({
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-white/[0.08] bg-[#0c0e14]/90 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+    <header className="sticky top-0 z-40 w-full border-b border-theme-border bg-theme-surface/95 backdrop-blur-md transition-colors duration-150">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-2">
         {/* Brand & System Mode */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 shrink-0">
           <div className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 rounded-sm bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]" />
-            <span className="font-mono text-sm font-semibold tracking-wider text-neutral-100 uppercase">
-              TEXTBOARD <span className="text-cyan-400 text-xs font-normal">v1.0</span>
+            <div className="w-2.5 h-2.5 rounded-sm bg-theme-accent shadow-theme-glow" />
+            <span className="font-mono text-xs sm:text-sm font-bold tracking-wider text-theme-text uppercase">
+              TEXTBOARD <span className="text-theme-accent text-[11px] font-normal">v2.0</span>
             </span>
           </div>
 
-          <div className="hidden md:flex items-center gap-1.5 px-2 py-0.5 rounded bg-white/[0.04] border border-white/[0.06] font-mono text-[11px] text-neutral-400">
+          <div className="hidden lg:flex items-center gap-1.5 px-2 py-0.5 rounded bg-theme-base border border-theme-border font-mono text-[11px] text-theme-muted">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             LOCAL-FIRST ENGINE
           </div>
         </div>
 
         {/* Primary Workstation Navigation Tabs */}
-        <nav className="flex items-center gap-1">
+        <nav className="flex items-center gap-0.5 sm:gap-1 overflow-x-auto py-1 max-w-full">
           {navItems.map((item) => {
             const isActive = currentTab === item.tab;
             return (
               <button
                 key={item.tab}
                 onClick={() => onSelectTab(item.tab)}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md font-mono text-xs tracking-wider transition-all ${
+                aria-label={item.label}
+                className={`flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-lg font-mono text-xs tracking-wider transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent cursor-pointer ${
                   isActive
-                    ? 'bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 shadow-[0_0_12px_rgba(34,211,238,0.15)] font-medium'
-                    : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/[0.04] border border-transparent'
+                    ? 'bg-theme-active text-theme-accent border border-theme-border-hi shadow-theme-glow font-bold'
+                    : 'text-theme-muted hover:text-theme-text hover:bg-theme-raised border border-transparent'
                 }`}
               >
                 {item.icon}
-                <span>{item.label}</span>
+                <span className="hidden sm:inline">{item.label}</span>
               </button>
             );
           })}
         </nav>
 
         {/* Right Side: Theme Switcher & System Telemetry */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <ThemeSwitcher />
 
           {activeJob ? (
             <button
               onClick={onOpenProcessingModal}
-              className="flex items-center gap-2 px-2.5 py-1 rounded bg-cyan-950/60 border border-cyan-500/40 text-cyan-300 font-mono text-xs hover:bg-cyan-900/60 transition-colors animate-pulse"
+              className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-theme-active border border-theme-accent text-theme-accent font-mono text-xs hover:opacity-90 transition-opacity animate-pulse focus-visible:ring-2 focus-visible:ring-theme-accent"
+              title="View Ingestion Progress"
             >
-              <RefreshCwIcon className="w-3.5 h-3.5 animate-spin text-cyan-400" />
-              <span>INGESTING ({activeJob.progress}%)</span>
+              <RefreshCwIcon className="w-3.5 h-3.5 animate-spin text-theme-accent" />
+              <span className="hidden sm:inline">INGESTING</span>
+              <span>({activeJob.progress}%)</span>
             </button>
           ) : (
-            <div className="hidden lg:flex items-center gap-3 font-mono text-xs text-neutral-400">
+            <div className="hidden xl:flex items-center gap-2.5 font-mono text-xs text-theme-dim">
               <span>
-                DATASETS: <strong className="text-neutral-200">{datasetCount}</strong>
+                DATASETS: <strong className="text-theme-text">{datasetCount}</strong>
               </span>
-              <span className="text-neutral-600">|</span>
+              <span className="text-theme-dim">|</span>
               <span>
-                RECORDS: <strong className="text-neutral-200">{totalRecords.toLocaleString()}</strong>
+                RECORDS: <strong className="text-theme-text">{totalRecords.toLocaleString()}</strong>
               </span>
             </div>
           )}

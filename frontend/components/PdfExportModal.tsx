@@ -291,26 +291,26 @@ export function PdfExportModal({
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
-          className="w-full max-w-xl bg-[#10141d] border border-white/[0.12] rounded-xl p-6 shadow-2xl text-neutral-200 max-h-[92vh] overflow-y-auto"
+          className="w-full max-w-xl bg-theme-surface border border-theme-border rounded-xl p-6 shadow-2xl text-theme-text max-h-[92vh] overflow-y-auto"
         >
           {/* Modal Header */}
-          <div className="flex items-center justify-between pb-4 border-b border-white/[0.08] mb-4">
+          <div className="flex items-center justify-between pb-4 border-b border-theme-border mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+              <div className="w-9 h-9 rounded-lg bg-theme-active border border-theme-border-hi flex items-center justify-center text-theme-accent">
                 <span className="text-lg">📄</span>
               </div>
               <div>
-                <h2 className="text-sm font-bold text-neutral-100 tracking-wider">
+                <h2 className="text-sm font-bold text-theme-text tracking-wider">
                   VISUAL STREAM PDF EXPORTER
                 </h2>
-                <p className="text-[11px] text-neutral-400">
+                <p className="text-[11px] text-theme-dim">
                   {datasetName} • {totalEvents.toLocaleString()} entries
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-1 rounded-lg text-neutral-400 hover:text-white hover:bg-white/[0.05] transition-colors"
+              className="p-1.5 rounded-lg text-theme-muted hover:text-theme-text hover:bg-theme-raised transition-colors cursor-pointer"
             >
               ✕
             </button>

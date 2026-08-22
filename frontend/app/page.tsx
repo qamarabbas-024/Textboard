@@ -8,6 +8,7 @@ import { ExploreView } from '../components/ExploreView';
 import { SearchView } from '../components/SearchView';
 import { InsightsView } from '../components/InsightsView';
 import { ProcessingModal, IngestionJobState } from '../components/ProcessingModal';
+import { BootSequence } from '../components/BootSequence';
 
 interface DatasetItem {
   id: string;
@@ -26,6 +27,7 @@ export default function WorkstationPage() {
   const [activeJob, setActiveJob] = useState<IngestionJobState | null>(null);
   const [isProcessingModalOpen, setIsProcessingModalOpen] = useState(false);
   const [insights, setInsights] = useState<any[]>([]);
+  const [isBootComplete, setIsBootComplete] = useState(false);
 
   // Fetch registered datasets
   const fetchDatasets = async () => {
@@ -121,7 +123,12 @@ export default function WorkstationPage() {
   ) || (datasets.length > 0 ? datasets.length * 2 : 0);
 
   return (
-    <div className="min-h-screen bg-[#08090e] text-neutral-100 selection:bg-cyan-500/30 selection:text-cyan-200">
+    <div className="min-h-screen bg-theme-base text-theme-text selection:bg-theme-accent/30 selection:text-theme-text transition-colors duration-200">
+      {/* 0. High-Tech Terminal Boot Diagnostics (Initial Visit) */}
+      {!isBootComplete && (
+        <BootSequence onComplete={() => setIsBootComplete(true)} />
+      )}
+
       {/* 1. Top Workstation Navigation */}
       <WorkstationNav
         currentTab={currentTab}

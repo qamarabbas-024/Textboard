@@ -66,22 +66,22 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
   };
 
   return (
-    <div className="p-5 rounded-xl border border-white/[0.08] bg-[#10141d]/80 space-y-4 font-mono">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/[0.06] pb-3">
+    <div className="p-5 rounded-xl border border-theme-border bg-theme-surface space-y-4 font-mono shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-theme-border pb-3">
         <div>
-          <h3 className="text-xs font-semibold text-neutral-200 uppercase tracking-wider flex items-center gap-2">
+          <h3 className="text-xs font-semibold text-theme-text uppercase tracking-wider flex items-center gap-2">
             <span>📅</span>
             <span>24/7 Peak Activity Matrix Heatmap</span>
           </h3>
-          <p className="text-[11px] text-neutral-500">
+          <p className="text-[11px] text-theme-dim">
             Hourly conversation velocity across days of the week
           </p>
         </div>
 
         {/* Legend */}
-        <div className="flex items-center gap-1.5 text-[10px] text-neutral-400">
+        <div className="flex items-center gap-1.5 text-[10px] text-theme-muted">
           <span>Low</span>
-          <span className="w-3 h-3 rounded bg-white/[0.04] border border-white/[0.08]" />
+          <span className="w-3 h-3 rounded bg-theme-base border border-theme-border" />
           <span className="w-3 h-3 rounded bg-cyan-950/40 border border-cyan-800/30" />
           <span className="w-3 h-3 rounded bg-cyan-700/60 border border-cyan-500/40" />
           <span className="w-3 h-3 rounded bg-cyan-400 border border-cyan-300" />
@@ -94,10 +94,10 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
       <div className="overflow-x-auto pb-2">
         <div className="min-w-[560px]">
           {/* Hour labels */}
-          <div className="grid grid-cols-[36px_repeat(24,1fr)] gap-1 mb-1 text-[9px] text-neutral-500 text-center">
+          <div className="grid grid-cols-[36px_repeat(24,1fr)] gap-1 mb-1 text-[9px] text-theme-dim text-center">
             <div />
             {HOURS.map((h) => (
-              <div key={h} className={h % 3 === 0 ? 'text-neutral-400 font-bold' : 'opacity-40'}>
+              <div key={h} className={h % 3 === 0 ? 'text-theme-muted font-bold' : 'opacity-40'}>
                 {h % 3 === 0 ? `${h}h` : '•'}
               </div>
             ))}
@@ -107,7 +107,7 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
           <div className="space-y-1">
             {DAYS.map((dayName, dIdx) => (
               <div key={dayName} className="grid grid-cols-[36px_repeat(24,1fr)] gap-1 items-center">
-                <span className="text-[10px] font-semibold text-neutral-400">{dayName}</span>
+                <span className="text-[10px] font-semibold text-theme-muted">{dayName}</span>
                 {HOURS.map((h) => {
                   const val = matrix[dIdx]?.[h] || 0;
                   const percent = Math.round((val / maxVal) * 100);
@@ -137,10 +137,10 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
       </div>
 
       {/* Dynamic Hover Tooltip Bar */}
-      <div className="h-6 flex items-center justify-between text-[11px] bg-white/[0.02] border border-white/[0.05] rounded px-3 text-neutral-400">
+      <div className="h-7 flex items-center justify-between text-[11px] bg-theme-base border border-theme-border rounded-lg px-3 text-theme-muted">
         {hoveredCell ? (
           <>
-            <span className="text-cyan-300 font-semibold">
+            <span className="text-theme-accent font-semibold">
               {hoveredCell.day} at {hoveredCell.hour.toString().padStart(2, '0')}:00 - {(hoveredCell.hour + 1).toString().padStart(2, '0')}:00
             </span>
             <span>
@@ -149,7 +149,7 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
             </span>
           </>
         ) : (
-          <span className="text-neutral-500 italic">
+          <span className="text-theme-dim italic">
             Hover over any cell in the 24x7 matrix to inspect specific hourly velocity.
           </span>
         )}
