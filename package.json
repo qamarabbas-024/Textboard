@@ -1,6 +1,6 @@
 {
   "name": "textboard",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "The Local-First Visual Intelligence & Communication Stream Analytics Workstation",
   "main": "electron/main.js",
   "author": "Qamar Abbas",
@@ -8,7 +8,9 @@
   "scripts": {
     "start": "electron .",
     "electron:dev": "electron .",
-    "electron:build": "electron-builder",
+    "electron:pack": "electron-builder --dir",
+    "electron:dist": "electron-builder",
+    "build:all": "npm run build --prefix backend && npm run build --prefix frontend",
     "dev:backend": "cd backend && npm run start:dev",
     "dev:frontend": "cd frontend && npm run dev"
   },
@@ -17,12 +19,14 @@
   },
   "devDependencies": {
     "@types/adm-zip": "^0.5.8",
-    "electron": "^33.2.1",
+    "electron": "33.2.1",
     "electron-builder": "^25.1.8"
   },
   "build": {
     "appId": "com.qamarabbas.textboard",
-    "productName": "Textboard",
+    "productName": "TextBoard",
+    "electronVersion": "33.2.1",
+    "copyright": "Copyright © 2026 Qamar Abbas",
     "directories": {
       "output": "dist-desktop"
     },
@@ -32,9 +36,17 @@
         "portable"
       ]
     },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "TextBoard Workstation"
+    },
     "files": [
       "electron/**/*",
       "package.json"
     ]
   }
 }
+
