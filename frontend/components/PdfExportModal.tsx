@@ -600,7 +600,7 @@ export function PdfExportModal({
                   </label>
                 </div>
 
-                {/* Right Side / Sent Messages Selector */}
+                {/* Sent Messages Actor Selector */}
                 <div className="pt-2 border-t border-white/[0.05] flex items-center justify-between gap-2">
                   <div className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
@@ -631,14 +631,51 @@ export function PdfExportModal({
                 </div>
               </div>
 
-              {/* Action Button */}
+              {/* Primary PDF Action Button */}
               <button
                 type="button"
                 onClick={handleStartExport}
-                className="w-full py-3 rounded-lg bg-linear-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 text-white text-xs font-bold uppercase tracking-wider transition-all shadow-lg hover:shadow-cyan-500/20 active:scale-[0.99]"
+                className="w-full py-3 rounded-lg bg-linear-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 text-white text-xs font-bold uppercase tracking-wider transition-all shadow-lg hover:shadow-cyan-500/20 active:scale-[0.99] cursor-pointer"
               >
                 Generate Lossless PDF Archive
               </button>
+
+              {/* Additional Export Formats Matrix */}
+              <div className="pt-3 border-t border-theme-border/60 space-y-2">
+                <span className="text-[10px] text-theme-dim uppercase font-semibold block text-center">
+                  ADDITIONAL FORENSIC EXPORT FORMATS
+                </span>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <a
+                    href={`/api/v1/datasets/${datasetId}/export/dossier`}
+                    download
+                    className="p-2.5 rounded-lg bg-theme-base hover:bg-theme-surface border border-theme-border text-center text-[11px] text-theme-text font-semibold hover:border-theme-border-hi transition-all block"
+                  >
+                    📄 HTML Case Dossier
+                  </a>
+                  <a
+                    href={`/api/v1/datasets/${datasetId}/export/vault`}
+                    download
+                    className="p-2.5 rounded-lg bg-theme-base hover:bg-theme-surface border border-theme-border text-center text-[11px] text-theme-text font-semibold hover:border-theme-border-hi transition-all block"
+                  >
+                    🗂️ Markdown Vault (.ZIP)
+                  </a>
+                  <a
+                    href={`/api/v1/datasets/${datasetId}/export/json`}
+                    download
+                    className="p-2.5 rounded-lg bg-theme-base hover:bg-theme-surface border border-theme-border text-center text-[11px] text-theme-muted hover:text-theme-text transition-all block"
+                  >
+                    {'{ }'} Raw JSON Export
+                  </a>
+                  <a
+                    href={`/api/v1/datasets/${datasetId}/export/csv`}
+                    download
+                    className="p-2.5 rounded-lg bg-theme-base hover:bg-theme-surface border border-theme-border text-center text-[11px] text-theme-muted hover:text-theme-text transition-all block"
+                  >
+                    📊 Tabular CSV Export
+                  </a>
+                </div>
+              </div>
             </div>
           )}
 

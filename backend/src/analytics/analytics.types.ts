@@ -171,6 +171,8 @@ export interface RelationshipPair {
   balanceRatio: number; // 0.5 is perfectly equal
 }
 
+import { AnomalyReport } from './services/anomaly-detector.service';
+
 export interface FullDatasetAnalytics {
   datasetId: string;
   datasetName: string;
@@ -180,8 +182,10 @@ export interface FullDatasetAnalytics {
   activityAnalytics: ActivityAnalytics;
   textAnalytics: TextAnalytics;
   insights: Insight[];
+  anomalies?: AnomalyReport;
   onThisDay?: OnThisDayMemory[];
   relationships?: RelationshipPair[];
   computedAt: Date;
   executionTimeMs: number;
 }
+

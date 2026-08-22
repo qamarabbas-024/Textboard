@@ -8,11 +8,17 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { ExportService } from './export.service';
+import { DossierGeneratorService } from './dossier-generator.service';
+import { MarkdownVaultService } from './markdown-vault.service';
 import { ChatExportOptions } from './types';
 
 @Controller('api/v1/datasets/:id/export')
 export class ExportController {
-  constructor(protected readonly exportService: ExportService) {}
+  constructor(
+    protected readonly exportService: ExportService,
+    protected readonly dossierGenerator: DossierGeneratorService,
+    protected readonly markdownVault: MarkdownVaultService,
+  ) {}
 
   @Post('pdf')
   async startPdfExport(
@@ -79,7 +85,25 @@ export class ExportController {
     res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"`);
     res.send(content);
   }
+
+  @Get('dossier')
+  async downloadHtmlDossier(@Param('id') datasetId: string, @Res() res: Response) {
+    const { filename, html } = await this.dossierGenerator.generateHtmlDossier(datasetId);
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"`);
+    res.send(html);
+  }
+
+  @Get('vault')
+  async downloadMarkdownVault(@Param('id') datasetId: string, @Res() res: Response) {
+    const { filename, buffer } = await this.markdownVault.generateMarkdownVault(datasetId);
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"`);
+    res.setHeader('Content-Length', buffer.length);
+    res.send(buffer);
+  }
 }
 
 @Controller('datasets/:id/export/pdf')
 export class LegacyExportController extends ExportController {}
+

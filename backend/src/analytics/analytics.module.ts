@@ -10,6 +10,10 @@ import { TextAnalyticsService } from './services/text-analytics.service';
 import { InsightsGeneratorService } from './services/insights-generator.service';
 import { OnThisDayService } from './services/on-this-day.service';
 import { RelationshipMatrixService } from './services/relationship-matrix.service';
+import { AnomalyDetectorService } from './services/anomaly-detector.service';
+import { CrossCorrelatorService } from './services/cross-correlator.service';
+import { ClusteringEngineService } from './services/clustering-engine.service';
+import { ThreadReconstructorService } from './services/thread-reconstructor.service';
 
 @Module({
   imports: [PrismaModule, RedisModule],
@@ -23,6 +27,10 @@ import { RelationshipMatrixService } from './services/relationship-matrix.servic
     InsightsGeneratorService,
     OnThisDayService,
     RelationshipMatrixService,
+    AnomalyDetectorService,
+    CrossCorrelatorService,
+    ClusteringEngineService,
+    ThreadReconstructorService,
   ],
   exports: [
     AnalyticsEngineService,
@@ -33,6 +41,13 @@ import { RelationshipMatrixService } from './services/relationship-matrix.servic
     InsightsGeneratorService,
     OnThisDayService,
     RelationshipMatrixService,
+    AnomalyDetectorService,
+    CrossCorrelatorService,
+    ClusteringEngineService,
+    ThreadReconstructorService,
   ],
 })
 export class AnalyticsModule {}
+
+
+

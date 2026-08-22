@@ -6,10 +6,25 @@ import {
   Query,
 } from '@nestjs/common';
 import { AnalyticsEngineService } from './analytics-engine.service';
+import { CrossCorrelatorService } from './services/cross-correlator.service';
 
 @Controller('api/v1/analytics')
 export class AnalyticsController {
-  constructor(private readonly analyticsEngine: AnalyticsEngineService) {}
+  constructor(
+    private readonly analyticsEngine: AnalyticsEngineService,
+    private readonly crossCorrelator: CrossCorrelatorService,
+  ) {}
+
+  /**
+   * Cross-dataset multi-stream correlation and overlap analysis.
+   */
+  @Get('correlate/compare')
+  async correlateDatasets(
+    @Query('datasetA') datasetA: string,
+    @Query('datasetB') datasetB: string,
+  ) {
+    return this.crossCorrelator.correlateDatasets(datasetA, datasetB);
+  }
 
   /**
    * Get complete multi-dimensional analytics report and insights.
@@ -101,6 +116,30 @@ export class AnalyticsController {
   }
 
   /**
+   * Get forensic communication anomalies and security alerts.
+   */
+  @Get(':datasetId/anomalies')
+  async getAnomalies(@Param('datasetId') datasetId: string) {
+    return this.analyticsEngine.getAnomalies(datasetId);
+  }
+
+  /**
+   * Get thematic topic clusters and keyword co-occurrences.
+   */
+  @Get(':datasetId/topics')
+  async getTopicClusters(@Param('datasetId') datasetId: string) {
+    return this.analyticsEngine.getTopicClusters(datasetId);
+  }
+
+  /**
+   * Get reconstructed conversational threads from chat stream.
+   */
+  @Get(':datasetId/threads')
+  async getThreads(@Param('datasetId') datasetId: string) {
+    return this.analyticsEngine.getReconstructedThreads(datasetId);
+  }
+
+  /**
    * Invalidate cache and force recompute all analytics.
    */
   @Post(':datasetId/refresh')
@@ -108,3 +147,5 @@ export class AnalyticsController {
     return this.analyticsEngine.getDatasetAnalytics(datasetId, true);
   }
 }
+
+

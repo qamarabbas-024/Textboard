@@ -5,12 +5,23 @@ import {
   ExploreIcon,
   SearchIcon,
   InsightsIcon,
+  AlertCircleIcon,
+  LayersIcon,
+  GitCompareIcon,
   CpuIcon,
   RefreshCwIcon,
 } from './Icons';
 import { ThemeSwitcher } from './ThemeSwitcher';
 
-export type NavTab = 'HOME' | 'DATA' | 'EXPLORE' | 'SEARCH' | 'INSIGHTS';
+export type NavTab =
+  | 'HOME'
+  | 'DATA'
+  | 'EXPLORE'
+  | 'SEARCH'
+  | 'INSIGHTS'
+  | 'ANOMALIES'
+  | 'TOPICS'
+  | 'CORRELATE';
 
 interface WorkstationNavProps {
   currentTab: NavTab;
@@ -36,11 +47,14 @@ export function WorkstationNav({
   onOpenProcessingModal,
 }: WorkstationNavProps) {
   const navItems: Array<{ tab: NavTab; label: string; icon: React.ReactNode }> = [
-    { tab: 'HOME', label: 'HOME', icon: <HomeIcon className="w-4 h-4" /> },
-    { tab: 'DATA', label: 'DATA', icon: <DatabaseIcon className="w-4 h-4" /> },
-    { tab: 'EXPLORE', label: 'EXPLORE', icon: <ExploreIcon className="w-4 h-4" /> },
-    { tab: 'SEARCH', label: 'SEARCH', icon: <SearchIcon className="w-4 h-4" /> },
-    { tab: 'INSIGHTS', label: 'INSIGHTS', icon: <InsightsIcon className="w-4 h-4" /> },
+    { tab: 'HOME', label: 'HOME', icon: <HomeIcon className="w-3.5 h-3.5" /> },
+    { tab: 'DATA', label: 'DATA', icon: <DatabaseIcon className="w-3.5 h-3.5" /> },
+    { tab: 'EXPLORE', label: 'EXPLORE', icon: <ExploreIcon className="w-3.5 h-3.5" /> },
+    { tab: 'SEARCH', label: 'SEARCH', icon: <SearchIcon className="w-3.5 h-3.5" /> },
+    { tab: 'INSIGHTS', label: 'INSIGHTS', icon: <InsightsIcon className="w-3.5 h-3.5" /> },
+    { tab: 'ANOMALIES', label: 'ANOMALIES', icon: <AlertCircleIcon className="w-3.5 h-3.5" /> },
+    { tab: 'TOPICS', label: 'TOPICS', icon: <LayersIcon className="w-3.5 h-3.5" /> },
+    { tab: 'CORRELATE', label: 'CORRELATE', icon: <GitCompareIcon className="w-3.5 h-3.5" /> },
   ];
 
   return (
@@ -51,11 +65,11 @@ export function WorkstationNav({
           <div className="flex items-center gap-2">
             <div className="w-2.5 h-2.5 rounded-sm bg-theme-accent shadow-theme-glow" />
             <span className="font-mono text-xs sm:text-sm font-bold tracking-wider text-theme-text uppercase">
-              TEXTBOARD <span className="text-theme-accent text-[11px] font-normal">v2.0</span>
+              TEXTBOARD <span className="text-theme-accent text-[11px] font-normal">v3.0</span>
             </span>
           </div>
 
-          <div className="hidden lg:flex items-center gap-1.5 px-2 py-0.5 rounded bg-theme-base border border-theme-border font-mono text-[11px] text-theme-muted">
+          <div className="hidden 2xl:flex items-center gap-1.5 px-2 py-0.5 rounded bg-theme-base border border-theme-border font-mono text-[11px] text-theme-muted">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             LOCAL-FIRST ENGINE
           </div>

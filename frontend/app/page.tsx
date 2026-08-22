@@ -7,6 +7,9 @@ import { DataView } from '../components/DataView';
 import { ExploreView } from '../components/ExploreView';
 import { SearchView } from '../components/SearchView';
 import { InsightsView } from '../components/InsightsView';
+import { AnomalyView } from '../components/AnomalyView';
+import { TopicClusterView } from '../components/TopicClusterView';
+import { CrossCorrelatorView } from '../components/CrossCorrelatorView';
 import { ProcessingModal, IngestionJobState } from '../components/ProcessingModal';
 import { BootSequence } from '../components/BootSequence';
 
@@ -122,6 +125,8 @@ export default function WorkstationPage() {
     0,
   ) || (datasets.length > 0 ? datasets.length * 2 : 0);
 
+  const activeDataset = datasets.find((d) => d.id === selectedDatasetId) || datasets[0];
+
   return (
     <div className="min-h-screen bg-theme-base text-theme-text selection:bg-theme-accent/30 selection:text-theme-text transition-colors duration-200">
       {/* 0. High-Tech Terminal Boot Diagnostics (Initial Visit) */}
@@ -193,6 +198,26 @@ export default function WorkstationPage() {
             onSelectDataset={setSelectedDatasetId}
           />
         )}
+
+        {currentTab === 'ANOMALIES' && selectedDatasetId && (
+          <AnomalyView
+            datasetId={selectedDatasetId}
+            datasetName={activeDataset?.name}
+            onExploreDate={() => setCurrentTab('EXPLORE')}
+          />
+        )}
+
+        {currentTab === 'TOPICS' && selectedDatasetId && (
+          <TopicClusterView
+            datasetId={selectedDatasetId}
+            datasetName={activeDataset?.name}
+            onExploreDate={() => setCurrentTab('EXPLORE')}
+          />
+        )}
+
+        {currentTab === 'CORRELATE' && (
+          <CrossCorrelatorView datasets={datasets} />
+        )}
       </main>
 
       {/* 3. Real-Time Processing Modal */}
@@ -210,3 +235,4 @@ export default function WorkstationPage() {
     </div>
   );
 }
+

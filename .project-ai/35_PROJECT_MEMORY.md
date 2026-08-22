@@ -29,8 +29,17 @@
 - **Supported Stream Formats**: WhatsApp (iOS/Android), Telegram (JSON/HTML), Discord (JSON/TXT), Apple iMessage, Signal, Slack, CSV, TSV, JSON, JSONL/NDJSON, XLSX/XLS, Plain Text, and Universal Multi-file `.ZIP` archives.
 - **Ingestion Execution**: Constant O(1) memory streaming via `readline` and chunked sinks (`BatchedSinkService`), scaling to 100,000+ entries.
 - **PDF Export Engine**: Vectorized multi-page PDF generation with Eye-Care cream palettes, cryptographic SHA-256 manifests, and zero-missing/zero-duplicate verification.
+- **Forensic Anomaly Engine (V2.1)**: Late-night spikes (00:00-05:00), rapid velocity bursts (>25 msgs/5min), extended silence gaps (>14 days), urgency/security keywords, and ghost participant tracking.
+- **Cross-Dataset Multi-Stream Correlator (V2.2)**: Side-by-side comparative analysis, temporal duration overlaps, Pearson hourly synchronicity, and lexical/emoji diffing.
+- **Universal Multi-Format Export Studio (V2.3)**:
+  - Zero-dependency Standalone HTML Forensic Case Dossier with embedded real-time search.
+  - Obsidian-ready Markdown Archive Vault (.ZIP) with monthly partitioning and YAML frontmatter.
+- **Topic Clustering & Thread Reconstruction (V3.0)**:
+  - Deterministic TF-IDF thematic clustering (Financial, Technical, Scheduling, Travel, Operations, Social).
+  - Conversation Thread Reconstructor grouping flat linear chat streams into discrete discussion sessions.
 
 ## 5. Security & Isolation
 - **Local PIN Convenience Lock**: SHA-based client session guard preventing shoulder-surfing without pretending to replace OS-level disk encryption.
 - **Offline Integrity**: SQLite WAL database at `backend/prisma/archive_local.db` with zero remote network dependencies.
+
 

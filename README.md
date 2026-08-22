@@ -47,6 +47,27 @@ Everything executes locally on your hardware with strict zero-cloud data isolati
 - **Interactive Bubble Studio**: Fine-tune left (received) and right (sent) message bubble colors with real-time modal preview.
 - **Non-Overlapping Attachment Badges**: Dedicated visual cards with colorful icons for stickers, photos, voice notes, and documents.
 
+### 🚨 4. Forensic Anomaly & Security Intelligence (V2.1)
+- **Late-Night Surge Detector**: Identifies abnormal message bursts between 00:00 and 05:00.
+- **Velocity Bursts**: Detects rapid-fire communication spikes (>25 messages in 5 minutes).
+- **Communication Gaps & Dormancy**: Flags significant silent hiatus periods (>14 days).
+- **Urgency & Security Tripwires**: Highlights sensitive terms (`asap`, `urgent`, `wire`, `confidential`).
+- **Ghost Participant Detector**: Identifies transient actors who engaged heavily then vanished.
+
+### 🔄 5. Multi-Stream Cross-Dataset Correlator (V2.2)
+- **Side-by-Side Stream Analysis**: Compare two distinct datasets (e.g. WhatsApp vs Discord or 2024 vs 2025).
+- **Temporal Overlap Index**: Overlapping duration, concurrent active days, and Pearson hourly schedule synchronicity.
+- **Lexical & Emoji Diff Matrix**: Shared high-frequency terms, unique vocabulary per stream, and shared emoji expressions.
+- **Participant Overlap Mapping**: Cross-platform identity matching and message volume comparison.
+
+### 📦 6. Standalone Forensic Case Dossier & Markdown Vaults (V2.3)
+- **Zero-Dependency HTML Dossier**: Single-file offline HTML case dossier with embedded CSS, KPI metrics, participant breakdown, and real-time client-side message search.
+- **Obsidian-Compatible Markdown Vault (.ZIP)**: Monthly markdown logs with YAML frontmatter metadata and wiki-link index.
+
+### 🧠 7. Semantic Topic Clustering & Thread Reconstructor (V3.0)
+- **Deterministic Thematic Clusters**: Categorizes conversations into Financial, Technical, Scheduling, Travel, Operations, and Social themes with keyword relevance vectors.
+- **Smart Thread Reconstruction**: Groups flat linear chat streams into discrete conversational discussion sessions with duration and participant breakdowns.
+
 ---
 
 ## 🏛️ Architecture
@@ -59,18 +80,19 @@ Everything executes locally on your hardware with strict zero-cloud data isolati
   │                         │                                     │                         │
   │ • React 18 & Lucide     │                                     │ • Stream Ingestion      │
   │ • Virtualized Timeline  │                                     │ • Analytics Engine      │
-  │ • Eye-Care Color Studio │                                     │ • TrueType Font Engine  │
-  │ • Glassmorphic UI       │                                     │ • Twemoji Asset Service │
+  │ • Eye-Care Color Studio │                                     │ • Anomaly Detection     │
+  │ • Topic & Thread Radar  │                                     │ • Cross-Correlator      │
+  │ • 5-Theme Token Engine  │                                     │ • TrueType Font Engine  │
   └─────────────────────────┘                                     └────────────┬────────────┘
                                                                                │
                                     ┌──────────────────────────────────────────┴───────────────┐
                                     ▼                                                          ▼
                       ┌───────────────────────────┐                              ┌───────────────────────────┐
-                      │    Local SQLite (WAL)     │                              │   Streaming PDF Exporter  │
+                      │    Local SQLite (WAL)     │                              │ Multi-Format Export Engine│
                       │                           │                              │                           │
-                      │ • High-performance WAL   │                              │ • O(1) Cursor Batching    │
-                      │ • Prisma ORM Integration  │                              │ • Native PDFKit Pipeline  │
-                      │ • Zero cloud leakage      │                              │ • SHA-256 Verification    │
+                      │ • High-performance WAL   │                              │ • Streaming Vector PDF    │
+                      │ • Prisma ORM Integration  │                              │ • Standalone HTML Dossier │
+                      │ • Zero cloud leakage      │                              │ • Obsidian Markdown Vault │
                       └───────────────────────────┘                              └───────────────────────────┘
 ```
 
@@ -128,6 +150,10 @@ npm run dev
 - [x] **V1.4**: Cross-conversation multi-actor relationship graph visualization.
 - [x] **V1.5**: Telegram JSON, Discord, Slack, and CSV universal stream parsers.
 - [x] **V2.0**: Native desktop client distribution (Electron / Tauri packaging).
+- [x] **V2.1**: Forensic Anomaly & Security Intelligence Engine (Late-Night Surges, Gaps, Ghost Contacts).
+- [x] **V2.2**: Universal Multi-Stream Cross-Dataset Correlator & Lexical Diff Matrix.
+- [x] **V2.3**: Standalone Single-File HTML Forensic Case Dossier & Obsidian Markdown Vault Exporter.
+- [x] **V3.0**: Semantic Topic Clustering Matrix & Smart Conversational Thread Reconstructor.
 
 ---
 
@@ -136,3 +162,4 @@ npm run dev
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
 Developed with ❤️ by **Qamar Abbas**.
+

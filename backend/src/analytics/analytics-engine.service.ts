@@ -8,6 +8,9 @@ import { TextAnalyticsService } from './services/text-analytics.service';
 import { InsightsGeneratorService } from './services/insights-generator.service';
 import { OnThisDayService } from './services/on-this-day.service';
 import { RelationshipMatrixService } from './services/relationship-matrix.service';
+import { AnomalyDetectorService, AnomalyReport } from './services/anomaly-detector.service';
+import { ClusteringEngineService, TopicClusteringReport } from './services/clustering-engine.service';
+import { ThreadReconstructorService, ThreadReconstructionReport } from './services/thread-reconstructor.service';
 import { FullDatasetAnalytics, OnThisDayMemory, RelationshipPair } from './analytics.types';
 
 @Injectable()
@@ -25,6 +28,9 @@ export class AnalyticsEngineService {
     private readonly insightsGenerator: InsightsGeneratorService,
     private readonly onThisDayService: OnThisDayService,
     private readonly relationshipMatrixService: RelationshipMatrixService,
+    private readonly anomalyDetector: AnomalyDetectorService,
+    private readonly clusteringEngine: ClusteringEngineService,
+    private readonly threadReconstructor: ThreadReconstructorService,
   ) {}
 
   /**
@@ -104,6 +110,7 @@ export class AnalyticsEngineService {
     const textStats = this.textAnalytics.computeTextAnalytics(events);
     const onThisDayMemories = this.onThisDayService.computeMemories(events);
     const relationships = this.relationshipMatrixService.computeRelationships(events);
+    const anomalies = this.anomalyDetector.detectAnomalies(datasetId, events);
 
     // 4. Generate deterministic, traceable insights
     const insights = this.insightsGenerator.generateInsights(
@@ -125,6 +132,7 @@ export class AnalyticsEngineService {
       activityAnalytics: activityStats,
       textAnalytics: textStats,
       insights,
+      anomalies,
       onThisDay: onThisDayMemories,
       relationships,
       computedAt: new Date(),
@@ -144,6 +152,68 @@ export class AnalyticsEngineService {
     });
 
     return result;
+  }
+
+  /**
+   * Directly get forensic anomalies detected in a dataset.
+   */
+  async getAnomalies(datasetId: string): Promise<AnomalyReport> {
+    const full = await this.getDatasetAnalytics(datasetId);
+    return (
+      full.anomalies || {
+        datasetId,
+        totalAnomalies: 0,
+        criticalCount: 0,
+        warningCount: 0,
+        noteCount: 0,
+        anomalies: [],
+        computedAt: new Date().toISOString(),
+      }
+    );
+  }
+
+  /**
+   * Directly get thematic topic clusters for a dataset.
+   */
+  async getTopicClusters(datasetId: string): Promise<TopicClusteringReport> {
+    const events = await this.prisma.timelineEvent.findMany({
+      where: { datasetId },
+      select: {
+        id: true,
+        actor: true,
+        timestamp: true,
+        content: true,
+        charLength: true,
+        wordCount: true,
+        eventType: true,
+      },
+      orderBy: { timestamp: 'asc' },
+      take: 20000,
+    });
+
+    return this.clusteringEngine.clusterEvents(datasetId, events);
+  }
+
+  /**
+   * Reconstruct discrete discussion threads from chat stream.
+   */
+  async getReconstructedThreads(datasetId: string): Promise<ThreadReconstructionReport> {
+    const events = await this.prisma.timelineEvent.findMany({
+      where: { datasetId },
+      select: {
+        id: true,
+        actor: true,
+        timestamp: true,
+        content: true,
+        charLength: true,
+        wordCount: true,
+        eventType: true,
+      },
+      orderBy: { timestamp: 'asc' },
+      take: 20000,
+    });
+
+    return this.threadReconstructor.reconstructThreads(datasetId, events);
   }
 
   /**
