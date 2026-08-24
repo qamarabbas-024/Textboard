@@ -17,6 +17,12 @@ import { SlackStreamParser } from './parsers/slack-stream-parser';
 import { DiscordStreamParser } from './parsers/discord-stream-parser';
 import { ChatStreamParser } from './parsers/chat-stream-parser';
 import { ZipStreamParser } from './parsers/zip-stream-parser';
+import { AiChatStreamParser } from './parsers/ai-chat-stream-parser';
+import { DocxStreamParser } from './parsers/docx-stream-parser';
+import { LogStreamParser } from './parsers/log-stream-parser';
+import { GitLogStreamParser } from './parsers/git-log-stream-parser';
+import { MboxStreamParser } from './parsers/mbox-stream-parser';
+import { TelegramStreamParser } from './parsers/telegram-stream-parser';
 import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
@@ -39,6 +45,12 @@ import { PrismaModule } from '../prisma/prisma.module';
     DiscordStreamParser,
     ChatStreamParser,
     ZipStreamParser,
+    AiChatStreamParser,
+    DocxStreamParser,
+    LogStreamParser,
+    GitLogStreamParser,
+    MboxStreamParser,
+    TelegramStreamParser,
   ],
   exports: [
     IngestionService,
@@ -55,6 +67,12 @@ import { PrismaModule } from '../prisma/prisma.module';
     DiscordStreamParser,
     ChatStreamParser,
     ZipStreamParser,
+    AiChatStreamParser,
+    DocxStreamParser,
+    LogStreamParser,
+    GitLogStreamParser,
+    MboxStreamParser,
+    TelegramStreamParser,
   ],
 })
 export class IngestionModule {}

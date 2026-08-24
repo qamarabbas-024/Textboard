@@ -9,6 +9,12 @@ import { SignalStreamParser } from './signal-stream-parser';
 import { SlackStreamParser } from './slack-stream-parser';
 import { DiscordStreamParser } from './discord-stream-parser';
 import { ChatStreamParser } from './chat-stream-parser';
+import { AiChatStreamParser } from './ai-chat-stream-parser';
+import { DocxStreamParser } from './docx-stream-parser';
+import { LogStreamParser } from './log-stream-parser';
+import { GitLogStreamParser } from './git-log-stream-parser';
+import { MboxStreamParser } from './mbox-stream-parser';
+import { TelegramStreamParser } from './telegram-stream-parser';
 
 @Injectable()
 export class ParserRegistryService {
@@ -24,15 +30,27 @@ export class ParserRegistryService {
     private readonly slackParser: SlackStreamParser,
     private readonly discordParser: DiscordStreamParser,
     private readonly chatParser: ChatStreamParser,
+    private readonly aiChatParser: AiChatStreamParser,
+    private readonly docxParser: DocxStreamParser,
+    private readonly logParser: LogStreamParser,
+    private readonly gitLogParser: GitLogStreamParser,
+    private readonly mboxParser: MboxStreamParser,
+    private readonly telegramParser: TelegramStreamParser,
   ) {
     // Specific platform parsers first
+    this.registerParser(aiChatParser);
+    this.registerParser(telegramParser);
     this.registerParser(discordParser);
     this.registerParser(imessageParser);
     this.registerParser(signalParser);
     this.registerParser(slackParser);
+    this.registerParser(mboxParser);
+    this.registerParser(gitLogParser);
     this.registerParser(csvParser);
     this.registerParser(jsonParser);
     this.registerParser(xlsxParser);
+    this.registerParser(docxParser);
+    this.registerParser(logParser);
     this.registerParser(chatParser);
     this.registerParser(txtParser); // General fallback
   }

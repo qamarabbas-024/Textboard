@@ -17,6 +17,12 @@ import { SignalStreamParser } from './parsers/signal-stream-parser';
 import { SlackStreamParser } from './parsers/slack-stream-parser';
 import { DiscordStreamParser } from './parsers/discord-stream-parser';
 import { ChatStreamParser } from './parsers/chat-stream-parser';
+import { AiChatStreamParser } from './parsers/ai-chat-stream-parser';
+import { DocxStreamParser } from './parsers/docx-stream-parser';
+import { LogStreamParser } from './parsers/log-stream-parser';
+import { GitLogStreamParser } from './parsers/git-log-stream-parser';
+import { MboxStreamParser } from './parsers/mbox-stream-parser';
+import { TelegramStreamParser } from './parsers/telegram-stream-parser';
 
 describe('IngestionService (V1 Streaming Pipeline)', () => {
   let service: IngestionService;
@@ -93,6 +99,12 @@ describe('IngestionService (V1 Streaming Pipeline)', () => {
         SlackStreamParser,
         DiscordStreamParser,
         ChatStreamParser,
+        AiChatStreamParser,
+        DocxStreamParser,
+        LogStreamParser,
+        GitLogStreamParser,
+        MboxStreamParser,
+        TelegramStreamParser,
         NormalizationService,
       ],
     }).compile();

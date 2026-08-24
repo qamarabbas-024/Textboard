@@ -9,6 +9,12 @@ import { SignalStreamParser } from './signal-stream-parser';
 import { SlackStreamParser } from './slack-stream-parser';
 import { DiscordStreamParser } from './discord-stream-parser';
 import { ChatStreamParser } from './chat-stream-parser';
+import { AiChatStreamParser } from './ai-chat-stream-parser';
+import { DocxStreamParser } from './docx-stream-parser';
+import { LogStreamParser } from './log-stream-parser';
+import { GitLogStreamParser } from './git-log-stream-parser';
+import { MboxStreamParser } from './mbox-stream-parser';
+import { TelegramStreamParser } from './telegram-stream-parser';
 import { ParserContext } from '../types';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -31,6 +37,12 @@ describe('ZipStreamParser (Universal Backup Archive Unpacker)', () => {
     const slackParser = new SlackStreamParser();
     const discordParser = new DiscordStreamParser();
     const chatParser = new ChatStreamParser();
+    const aiChatParser = new AiChatStreamParser();
+    const docxParser = new DocxStreamParser();
+    const logParser = new LogStreamParser();
+    const gitLogParser = new GitLogStreamParser();
+    const mboxParser = new MboxStreamParser();
+    const telegramParser = new TelegramStreamParser();
 
     registry = new ParserRegistryService(
       txtParser,
@@ -42,6 +54,12 @@ describe('ZipStreamParser (Universal Backup Archive Unpacker)', () => {
       slackParser,
       discordParser,
       chatParser,
+      aiChatParser,
+      docxParser,
+      logParser,
+      gitLogParser,
+      mboxParser,
+      telegramParser,
     );
 
     zipParser = new ZipStreamParser(registry);
