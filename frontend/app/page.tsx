@@ -17,6 +17,7 @@ import { PdfExportModal } from '../components/PdfExportModal';
 import { PinLockModal } from '../components/PinLockModal';
 import { MediaGalleryModal } from '../components/MediaGalleryModal';
 import { LocalAssistantDrawer } from '../components/LocalAssistantDrawer';
+import { SpatialUniverseView } from '../components/SpatialUniverseView';
 import BackgroundEffect from '../components/BackgroundEffect';
 
 interface DatasetItem {
@@ -148,6 +149,7 @@ export default function WorkstationPage() {
         else if (e.key === '6') setCurrentTab('INSIGHTS');
         else if (e.key === '7') setCurrentTab('TOPICS');
         else if (e.key === '8') setCurrentTab('CORRELATE');
+        else if (e.key === '9') setCurrentTab('SPATIAL');
         else if (e.key === '/') {
           e.preventDefault();
           setCurrentTab('SEARCH');
@@ -294,6 +296,13 @@ export default function WorkstationPage() {
 
         {currentTab === 'CORRELATE' && (
           <CrossCorrelatorView datasets={datasets} />
+        )}
+
+        {currentTab === 'SPATIAL' && selectedDatasetId && (
+          <SpatialUniverseView
+            datasetId={selectedDatasetId}
+            datasetName={activeDataset?.name || 'Dataset'}
+          />
         )}
       </main>
 

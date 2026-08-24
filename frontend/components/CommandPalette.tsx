@@ -133,6 +133,15 @@ export function CommandPalette({
       shortcut: '8',
       action: () => onSelectTab('CORRELATE'),
     },
+    {
+      id: 'nav_spatial',
+      category: 'NAVIGATION',
+      title: '3D Spatial Universe Explorer',
+      subtitle: 'Interactive 3D galaxy particle space with orbital camera',
+      icon: '🌌',
+      shortcut: '9',
+      action: () => onSelectTab('SPATIAL'),
+    },
 
     // 2. Exports
     {
