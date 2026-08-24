@@ -31,10 +31,30 @@ export class FontResolverService {
         regular: 'C:\\Windows\\Fonts\\tahoma.ttf',
         bold: 'C:\\Windows\\Fonts\\tahomabd.ttf',
       },
+      {
+        regular: 'C:\\Windows\\Fonts\\urdu.ttf',
+        bold: 'C:\\Windows\\Fonts\\urdu.ttf',
+      },
+      {
+        regular: 'C:\\Windows\\Fonts\\JameelNooriNastaleeq.ttf',
+        bold: 'C:\\Windows\\Fonts\\JameelNooriNastaleeq.ttf',
+      },
+      {
+        regular: 'C:\\Windows\\Fonts\\tradbdo.ttf',
+        bold: 'C:\\Windows\\Fonts\\tradbdo.ttf',
+      },
       // Linux
       {
         regular: '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
         bold: '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',
+      },
+      {
+        regular: '/usr/share/fonts/truetype/noto/NotoSansArabic-Regular.ttf',
+        bold: '/usr/share/fonts/truetype/noto/NotoSansArabic-Bold.ttf',
+      },
+      {
+        regular: '/usr/share/fonts/truetype/noto/NotoNaskhArabic-Regular.ttf',
+        bold: '/usr/share/fonts/truetype/noto/NotoNaskhArabic-Bold.ttf',
       },
       {
         regular: '/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf',
@@ -52,6 +72,10 @@ export class FontResolverService {
       {
         regular: '/System/Library/Fonts/Supplemental/Arial.ttf',
         bold: '/System/Library/Fonts/Supplemental/Arial Bold.ttf',
+      },
+      {
+        regular: '/System/Library/Fonts/SFArabic.ttf',
+        bold: '/System/Library/Fonts/SFArabic.ttf',
       },
     ];
 

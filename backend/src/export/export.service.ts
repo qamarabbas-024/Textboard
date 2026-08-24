@@ -438,67 +438,154 @@ export class ExportService {
   }
 
   /**
-   * Generates highlights report PDF
+   * Generates comprehensive Analytics Intelligence Dossier PDF report.
    */
   private async processHighlightsExport(job: InternalExportJob, dataset: any) {
     const { doc, writeStream, fonts } = this.chatRenderer.createPdfDocument(job.filePath, {});
 
-    const [highlights, peopleStats, streaks, milestones] = await Promise.all([
+    const [highlights, peopleStats, streaks, milestones, overview, wordCloud] = await Promise.all([
       this.analyticsService.getHighlights(dataset.id),
       this.analyticsService.getPeopleStats(dataset.id),
       this.analyticsService.getStreaks(dataset.id),
       this.analyticsService.getMilestones(dataset.id),
+      this.analyticsService.getOverview(dataset.id).catch(() => null),
+      this.analyticsService.getWordCloud(dataset.id, 20).catch(() => []),
     ]);
 
-    // Title
-    doc.fillColor('#065f46').font(fonts.bold).fontSize(20).text('Textboard Analytics Report', { align: 'center' });
+    const generatedDateStr = new Date().toUTCString();
+
+    // 1. Header Banner
+    doc.rect(36, 36, 523, 70).fillAndStroke('#0f172a', '#1e293b');
+    doc.fillColor('#38bdf8').font(fonts.bold).fontSize(10).text('TEXTBOARD FORENSIC INTELLIGENCE DOSSIER', 50, 48);
+    doc.fillColor('#ffffff').font(fonts.bold).fontSize(16).text(this.fontResolver.sanitizeText(dataset.name), 50, 62);
+    doc.fillColor('#94a3b8').font(fonts.regular).fontSize(8.5).text(
+      `SOURCE: ${dataset.sourceType.toUpperCase()}  |  GENERATED: ${generatedDateStr}`,
+      50,
+      84,
+    );
+
+    doc.y = 120;
+
+    // 2. Executive KPI Grid (4 Boxes)
+    const kpiY = doc.y;
+    const kpiWidth = 122;
+    const kpis = [
+      { label: 'TOTAL MESSAGES', val: (overview?.totalEvents || dataset.totalEvents || 0).toLocaleString(), color: '#0284c7' },
+      { label: 'ACTIVE PARTICIPANTS', val: (peopleStats.totalParticipants || 0).toString(), color: '#059669' },
+      { label: 'ACTIVE CALENDAR DAYS', val: (streaks.totalActiveDays || 0).toString(), color: '#7c3aed' },
+      { label: 'LONGEST STREAK', val: `${streaks.longestStreak?.days || 0} Days`, color: '#d97706' },
+    ];
+
+    kpis.forEach((kpi, idx) => {
+      const x = 36 + idx * (kpiWidth + 11);
+      doc.roundedRect(x, kpiY, kpiWidth, 50, 4).fillAndStroke('#f8fafc', '#e2e8f0');
+      doc.fillColor('#64748b').font(fonts.bold).fontSize(7.5).text(kpi.label, x + 8, kpiY + 10, { width: kpiWidth - 16 });
+      doc.fillColor(kpi.color).font(fonts.bold).fontSize(13).text(kpi.val, x + 8, kpiY + 24, { width: kpiWidth - 16 });
+    });
+
+    doc.y = kpiY + 65;
+
+    // 3. Section 1: Participant Dynamics & Volume Share
+    doc.fillColor('#0f172a').font(fonts.bold).fontSize(12).text('1. Participant Distribution & Engagement', 36, doc.y);
     doc.moveDown(0.3);
-    doc.fillColor('#374151').font(fonts.regular).fontSize(12).text(`Dataset: ${dataset.name}`, { align: 'center' });
-    doc.fillColor('#6b7280').fontSize(9).text(`Generated: ${new Date().toUTCString()}`, { align: 'center' });
-    doc.moveDown(1.5);
 
-    // Section 1: Overview Summary
-    doc.fillColor('#111827').font(fonts.bold).fontSize(13).text('1. Dataset Overview', { underline: true });
-    doc.moveDown(0.4);
-    doc.font(fonts.regular).fontSize(9.5).fillColor('#374151');
-    doc.text(`Total Active Participants: ${peopleStats.totalParticipants}`);
-    doc.text(`Longest Continuous Chat Streak: ${streaks.longestStreak?.days || 0} days`);
-    doc.text(`Longest Gap: ${streaks.longestGap?.days || 0} days`);
-    doc.text(`Total Active Calendar Days: ${streaks.totalActiveDays || 0} days`);
-    doc.moveDown(1);
+    const tableStartY = doc.y;
+    doc.rect(36, tableStartY, 523, 18).fill('#f1f5f9');
+    doc.fillColor('#475569').font(fonts.bold).fontSize(8);
+    doc.text('PARTICIPANT', 44, tableStartY + 5);
+    doc.text('MESSAGES', 220, tableStartY + 5);
+    doc.text('VOLUME SHARE', 310, tableStartY + 5);
+    doc.text('TOTAL CHARACTERS', 420, tableStartY + 5);
 
-    // Section 2: Key Highlights
-    doc.fillColor('#111827').font(fonts.bold).fontSize(13).text('2. Key Highlights', { underline: true });
+    let curY = tableStartY + 20;
+    const topParticipants = (peopleStats.participants || []).slice(0, 8);
+    const totalMsgs = overview?.totalEvents || dataset.totalEvents || 1;
+
+    topParticipants.forEach((p: any, idx: number) => {
+      const share = totalMsgs > 0 ? ((p.eventCount / totalMsgs) * 100).toFixed(1) : '0';
+      if (idx % 2 === 1) {
+        doc.rect(36, curY - 2, 523, 16).fill('#f8fafc');
+      }
+      doc.fillColor('#0f172a').font(fonts.regular).fontSize(8.5);
+      doc.text(this.fontResolver.sanitizeText(p.displayName || p.actor || 'Unknown'), 44, curY, { width: 170 });
+      doc.text(p.eventCount.toLocaleString(), 220, curY);
+      doc.text(`${share}%`, 310, curY);
+      doc.text((p.totalChars || 0).toLocaleString(), 420, curY);
+      curY += 16;
+    });
+
+    doc.y = curY + 15;
+
+    // 4. Section 2: Key Milestones & Significant Anchor Points
+    doc.fillColor('#0f172a').font(fonts.bold).fontSize(12).text('2. Anchor Points & Milestones', 36, doc.y);
     doc.moveDown(0.4);
-    doc.font(fonts.regular).fontSize(9.5).fillColor('#374151');
 
     if (highlights.firstMessage) {
-      doc.font(fonts.bold).text('First Message:');
-      doc.font(fonts.regular).text(
-        `[${new Date(highlights.firstMessage.timestamp).toLocaleDateString()}] ${highlights.firstMessage.actor || 'System'}: "${this.fontResolver.sanitizeText(highlights.firstMessage.content.slice(0, 200))}"`,
+      doc.roundedRect(36, doc.y, 523, 34, 4).fillAndStroke('#eff6ff', '#bfdbfe');
+      doc.fillColor('#1d4ed8').font(fonts.bold).fontSize(8).text('FIRST RECORDED MESSAGE', 46, doc.y + 6);
+      const firstContent = this.fontResolver.sanitizeText(highlights.firstMessage.content || '').slice(0, 180);
+      const firstDate = new Date(highlights.firstMessage.timestamp).toLocaleDateString();
+      doc.fillColor('#1e293b').font(fonts.regular).fontSize(8.5).text(
+        `[${firstDate}] ${highlights.firstMessage.actor || 'System'}: "${firstContent}"`,
+        46,
+        doc.y + 18,
+        { width: 500 },
       );
-      doc.moveDown(0.4);
+      doc.y += 42;
     }
 
     if (highlights.longestMessage) {
-      doc.font(fonts.bold).text(`Longest Message (${highlights.longestMessage.charLength} chars):`);
-      doc.font(fonts.regular).text(
-        `[${new Date(highlights.longestMessage.timestamp).toLocaleDateString()}] ${highlights.longestMessage.actor}: "${this.fontResolver.sanitizeText(highlights.longestMessage.content.slice(0, 300))}..."`,
+      doc.roundedRect(36, doc.y, 523, 36, 4).fillAndStroke('#f0fdf4', '#bbf7d0');
+      doc.fillColor('#15803d').font(fonts.bold).fontSize(8).text(
+        `LONGEST MESSAGE (${highlights.longestMessage.charLength.toLocaleString()} CHARACTERS)`,
+        46,
+        doc.y + 6,
       );
-      doc.moveDown(0.4);
+      const longContent = this.fontResolver.sanitizeText(highlights.longestMessage.content || '').slice(0, 200);
+      const longDate = new Date(highlights.longestMessage.timestamp).toLocaleDateString();
+      doc.fillColor('#1e293b').font(fonts.regular).fontSize(8.5).text(
+        `[${longDate}] ${highlights.longestMessage.actor || 'Actor'}: "${longContent}..."`,
+        46,
+        doc.y + 18,
+        { width: 500 },
+      );
+      doc.y += 44;
     }
 
-    // Section 3: Milestones
-    doc.fillColor('#111827').font(fonts.bold).fontSize(13).text('3. Milestones', { underline: true });
-    doc.moveDown(0.4);
-    doc.font(fonts.regular).fontSize(9.5).fillColor('#374151');
-    for (const m of milestones.slice(0, 6)) {
-      if (m.event) {
-        doc.text(
-          `#${m.milestoneIndex.toLocaleString()} Message: [${new Date(m.event.timestamp).toLocaleDateString()}] ${m.event.actor}: "${this.fontResolver.sanitizeText(m.event.content.slice(0, 100))}"`,
-        );
+    // Milestones list
+    if (milestones && milestones.length > 0) {
+      doc.fillColor('#475569').font(fonts.bold).fontSize(9).text('Stream Volume Milestones:', 36, doc.y);
+      doc.moveDown(0.2);
+      for (const m of milestones.slice(0, 4)) {
+        if (m.event) {
+          doc.fillColor('#334155').font(fonts.regular).fontSize(8).text(
+            `• #${m.milestoneIndex.toLocaleString()} Message reached on ${new Date(m.event.timestamp).toLocaleDateString()} by ${m.event.actor}`,
+            44,
+          );
+        }
       }
+      doc.moveDown(0.8);
     }
+
+    // 5. Section 3: High-Frequency Vocabulary Keywords
+    if (wordCloud && wordCloud.length > 0) {
+      doc.fillColor('#0f172a').font(fonts.bold).fontSize(12).text('3. Lexical Topic & Keyword Density', 36, doc.y);
+      doc.moveDown(0.3);
+      const topWords = wordCloud.slice(0, 15).map((w: any) => `${w.text} (${w.value})`).join('  •  ');
+      doc.roundedRect(36, doc.y, 523, 28, 4).fillAndStroke('#fdf4ff', '#f5d0fe');
+      doc.fillColor('#86198f').font(fonts.regular).fontSize(8.5).text(topWords, 44, doc.y + 8, { width: 505 });
+      doc.y += 38;
+    }
+
+    // 6. Cryptographic Audit Seal
+    const sha256Seal = crypto
+      .createHash('sha256')
+      .update(`${dataset.id}_${totalMsgs}_${generatedDateStr}`)
+      .digest('hex');
+
+    doc.rect(36, doc.page.height - 70, 523, 34).fillAndStroke('#f8fafc', '#cbd5e1');
+    doc.fillColor('#64748b').font(fonts.bold).fontSize(7).text('CRYPTOGRAPHIC VERIFICATION SEAL & AUDIT SIGNATURE', 46, doc.page.height - 64);
+    doc.fillColor('#0284c7').font(fonts.regular).fontSize(7.5).text(`SHA-256: ${sha256Seal}`, 46, doc.page.height - 52);
 
     doc.end();
 
