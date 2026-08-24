@@ -2,18 +2,32 @@ import {
   Controller,
   Get,
   Post,
+  Body,
   Param,
   Query,
 } from '@nestjs/common';
 import { AnalyticsEngineService } from './analytics-engine.service';
 import { CrossCorrelatorService } from './services/cross-correlator.service';
+import { LocalAssistantService } from './services/local-assistant.service';
 
 @Controller('api/v1/analytics')
 export class AnalyticsController {
   constructor(
     private readonly analyticsEngine: AnalyticsEngineService,
     private readonly crossCorrelator: CrossCorrelatorService,
+    private readonly assistantService: LocalAssistantService,
   ) {}
+
+  /**
+   * 100% On-Device Natural Language Query Assistant.
+   */
+  @Post(':datasetId/assistant/ask')
+  async askAssistant(
+    @Param('datasetId') datasetId: string,
+    @Body('prompt') prompt: string,
+  ) {
+    return this.assistantService.askQuestion(datasetId, prompt || '');
+  }
 
   /**
    * Cross-dataset multi-stream correlation and overlap analysis.

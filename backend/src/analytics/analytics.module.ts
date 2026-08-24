@@ -14,6 +14,7 @@ import { AnomalyDetectorService } from './services/anomaly-detector.service';
 import { CrossCorrelatorService } from './services/cross-correlator.service';
 import { ClusteringEngineService } from './services/clustering-engine.service';
 import { ThreadReconstructorService } from './services/thread-reconstructor.service';
+import { LocalAssistantService } from './services/local-assistant.service';
 
 @Module({
   imports: [PrismaModule, RedisModule],
@@ -31,6 +32,7 @@ import { ThreadReconstructorService } from './services/thread-reconstructor.serv
     CrossCorrelatorService,
     ClusteringEngineService,
     ThreadReconstructorService,
+    LocalAssistantService,
   ],
   exports: [
     AnalyticsEngineService,
@@ -45,6 +47,7 @@ import { ThreadReconstructorService } from './services/thread-reconstructor.serv
     CrossCorrelatorService,
     ClusteringEngineService,
     ThreadReconstructorService,
+    LocalAssistantService,
   ],
 })
 export class AnalyticsModule {}

@@ -4,16 +4,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const BOOT_LOGS = [
-  { text: 'TEXTBOARD OS v2.0 // KERNEL INITIALIZATION', type: 'header', delay: 120 },
-  { text: 'CPU: System Virtual Core @ 3.4GHz [OK]', type: 'system', delay: 80 },
-  { text: 'STORAGE: Initializing SQLite WAL engine (archive_local.db)...', type: 'info', delay: 100 },
-  { text: 'PRAGMA journal_mode = WAL; PRAGMA synchronous = NORMAL; [APPLIED]', type: 'success', delay: 90 },
-  { text: 'MEMORY: Mounting In-Memory Frequency & Activity Sinks...', type: 'info', delay: 80 },
-  { text: 'SECURITY: Initializing PIN-Lock & Cryptographic Integrity Subsystem...', type: 'info', delay: 90 },
-  { text: 'PARSERS: Loaded 9 Universal Stream Parsers (WA, TG, Signal, Slack, Discord, XLSX)...', type: 'info', delay: 90 },
-  { text: 'TIMELINE: Virtualized Kinetic Stream Engine [ACTIVE]', type: 'success', delay: 80 },
-  { text: 'AI CORE: 384-Dim Local Vector Semantic Embeddings [READY]', type: 'success', delay: 100 },
-  { text: '>> WORKSTATION READY. ALL SYSTEMS GO.', type: 'ready', delay: 140 },
+  { text: 'TEXTBOARD WORKSTATION // LOCAL-FIRST INTELLIGENCE CORE', type: 'header', delay: 110 },
+  { text: 'LOCAL ENGINE: Zero-Cloud Processing Sandbox [INITIALIZED]', type: 'system', delay: 75 },
+  { text: 'STORAGE: Mounting Local SQLite WAL Database (archive_local.db)...', type: 'info', delay: 85 },
+  { text: 'PARSERS: Loaded 10+ Universal Stream Parsers (Chat, AI/LLM, Discord, Slack, XLSX)...', type: 'info', delay: 80 },
+  { text: 'UNICODE: Dynamic TrueType Multi-Script & Emoji Resolver [MOUNTED]', type: 'success', delay: 75 },
+  { text: 'VERIFIER: Cryptographic SHA-256 Rolling Digest Subsystem [ACTIVE]', type: 'success', delay: 80 },
+  { text: 'VISUAL: 5-Theme High-Fidelity Canvas Workstation [LOADED]', type: 'success', delay: 75 },
+  { text: '>> WORKSTATION ONLINE. ALL LOCAL SUBSYSTEMS VERIFIED.', type: 'ready', delay: 120 },
 ];
 
 interface BootSequenceProps {

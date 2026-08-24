@@ -12,6 +12,11 @@ import { TopicClusterView } from '../components/TopicClusterView';
 import { CrossCorrelatorView } from '../components/CrossCorrelatorView';
 import { ProcessingModal, IngestionJobState } from '../components/ProcessingModal';
 import { BootSequence } from '../components/BootSequence';
+import { CommandPalette } from '../components/CommandPalette';
+import { PdfExportModal } from '../components/PdfExportModal';
+import { PinLockModal } from '../components/PinLockModal';
+import { MediaGalleryModal } from '../components/MediaGalleryModal';
+import { LocalAssistantDrawer } from '../components/LocalAssistantDrawer';
 import BackgroundEffect from '../components/BackgroundEffect';
 
 interface DatasetItem {
@@ -30,6 +35,11 @@ export default function WorkstationPage() {
   const [selectedDatasetId, setSelectedDatasetId] = useState<string | null>(null);
   const [activeJob, setActiveJob] = useState<IngestionJobState | null>(null);
   const [isProcessingModalOpen, setIsProcessingModalOpen] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isPdfExportModalOpen, setIsPdfExportModalOpen] = useState(false);
+  const [isMediaGalleryOpen, setIsMediaGalleryOpen] = useState(false);
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
   const [insights, setInsights] = useState<any[]>([]);
   const [isBootComplete, setIsBootComplete] = useState(false);
 
@@ -106,6 +116,58 @@ export default function WorkstationPage() {
     };
   }, [activeJob?.jobId]);
 
+  // Global Keyboard Shortcuts (Ctrl+K, Numbers 1-8, E, /, Escape)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isInput =
+        document.activeElement?.tagName === 'INPUT' ||
+        document.activeElement?.tagName === 'TEXTAREA' ||
+        document.activeElement?.getAttribute('contenteditable') === 'true';
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen((prev) => !prev);
+        return;
+      }
+
+      if (e.key === 'Escape') {
+        setIsCommandPaletteOpen(false);
+        setIsPdfExportModalOpen(false);
+        setIsMediaGalleryOpen(false);
+        setIsAssistantOpen(false);
+        setIsProcessingModalOpen(false);
+        return;
+      }
+
+      if (!isInput && !isCommandPaletteOpen && !isPdfExportModalOpen && !isMediaGalleryOpen && !isAssistantOpen && !isProcessingModalOpen) {
+        if (e.key === '1') setCurrentTab('HOME');
+        else if (e.key === '2') setCurrentTab('EXPLORE');
+        else if (e.key === '3') setCurrentTab('DATA');
+        else if (e.key === '4') setCurrentTab('SEARCH');
+        else if (e.key === '5') setCurrentTab('ANOMALIES');
+        else if (e.key === '6') setCurrentTab('INSIGHTS');
+        else if (e.key === '7') setCurrentTab('TOPICS');
+        else if (e.key === '8') setCurrentTab('CORRELATE');
+        else if (e.key === '/') {
+          e.preventDefault();
+          setCurrentTab('SEARCH');
+        } else if (e.key.toLowerCase() === 'a' && selectedDatasetId) {
+          e.preventDefault();
+          setIsAssistantOpen((prev) => !prev);
+        } else if (e.key.toLowerCase() === 'e' && selectedDatasetId) {
+          e.preventDefault();
+          setIsPdfExportModalOpen(true);
+        } else if (e.key.toLowerCase() === 'm' && selectedDatasetId) {
+          e.preventDefault();
+          setIsMediaGalleryOpen(true);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isCommandPaletteOpen, isPdfExportModalOpen, isMediaGalleryOpen, isAssistantOpen, isProcessingModalOpen, selectedDatasetId]);
+
   const handleStartIngestionJob = (job: IngestionJobState) => {
     setActiveJob(job);
     setIsProcessingModalOpen(true);
@@ -138,6 +200,15 @@ export default function WorkstationPage() {
         <BootSequence onComplete={() => setIsBootComplete(true)} />
       )}
 
+      {/* Local Convenience PIN Lock Modal */}
+      {isLocked && (
+        <PinLockModal
+          isLocked={isLocked}
+          onUnlock={() => setIsLocked(false)}
+          onPinConfigured={() => {}}
+        />
+      )}
+
       {/* 1. Top Workstation Navigation */}
       <WorkstationNav
         currentTab={currentTab}
@@ -146,6 +217,8 @@ export default function WorkstationPage() {
         datasetCount={datasets.length}
         totalRecords={totalRecordsCount}
         onOpenProcessingModal={() => setIsProcessingModalOpen(true)}
+        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        onOpenAssistant={() => setIsAssistantOpen(true)}
       />
 
       {/* 2. Main Workstation Viewport */}
@@ -236,6 +309,66 @@ export default function WorkstationPage() {
         }}
         onCancelJob={handleCancelJob}
       />
+
+      {/* 4. Command Palette (Ctrl+K) */}
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        onSelectTab={setCurrentTab}
+        datasets={datasets}
+        selectedDatasetId={selectedDatasetId}
+        onSelectDataset={(id) => {
+          setSelectedDatasetId(id);
+          setIsCommandPaletteOpen(false);
+        }}
+        onTriggerExport={() => {
+          setIsCommandPaletteOpen(false);
+          setIsPdfExportModalOpen(true);
+        }}
+        onOpenMediaGallery={() => {
+          setIsCommandPaletteOpen(false);
+          setIsMediaGalleryOpen(true);
+        }}
+        onOpenAssistant={() => {
+          setIsCommandPaletteOpen(false);
+          setIsAssistantOpen(true);
+        }}
+        onOpenPinLock={() => {
+          setIsCommandPaletteOpen(false);
+          setIsLocked(true);
+        }}
+      />
+
+      {/* 5. Lossless PDF Export Modal */}
+      {selectedDatasetId && activeDataset && (
+        <PdfExportModal
+          isOpen={isPdfExportModalOpen}
+          onClose={() => setIsPdfExportModalOpen(false)}
+          datasetId={selectedDatasetId}
+          datasetName={activeDataset.name}
+          totalEvents={activeDataset.totalEvents || 0}
+        />
+      )}
+
+      {/* 6. Media & Attachment Gallery Modal */}
+      {selectedDatasetId && activeDataset && (
+        <MediaGalleryModal
+          isOpen={isMediaGalleryOpen}
+          onClose={() => setIsMediaGalleryOpen(false)}
+          datasetId={selectedDatasetId}
+          datasetName={activeDataset.name}
+        />
+      )}
+
+      {/* 7. Local AI Intelligence Assistant Drawer */}
+      {selectedDatasetId && activeDataset && (
+        <LocalAssistantDrawer
+          isOpen={isAssistantOpen}
+          onClose={() => setIsAssistantOpen(false)}
+          datasetId={selectedDatasetId}
+          datasetName={activeDataset.name}
+        />
+      )}
     </div>
   );
 }

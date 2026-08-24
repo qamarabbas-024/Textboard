@@ -37,6 +37,8 @@ interface WorkstationNavProps {
   datasetCount?: number;
   totalRecords?: number;
   onOpenProcessingModal?: () => void;
+  onOpenCommandPalette?: () => void;
+  onOpenAssistant?: () => void;
 }
 
 export function WorkstationNav({
@@ -46,6 +48,8 @@ export function WorkstationNav({
   datasetCount = 0,
   totalRecords = 0,
   onOpenProcessingModal,
+  onOpenCommandPalette,
+  onOpenAssistant,
 }: WorkstationNavProps) {
   const navItems: Array<{ tab: NavTab; label: string; icon: React.ReactNode }> = [
     { tab: 'HOME', label: 'HOME', icon: <HomeIcon className="w-3.5 h-3.5" /> },
@@ -100,8 +104,32 @@ export function WorkstationNav({
           })}
         </nav>
 
-        {/* Right Side: Theme Switcher & System Telemetry */}
+        {/* Right Side: Assistant, Command Palette Trigger, Theme Switcher & System Telemetry */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {onOpenAssistant && (
+            <button
+              onClick={onOpenAssistant}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-300 hover:bg-purple-500/20 hover:border-purple-400 font-mono text-xs transition-all shadow-sm cursor-pointer"
+              title="Open Local AI Assistant (A)"
+            >
+              <span>🤖</span>
+              <span className="hidden md:inline">AI ASSISTANT</span>
+            </button>
+          )}
+
+          {onOpenCommandPalette && (
+            <button
+              onClick={onOpenCommandPalette}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-theme-surface border border-theme-border/60 text-theme-muted hover:text-cyan-300 hover:border-cyan-500/40 font-mono text-xs transition-all shadow-sm cursor-pointer"
+              title="Open Command Palette (Ctrl+K)"
+            >
+              <span className="text-cyan-400 font-bold">⌘</span>
+              <kbd className="hidden md:inline px-1 py-0.2 rounded bg-black/40 text-[10px] text-theme-muted">
+                Ctrl+K
+              </kbd>
+            </button>
+          )}
+
           <ThemeSwitcher />
 
           {activeJob ? (

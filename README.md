@@ -1,72 +1,33 @@
-# ⚡ Textboard
+# ⚡ TextBoard
 
 <div align="center">
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg?style=for-the-badge)
 ![Next.js 14](https://img.shields.io/badge/Next.js-14.2-black?style=for-the-badge&logo=next.js)
-![NestJS](https://img.shields.io/badge/NestJS-10.0-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![NestJS](https://img.shields.io/badge/NestJS-10.4-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-WAL-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
-![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Electron](https://img.shields.io/badge/Electron-33.2-47848F?style=for-the-badge&logo=electron&logoColor=white)
 
-**The Local-First Visual Intelligence & Communication Stream Analytics Workstation**
+**The Local-First Personal Data Intelligence Platform & Workstation**
 
-*Analyze, explore, and generate high-fidelity lossless archives from massive conversational datasets.*
+*Ingest, search, analyze, explore, and generate high-fidelity verifiable exports from massive communication streams and personal datasets.*
 
-[Key Features](#-key-features) • [Architecture](#-architecture) • [Getting Started](#-getting-started) • [Security & Privacy](#-security--privacy) • [Roadmap](#-master-roadmap)
+[Architecture](#-architecture) • [Supported Formats](#-supported-ingestion-formats) • [Export Capabilities](#-export-capabilities) • [Setup & Development](#-getting-started) • [Security & Privacy](#-privacy--local-first-guarantees) • [Roadmap](#-product-roadmap)
 
 ---
 
 </div>
 
-## 📖 Overview
+## 📖 Executive Mission & Overview
 
-**Textboard** is a high-performance, local-first analytics dashboard and document stream processing workstation. Built from the ground up to handle massive communication archives (**100,000 to 500,000+ records**), Textboard transforms raw data streams into actionable intelligence, interactive timelines, and publication-ready visual PDF documents.
+**TextBoard** is a high-performance, local-first personal data intelligence workstation. Designed to process massive communication archives (**10,000 to 500,000+ records**) without arbitrary file-size ceilings, TextBoard turns raw data streams into searchable indices, interactive multi-dimensional analytics, circadian timelines, and publication-grade verifiable PDF archives.
 
-Everything executes locally on your hardware with strict zero-cloud data isolation, ensuring total confidentiality for your private archives and documents.
-
----
-
-## ✨ Key Features
-
-### 📊 1. Multi-Dimensional Analytics Dashboard
-- **Activity & Peak Frequency**: Identify peak communication hours, day-of-week trends, and burst velocity.
-- **Participant Dynamics**: Interaction matrix, word/char counts, response ratios, and engagement distribution.
-- **Emoji & Sentiment Radar**: Deep emoji frequency metrics with colorful Twemoji vector rendering.
-- **Topic & Keyword Clustering**: Frequency ranking, custom phrase search, and contextual conversation jump.
-
-### 📄 2. Production $O(1)$ Stream PDF Exporter
-- **Lossless Large-Scale Exports**: Effortlessly exports 500,000+ records in a single streaming pass while maintaining strictly bounded memory consumption (<120 MB RAM).
-- **Executive Cover Page & KPI Badges**: Generates professional cover pages with dataset metadata, participant cards, and peak metrics.
-- **Interactive Month Bookmarks**: Built-in PDF navigation tree index for instant jumping across months and years.
-- **Deterministic Data Integrity**: Real-time SHA-256 cryptographic verification comparing source database records against rendered document objects.
-
-### 🎨 3. Eye-Care Color Studio & Themes
-- **Fatigue-Free Canvas**: Signature **Eye-Care Warm Cream (`#EFEAE2`)** canvas tone specifically engineered for extended reading sessions.
-- **Customizable Palettes**: Choose from *Pure White*, *Soft Ice Blue*, *Executive Slate Dark*, and *Soft Mint*.
-- **Interactive Bubble Studio**: Fine-tune left (received) and right (sent) message bubble colors with real-time modal preview.
-- **Non-Overlapping Attachment Badges**: Dedicated visual cards with colorful icons for stickers, photos, voice notes, and documents.
-
-### 🚨 4. Forensic Anomaly & Security Intelligence (V2.1)
-- **Late-Night Surge Detector**: Identifies abnormal message bursts between 00:00 and 05:00.
-- **Velocity Bursts**: Detects rapid-fire communication spikes (>25 messages in 5 minutes).
-- **Communication Gaps & Dormancy**: Flags significant silent hiatus periods (>14 days).
-- **Urgency & Security Tripwires**: Highlights sensitive terms (`asap`, `urgent`, `wire`, `confidential`).
-- **Ghost Participant Detector**: Identifies transient actors who engaged heavily then vanished.
-
-### 🔄 5. Multi-Stream Cross-Dataset Correlator (V2.2)
-- **Side-by-Side Stream Analysis**: Compare two distinct datasets (e.g. WhatsApp vs Discord or 2024 vs 2025).
-- **Temporal Overlap Index**: Overlapping duration, concurrent active days, and Pearson hourly schedule synchronicity.
-- **Lexical & Emoji Diff Matrix**: Shared high-frequency terms, unique vocabulary per stream, and shared emoji expressions.
-- **Participant Overlap Mapping**: Cross-platform identity matching and message volume comparison.
-
-### 📦 6. Standalone Forensic Case Dossier & Markdown Vaults (V2.3)
-- **Zero-Dependency HTML Dossier**: Single-file offline HTML case dossier with embedded CSS, KPI metrics, participant breakdown, and real-time client-side message search.
-- **Obsidian-Compatible Markdown Vault (.ZIP)**: Monthly markdown logs with YAML frontmatter metadata and wiki-link index.
-
-### 🧠 7. Semantic Topic Clustering & Thread Reconstructor (V3.0)
-- **Deterministic Thematic Clusters**: Categorizes conversations into Financial, Technical, Scheduling, Travel, Operations, and Social themes with keyword relevance vectors.
-- **Smart Thread Reconstruction**: Groups flat linear chat streams into discrete conversational discussion sessions with duration and participant breakdowns.
+### Core Promises
+1. **Local-First & Offline**: 100% of parsing, indexing, analytics, and rendering executes strictly on your local machine.
+2. **Zero Mandatory Cloud / External APIs**: No telemetry, no third-party data transmission, and no required external LLM keys.
+3. **No Arbitrary Tiny Size Limits**: Memory usage is strictly bounded ($\mathcal{O}(1)$ RAM) through indexed cursor streaming, chunked sinks, and sequential page generation.
+4. **Verifiable Data Integrity**: Exports compute rolling cryptographic SHA-256 digests ensuring exact source-to-render parity ($\text{missing} = 0, \text{duplicates} = 0, \text{failed} = 0$).
 
 ---
 
@@ -75,85 +36,158 @@ Everything executes locally on your hardware with strict zero-cloud data isolati
 ```
                                   TEXTBOARD SYSTEM ARCHITECTURE
                                   
-  ┌─────────────────────────┐             HTTP / REST             ┌─────────────────────────┐
-  │     Next.js Frontend    │ ◄─────────────────────────────────► │     NestJS Backend      │
-  │                         │                                     │                         │
-  │ • React 18 & Lucide     │                                     │ • Stream Ingestion      │
-  │ • Virtualized Timeline  │                                     │ • Analytics Engine      │
-  │ • Eye-Care Color Studio │                                     │ • Anomaly Detection     │
-  │ • Topic & Thread Radar  │                                     │ • Cross-Correlator      │
-  │ • 5-Theme Token Engine  │                                     │ • TrueType Font Engine  │
-  └─────────────────────────┘                                     └────────────┬────────────┘
-                                                                               │
-                                    ┌──────────────────────────────────────────┴───────────────┐
-                                    ▼                                                          ▼
-                      ┌───────────────────────────┐                              ┌───────────────────────────┐
-                      │    Local SQLite (WAL)     │                              │ Multi-Format Export Engine│
-                      │                           │                              │                           │
-                      │ • High-performance WAL   │                              │ • Streaming Vector PDF    │
-                      │ • Prisma ORM Integration  │                              │ • Standalone HTML Dossier │
-                      │ • Zero cloud leakage      │                              │ • Obsidian Markdown Vault │
-                      └───────────────────────────┘                              └───────────────────────────┘
+  ┌─────────────────────────────────────────┐             HTTP / REST             ┌─────────────────────────────────────────┐
+  │         Next.js 14 Frontend UI          │ ◄─────────────────────────────────► │         NestJS 10 Backend Core          │
+  │                                         │                                     │                                         │
+  │ • Workstation Multi-View Navigation     │                                     │ • Universal Stream Ingestion Engine     │
+  │ • Interactive HTML5 Canvas Charts       │                                     │ • Batched Sinks & Data Normalizers      │
+  │ • Dynamic 5-Theme Token System          │                                     │ • Fast Tokenized Query Search Index     │
+  │ • Stream Timeline Scrubber & Filters    │                                     │ • Anomaly Detection & Velocity Scans    │
+  │ • Dual PDF Export Modal with Live Stats │                                     │ • DataIntegrityVerifier (SHA-256 Chain) │
+  └─────────────────────────────────────────┘                                     └────────────────────┬────────────────────┘
+                       │                                                                               │
+                       ▼                                                                               ▼
+  ┌─────────────────────────────────────────┐                                     ┌─────────────────────────────────────────┐
+  │        Electron 33 Desktop Shell        │                                     │       Local Storage Vault (Prisma)      │
+  │                                         │                                     │                                         │
+  │ • Background Process Bridge             │                                     │ • High-performance SQLite (WAL mode)   │
+  │ • NSIS & Portable Windows Packaging     │                                     │ • Local File Vault (.textboard/exports) │
+  └─────────────────────────────────────────┘                                     └─────────────────────────────────────────┘
 ```
+
+---
+
+## 📂 Supported Ingestion Formats
+
+TextBoard adopts a universal schema mapping incoming streams into canonical `TimelineEvent`, `Dataset`, and `Entity` models.
+
+### Status Classification
+
+#### ✅ CURRENT (Fully Working & Unit Tested)
+- **WhatsApp Chat Archives**: `_chat.txt` and `.zip` archives with auto-format detection (iOS / Android / 12h / 24h).
+- **AI / LLM Conversation Transcripts**: ChatGPT (`conversations.json`), Claude AI (`conversations.json`), Gemini Takeout, and AI Markdown transcripts with canonical role taxonomy (`human`, `assistant`, `system`, `tool`).
+- **Telegram Desktop Exports**: `result.json` with rich text entities, media tags, stickers, and reactions.
+- **Discord Communication Streams**: JSON channel exports and formatted text chat logs.
+- **Signal Transcripts**: Formatted Signal plain text backup exports.
+- **iMessage & Slack**: Formatted `.txt` and multi-channel JSON archives.
+- **Email Archives**: `.mbox` and `.eml` mail archives with header threading (`From:`, `To:`, `Subject:`, `Date:`).
+- **Git Commit Histories**: `git log --pretty` and `commits.txt` history stream parser.
+- **System & Application Logs**: Standardized server and application log formats (`.log`, `.access`, `.error`) with stack trace preservation.
+- **Rich Documents**: Microsoft Word (`.docx`) via Mammoth, Plain Text (`.txt`), and Markdown (`.md`).
+- **Structured Data**: CSV, TSV, JSON, NDJSON (newline-delimited JSON), and Excel Spreadsheets (`.xlsx`).
+- **ZIP Archives**: Multi-file ZIP ingestion with automatic inner file classification.
+
+#### ⚪ PLANNED (Future Generations)
+- **Google Takeout & Browser History**: Location logs, search queries, and bookmarks.
+- **Embedded Local LLM Assistant**: Natural language query execution on local models.
+
+#### 🧪 EXPERIMENTAL
+- **OCR & Image Text Extraction**: Local Tesseract-based text extraction from embedded image attachments.
+
+---
+
+## 📄 Export Capabilities
+
+TextBoard provides two clearly separated export pipelines:
+
+### 1. Conversation Document Archive (PDF)
+- Chronological WhatsApp-style message layout with speaker bubbles and timestamps.
+- Distinct participant color badges and 5-minute consecutive message collapsing.
+- Date separators (`MONDAY, 24 AUGUST 2026`) and attachment indicator tags (`📷 PHOTO`, `🎙️ AUDIO`, `📄 DOCUMENT`).
+- Host TrueType font resolution supporting Latin, Arabic, Urdu, and Emoji glyphs without crashes.
+- Cryptographic SHA-256 verification manifest confirming $100\%$ message coverage.
+
+### 2. Analytics Intelligence Dossier (PDF & HTML)
+- Executive summary report with dataset KPIs, total actors, and date ranges.
+- Hourly circadian distribution, weekday velocity, and interaction matrix.
+- Thematic topic clusters and flagged forensic anomaly timeline.
 
 ---
 
 ## 🚀 Getting Started
 
-### 1. Prerequisites
-- **Node.js** (v18.0 or newer)
-- **npm** or **yarn** / **pnpm**
+### Prerequisites
+- **Node.js**: v18.0 or newer (v20+ recommended)
+- **npm**: v9.0 or newer
+- **Operating System**: Windows 10/11, macOS, or Linux
 
-### 2. Installation
+### Quick Setup
 
-Clone the repository:
 ```bash
+# 1. Clone repository
 git clone https://github.com/qamarabbas-024/Textboard.git
 cd Textboard
-```
 
-### 3. Backend Setup
-```bash
+# 2. Setup Backend
 cd backend
 npm install
 npx prisma generate
 npx prisma db push
 npm run start:dev
-```
-*Backend runs on `http://localhost:3001` (Health check: `http://localhost:3001/health`)*
 
-### 4. Frontend Setup
-In a separate terminal:
-```bash
-cd frontend
+# 3. Setup Frontend (in a separate terminal)
+cd ../frontend
 npm install
 npm run dev
 ```
-*Frontend runs on `http://localhost:3000`*
+
+- **Frontend Workstation**: `http://localhost:3000`
+- **Backend API**: `http://localhost:3001` (Health Check: `http://localhost:3001/health`)
+
+### Desktop Distribution (Electron)
+```bash
+# Launch Desktop Workstation in development
+npm run electron:dev
+
+# Build Windows NSIS / Portable installer
+npm run electron:dist
+```
 
 ---
 
-## 🔒 Security & Privacy
+## 🧪 Testing & Validation
 
-- **100% Local-First Processing**: Raw data files, parsed message databases, and generated PDFs remain strictly on the local machine.
-- **Zero Third-Party Telemetry**: No tracking scripts, analytics beacons, or remote cloud logging.
-- **Strict Data Exclusion**: All user databases, uploads, and temporary archives are guarded by strict `.gitignore` filters.
+TextBoard enforces strict automated testing across all stream parsers, analytics algorithms, and export verifiers.
+
+```bash
+# Run backend test suite (21+ suites / 89+ tests)
+cd backend
+npm test
+
+# Run frontend build validation
+cd ../frontend
+npm run build
+```
 
 ---
 
-## 🗺️ Master Roadmap
+## 🔒 Privacy & Local-First Guarantees
 
-- [x] **V1.0**: Local-first stream ingestion, SQLite WAL engine, and analytics dashboard.
-- [x] **V1.1**: Production $O(1)$ PDF export engine with TrueType font resolution.
-- [x] **V1.2**: Full Twemoji color rendering, sticker badges, and Eye-Care Color Studio.
-- [x] **V1.3**: Advanced Framer Motion animated data-scrubbing timeline.
-- [x] **V1.4**: Cross-conversation multi-actor relationship graph visualization.
-- [x] **V1.5**: Telegram JSON, Discord, Slack, and CSV universal stream parsers.
-- [x] **V2.0**: Native desktop client distribution (Electron / Tauri packaging).
-- [x] **V2.1**: Forensic Anomaly & Security Intelligence Engine (Late-Night Surges, Gaps, Ghost Contacts).
-- [x] **V2.2**: Universal Multi-Stream Cross-Dataset Correlator & Lexical Diff Matrix.
-- [x] **V2.3**: Standalone Single-File HTML Forensic Case Dossier & Obsidian Markdown Vault Exporter.
-- [x] **V3.0**: Semantic Topic Clustering Matrix & Smart Conversational Thread Reconstructor.
+- **No Remote Telemetry**: Zero external tracking, analytics beacons, or remote cloud logging.
+- **Zero Cloud Leakage**: All raw files, parsed databases, and generated PDFs remain inside the local directory (`.textboard/`).
+- **Cryptographic Verification**: Every export produces an immutable manifest validating exact source record counts.
+
+---
+
+## 🗺️ Product Roadmap
+
+### V1.x — Foundation & Core Workstation (Current)
+- [x] **V1.0**: Local-first stream ingestion, SQLite WAL engine, high-speed search, and 12 analytics views.
+- [x] **V1.1**: Production $O(1)$ PDF export engine with TrueType font resolution and SHA-256 verification.
+- [ ] **V1.2**: AI/LLM conversation parser (ChatGPT, Claude, Gemini) and multilingual font fallback hardening.
+- [ ] **V1.3**: Dual-mode export selector (Analytics Dossier vs. Conversation Archive) and 5-theme token engine.
+
+### V2.x — Universal Data Expansion
+- [ ] **V2.0**: Universal multi-file ingestion (Email archives, Google Takeout, Git logs).
+- [ ] **V2.1**: Local media vault, image thumbnailing, and document attachment relationships.
+- [ ] **V2.2**: Cross-dataset comparative intelligence and vocabulary drift matrices.
+
+### V3.x — Spatial Workstation & Deep Intelligence
+- [ ] **V3.0**: 3D spatial data universe explorer with interactive WebGL graph visualization.
+- [ ] **V3.5**: Embedded vector similarity search (SQLite FTS5 + offline sentence embeddings).
+
+### V4.x — Autonomous Personal Workstation
+- [ ] **V4.0**: Local LLM sidecar integration (via Ollama / WebLLM) for offline natural language synthesis.
 
 ---
 
@@ -161,5 +195,4 @@ npm run dev
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
-Developed with ❤️ by **Qamar Abbas**.
-
+Developed with precision by **Qamar Abbas**.
