@@ -15,6 +15,8 @@ import { LogStreamParser } from './log-stream-parser';
 import { GitLogStreamParser } from './git-log-stream-parser';
 import { MboxStreamParser } from './mbox-stream-parser';
 import { TelegramStreamParser } from './telegram-stream-parser';
+import { GoogleTakeoutStreamParser } from './google-takeout-stream-parser';
+import { ImageStreamParser } from './image-stream-parser';
 
 @Injectable()
 export class ParserRegistryService {
@@ -36,10 +38,14 @@ export class ParserRegistryService {
     private readonly gitLogParser: GitLogStreamParser,
     private readonly mboxParser: MboxStreamParser,
     private readonly telegramParser: TelegramStreamParser,
+    private readonly takeoutParser: GoogleTakeoutStreamParser,
+    private readonly imageParser: ImageStreamParser,
   ) {
     // Specific platform parsers first
     this.registerParser(aiChatParser);
     this.registerParser(telegramParser);
+    this.registerParser(takeoutParser);
+    this.registerParser(imageParser);
     this.registerParser(discordParser);
     this.registerParser(imessageParser);
     this.registerParser(signalParser);

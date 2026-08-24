@@ -67,6 +67,8 @@ TextBoard adopts a universal schema mapping incoming streams into canonical `Tim
 - **WhatsApp Chat Archives**: `_chat.txt` and `.zip` archives with auto-format detection (iOS / Android / 12h / 24h).
 - **AI / LLM Conversation Transcripts**: ChatGPT (`conversations.json`), Claude AI (`conversations.json`), Gemini Takeout, and AI Markdown transcripts with canonical role taxonomy (`human`, `assistant`, `system`, `tool`).
 - **Telegram Desktop Exports**: `result.json` with rich text entities, media tags, stickers, and reactions.
+- **Google Takeout & Browser History**: `MyActivity.json`, `BrowserHistory.json`, search queries, and URLs.
+- **Image Media & Attachment Archives**: `.png`, `.jpg`, `.jpeg`, `.webp`, `.gif` photo metadata and dimension extraction.
 - **Discord Communication Streams**: JSON channel exports and formatted text chat logs.
 - **Signal Transcripts**: Formatted Signal plain text backup exports.
 - **iMessage & Slack**: Formatted `.txt` and multi-channel JSON archives.
@@ -76,13 +78,6 @@ TextBoard adopts a universal schema mapping incoming streams into canonical `Tim
 - **Rich Documents**: Microsoft Word (`.docx`) via Mammoth, Plain Text (`.txt`), and Markdown (`.md`).
 - **Structured Data**: CSV, TSV, JSON, NDJSON (newline-delimited JSON), and Excel Spreadsheets (`.xlsx`).
 - **ZIP Archives**: Multi-file ZIP ingestion with automatic inner file classification.
-
-#### ⚪ PLANNED (Future Generations)
-- **Google Takeout & Browser History**: Location logs, search queries, and bookmarks.
-- **Embedded Local LLM Assistant**: Natural language query execution on local models.
-
-#### 🧪 EXPERIMENTAL
-- **OCR & Image Text Extraction**: Local Tesseract-based text extraction from embedded image attachments.
 
 ---
 

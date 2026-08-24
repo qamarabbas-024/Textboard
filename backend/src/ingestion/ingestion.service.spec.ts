@@ -23,6 +23,8 @@ import { LogStreamParser } from './parsers/log-stream-parser';
 import { GitLogStreamParser } from './parsers/git-log-stream-parser';
 import { MboxStreamParser } from './parsers/mbox-stream-parser';
 import { TelegramStreamParser } from './parsers/telegram-stream-parser';
+import { GoogleTakeoutStreamParser } from './parsers/google-takeout-stream-parser';
+import { ImageStreamParser } from './parsers/image-stream-parser';
 
 describe('IngestionService (V1 Streaming Pipeline)', () => {
   let service: IngestionService;
@@ -105,6 +107,8 @@ describe('IngestionService (V1 Streaming Pipeline)', () => {
         GitLogStreamParser,
         MboxStreamParser,
         TelegramStreamParser,
+        GoogleTakeoutStreamParser,
+        ImageStreamParser,
         NormalizationService,
       ],
     }).compile();

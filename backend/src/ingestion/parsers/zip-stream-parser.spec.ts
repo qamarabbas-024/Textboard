@@ -15,6 +15,8 @@ import { LogStreamParser } from './log-stream-parser';
 import { GitLogStreamParser } from './git-log-stream-parser';
 import { MboxStreamParser } from './mbox-stream-parser';
 import { TelegramStreamParser } from './telegram-stream-parser';
+import { GoogleTakeoutStreamParser } from './google-takeout-stream-parser';
+import { ImageStreamParser } from './image-stream-parser';
 import { ParserContext } from '../types';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -43,6 +45,8 @@ describe('ZipStreamParser (Universal Backup Archive Unpacker)', () => {
     const gitLogParser = new GitLogStreamParser();
     const mboxParser = new MboxStreamParser();
     const telegramParser = new TelegramStreamParser();
+    const takeoutParser = new GoogleTakeoutStreamParser();
+    const imageParser = new ImageStreamParser();
 
     registry = new ParserRegistryService(
       txtParser,
@@ -60,6 +64,8 @@ describe('ZipStreamParser (Universal Backup Archive Unpacker)', () => {
       gitLogParser,
       mboxParser,
       telegramParser,
+      takeoutParser,
+      imageParser,
     );
 
     zipParser = new ZipStreamParser(registry);

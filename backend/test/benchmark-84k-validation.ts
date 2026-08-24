@@ -22,6 +22,8 @@ import { LogStreamParser } from '../src/ingestion/parsers/log-stream-parser';
 import { GitLogStreamParser } from '../src/ingestion/parsers/git-log-stream-parser';
 import { MboxStreamParser } from '../src/ingestion/parsers/mbox-stream-parser';
 import { TelegramStreamParser } from '../src/ingestion/parsers/telegram-stream-parser';
+import { GoogleTakeoutStreamParser } from '../src/ingestion/parsers/google-takeout-stream-parser';
+import { ImageStreamParser } from '../src/ingestion/parsers/image-stream-parser';
 import { IngestionService } from '../src/ingestion/ingestion.service';
 import { ExportService } from '../src/export/export.service';
 import { StreamPdfRendererService } from '../src/export/stream-pdf-renderer.service';
@@ -75,6 +77,8 @@ async function run84kValidationBenchmark() {
   const gitLogParser = new GitLogStreamParser();
   const mboxParser = new MboxStreamParser();
   const telegramParser = new TelegramStreamParser();
+  const takeoutParser = new GoogleTakeoutStreamParser();
+  const imageParser = new ImageStreamParser();
 
   const registry = new ParserRegistryService(
     txtParser,
@@ -92,6 +96,8 @@ async function run84kValidationBenchmark() {
     gitLogParser,
     mboxParser,
     telegramParser,
+    takeoutParser,
+    imageParser,
   );
 
   const ingestionService = new IngestionService(
