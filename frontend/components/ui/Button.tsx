@@ -31,9 +31,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     // Base styles
     const baseClasses =
-      'inline-flex items-center justify-center font-semibold font-mono transition-all duration-150 select-none ' +
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent focus-visible:ring-offset-1 focus-visible:ring-offset-theme-base ' +
-      'active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 cursor-pointer';
+      'inline-flex items-center justify-center font-semibold font-mono transition-all duration-200 ease-out select-none ' +
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-accent focus-visible:ring-offset-2 focus-visible:ring-offset-theme-base ' +
+      'active:scale-[0.97] hover:scale-[1.01] disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 cursor-pointer';
 
     // Variant mapping
     const variantClasses: Record<ButtonVariant, string> = {
