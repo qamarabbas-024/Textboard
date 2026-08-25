@@ -166,23 +166,24 @@ npm run build
 
 ## 🗺️ Product Roadmap
 
-### V1.x — Foundation & Core Workstation (Current)
+### V1.x — Foundation & Core Workstation
 - [x] **V1.0**: Local-first stream ingestion, SQLite WAL engine, high-speed search, and 12 analytics views.
-- [x] **V1.1**: Production $O(1)$ PDF export engine with TrueType font resolution and SHA-256 verification.
-- [ ] **V1.2**: AI/LLM conversation parser (ChatGPT, Claude, Gemini) and multilingual font fallback hardening.
-- [ ] **V1.3**: Dual-mode export selector (Analytics Dossier vs. Conversation Archive) and 5-theme token engine.
+- [x] **V1.1**: Production O(1) PDF export engine with TrueType font resolution and SHA-256 verification.
+- [x] **V1.2**: AI/LLM conversation parser (ChatGPT, Claude, Gemini, Copilot, DeepSeek).
+- [x] **V1.3**: Dual-mode export selector (Analytics Dossier vs. Conversation Archive) and 5-theme token engine.
 
 ### V2.x — Universal Data Expansion
-- [ ] **V2.0**: Universal multi-file ingestion (Email archives, Google Takeout, Git logs).
-- [ ] **V2.1**: Local media vault, image thumbnailing, and document attachment relationships.
-- [ ] **V2.2**: Cross-dataset comparative intelligence and vocabulary drift matrices.
+- [x] **V2.0**: Universal multi-file ingestion (Mbox Email archives, Google Takeout, Git logs, DOCX, XLSX).
+- [x] **V2.1**: Forensic media gallery, image EXIF metadata extraction, and attachment relationship links.
+- [x] **V2.2**: Cross-dataset comparative intelligence and vocabulary drift matrices.
 
 ### V3.x — Spatial Workstation & Deep Intelligence
-- [ ] **V3.0**: 3D spatial data universe explorer with interactive WebGL graph visualization.
-- [ ] **V3.5**: Embedded vector similarity search (SQLite FTS5 + offline sentence embeddings).
+- [x] **V3.0**: 3D spatial data universe explorer with interactive particle projections and orbit controls.
+- [x] **V3.5**: Embedded BM25 vector similarity search with offline query intent classification.
 
 ### V4.x — Autonomous Personal Workstation
-- [ ] **V4.0**: Local LLM sidecar integration (via Ollama / WebLLM) for offline natural language synthesis.
+- [x] **V4.0**: Local autonomous AI intelligence assistant with multi-intent conversational synthesis.
+- [x] **V4.1**: Google Takeout browser history, YouTube watch metrics, and forensic audit sealing.
 
 ---
 
