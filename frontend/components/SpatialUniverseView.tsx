@@ -443,6 +443,8 @@ export function SpatialUniverseView({ datasetId, datasetName }: SpatialUniverseV
         onMouseLeave={handleMouseUp}
         onWheel={handleWheel}
         onClick={handleClick}
+        role="img"
+        aria-label="3D Spatial Universe particle projection of communication timeline"
         className="w-full h-full cursor-grab active:cursor-grabbing"
       />
 
