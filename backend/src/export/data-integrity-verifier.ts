@@ -146,7 +146,7 @@ export class DataIntegrityVerifier {
       lastMessageId: this.lastRenderedId,
       firstMessageTimestamp: this.firstRenderedTimestamp,
       lastMessageTimestamp: this.lastRenderedTimestamp,
-      contentChecksum,
+      contentChecksum: `sha256:${contentChecksum}`,
       status: isValid ? 'VERIFIED' : 'FAILED',
       diagnostics: this.diagnostics.length > 0 ? this.diagnostics : undefined,
       generatedAt: new Date().toISOString(),
