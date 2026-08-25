@@ -97,7 +97,7 @@ export default function AnomalyPulseChart({
 
       {/* SVG Oscilloscope Waveform */}
       <div className="relative w-full overflow-hidden bg-black/40 rounded-xl border border-theme-border/60 py-2">
-        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto overflow-visible">
+        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto overflow-visible" role="img" aria-label="Anomaly oscilloscope pulse chart">
           <defs>
             <linearGradient id="waveGrad" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#00f0ff" />
