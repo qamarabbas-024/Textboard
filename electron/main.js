@@ -129,10 +129,18 @@ ipcMain.handle('dialog:openFile', async (event, options) => {
     filters: [
       {
         name: 'Communication Streams & Datasets',
-        extensions: ['txt', 'json', 'csv', 'tsv', 'xlsx', 'zip', 'log', 'imessage', 'signal'],
+        extensions: ['txt', 'json', 'jsonl', 'csv', 'tsv', 'xlsx', 'zip', 'log', 'gitlog', 'mbox', 'eml', 'docx', 'imessage', 'signal', 'png', 'jpg', 'jpeg', 'webp'],
       },
       { name: 'All Files', extensions: ['*'] },
     ],
+    ...options,
+  });
+  return result;
+});
+
+ipcMain.handle('dialog:openDirectory', async (event, options) => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openDirectory'],
     ...options,
   });
   return result;
