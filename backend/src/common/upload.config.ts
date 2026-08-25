@@ -11,8 +11,20 @@ export const UPLOAD_LIMITS = {
 export const ALLOWED_EXTENSIONS = {
   TEXT_CHAT: ['txt'],
   SPREADSHEET: ['csv', 'xlsx', 'xls', 'tsv'],
-  DOCUMENT: ['pdf', 'docx', 'doc', 'txt', 'md', 'rtf'],
+  DOCUMENT: ['pdf', 'docx', 'doc', 'txt', 'md', 'rtf', 'json', 'jsonl', 'mbox', 'eml', 'log', 'gitlog', 'png', 'jpg', 'jpeg', 'webp', 'zip'],
 } as const;
+
+/**
+ * Sanitizes uploaded filenames against path traversal and special characters.
+ */
+export function sanitizeUploadFilename(rawName: string): string {
+  if (!rawName) return 'unnamed_upload';
+  return rawName
+    .replace(/^(\.\.[\/\\])+/, '')
+    .replace(/[\x00-\x1f\x80-\x9f]/g, '')
+    .replace(/[<>:"/\\|?*]/g, '_')
+    .slice(0, 255);
+}
 
 /**
  * Text Chat Multer options with strict fileSize limit and text validation
