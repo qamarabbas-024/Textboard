@@ -8,6 +8,7 @@ export interface TopicCluster {
   icon: string;
   messageCount: number;
   percentage: number;
+  coherenceScore?: number;
   topKeywords: Array<{ word: string; weight: number }>;
   topParticipants: Array<{ actor: string; count: number }>;
   sampleMessages: Array<{
