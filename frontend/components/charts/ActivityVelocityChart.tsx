@@ -106,6 +106,8 @@ export default function ActivityVelocityChart({
         <svg
           viewBox={`0 0 ${chartWidth} ${chartHeight}`}
           className="w-full h-auto overflow-visible cursor-crosshair"
+          role="img"
+          aria-label={`${title} chart displaying data distribution`}
           onMouseLeave={() => setHoverIndex(null)}
         >
           <defs>
