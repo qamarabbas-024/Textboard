@@ -97,6 +97,10 @@ export class AnomalyDetectorService {
     const ghostAnomalies = this.detectGhostParticipants(events);
     anomalies.push(...ghostAnomalies);
 
+    // 6. Detect Monologue Length Anomaly (>1500 chars)
+    const longMsgAnomalies = this.detectMonologues(events);
+    anomalies.push(...longMsgAnomalies);
+
     // Sort by severity (CRITICAL -> WARNING -> NOTE) then timestamp
     const severityWeight: Record<AnomalySeverity, number> = {
       CRITICAL: 3,
@@ -361,5 +365,33 @@ export class AnomalyDetectorService {
     }
 
     return anomalies.slice(0, 10);
+  }
+
+  /**
+   * Detects abnormal long single-message monologues (>1500 chars).
+   */
+  private detectMonologues(events: EventSummaryRow[]): ForensicAnomaly[] {
+    const anomalies: ForensicAnomaly[] = [];
+    for (const ev of events) {
+      if (ev.content && ev.content.length > 2000) {
+        anomalies.push({
+          id: `anomaly_monologue_${ev.id}`,
+          type: 'LEXICAL_SHIFT',
+          severity: 'NOTE',
+          title: `Extended Monologue Detected (${ev.content.length.toLocaleString()} Chars)`,
+          description: `${ev.actor || 'User'} sent an unusually extensive long-form transmission (${ev.content.length} characters).`,
+          timestamp: new Date(ev.timestamp).toISOString(),
+          actor: ev.actor || undefined,
+          metrics: {
+            value: ev.content.length,
+            baseline: 150,
+            ratio: parseFloat((ev.content.length / 150).toFixed(1)),
+            unit: 'chars',
+          },
+          sampleSnippet: ev.content.slice(0, 140) + '...',
+        });
+      }
+    }
+    return anomalies.slice(0, 8);
   }
 }
