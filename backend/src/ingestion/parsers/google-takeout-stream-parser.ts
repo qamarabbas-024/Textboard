@@ -15,6 +15,9 @@ export class GoogleTakeoutStreamParser implements IStreamParser {
         lower.includes('browserhistory') ||
         lower.includes('chrome') ||
         lower.includes('takeout') ||
+        lower.includes('youtube') ||
+        lower.includes('watch-history') ||
+        lower.includes('keep') ||
         lower.includes('search_history') ||
         lower.includes('searches')) &&
       lower.endsWith('.json')
