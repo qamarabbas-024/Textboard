@@ -27,6 +27,7 @@ export interface CrossDatasetCorrelation {
     overlapPercentage: number;
     concurrentActiveDays: number;
     hourlySynchronicity: number; // 0 to 1 Pearson correlation
+    confidenceScore?: number;
   };
   lexicalCorrelation: {
     sharedKeywords: Array<{ word: string; countA: number; countB: number }>;

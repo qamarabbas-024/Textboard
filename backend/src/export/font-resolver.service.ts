@@ -86,14 +86,19 @@ export class FontResolverService {
 
     for (const candidate of candidatePaths) {
       if (fs.existsSync(candidate.regular)) {
-        const hasBold = fs.existsSync(candidate.bold);
-        this.logger.log(
-          `Discovered host TrueType font: ${candidate.regular} (Bold: ${hasBold ? candidate.bold : 'same'})`,
-        );
-        return {
-          regularPath: candidate.regular,
-          boldPath: hasBold ? candidate.bold : candidate.regular,
-        };
+        try {
+          const stat = fs.statSync(candidate.regular);
+          if (stat.size > 2048) {
+            const hasBold = fs.existsSync(candidate.bold) && fs.statSync(candidate.bold).size > 2048;
+            this.logger.log(
+              `Discovered host TrueType font: ${candidate.regular} (Bold: ${hasBold ? candidate.bold : 'same'})`,
+            );
+            return {
+              regularPath: candidate.regular,
+              boldPath: hasBold ? candidate.bold : candidate.regular,
+            };
+          }
+        } catch {}
       }
     }
 

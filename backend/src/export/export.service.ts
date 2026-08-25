@@ -5,6 +5,7 @@ import { StreamPdfRendererService } from './stream-pdf-renderer.service';
 import { FontResolverService } from './font-resolver.service';
 import { DataIntegrityVerifier } from './data-integrity-verifier';
 import { ChatExportOptions, ExportJobProgress, ExportJobStatus, ExportManifest } from './types';
+import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Prisma } from '@prisma/client';
@@ -443,13 +444,11 @@ export class ExportService {
   private async processHighlightsExport(job: InternalExportJob, dataset: any) {
     const { doc, writeStream, fonts } = this.chatRenderer.createPdfDocument(job.filePath, {});
 
-    const [highlights, peopleStats, streaks, milestones, overview, wordCloud] = await Promise.all([
+    const [highlights, peopleStats, streaks, milestones] = await Promise.all([
       this.analyticsService.getHighlights(dataset.id),
       this.analyticsService.getPeopleStats(dataset.id),
       this.analyticsService.getStreaks(dataset.id),
       this.analyticsService.getMilestones(dataset.id),
-      this.analyticsService.getOverview(dataset.id).catch(() => null),
-      this.analyticsService.getWordCloud(dataset.id, 20).catch(() => []),
     ]);
 
     const generatedDateStr = new Date().toUTCString();
@@ -470,7 +469,7 @@ export class ExportService {
     const kpiY = doc.y;
     const kpiWidth = 122;
     const kpis = [
-      { label: 'TOTAL MESSAGES', val: (overview?.totalEvents || dataset.totalEvents || 0).toLocaleString(), color: '#0284c7' },
+      { label: 'TOTAL MESSAGES', val: (dataset.totalEvents || 0).toLocaleString(), color: '#0284c7' },
       { label: 'ACTIVE PARTICIPANTS', val: (peopleStats.totalParticipants || 0).toString(), color: '#059669' },
       { label: 'ACTIVE CALENDAR DAYS', val: (streaks.totalActiveDays || 0).toString(), color: '#7c3aed' },
       { label: 'LONGEST STREAK', val: `${streaks.longestStreak?.days || 0} Days`, color: '#d97706' },
@@ -499,7 +498,7 @@ export class ExportService {
 
     let curY = tableStartY + 20;
     const topParticipants = (peopleStats.participants || []).slice(0, 8);
-    const totalMsgs = overview?.totalEvents || dataset.totalEvents || 1;
+    const totalMsgs = dataset.totalEvents || 1;
 
     topParticipants.forEach((p: any, idx: number) => {
       const share = totalMsgs > 0 ? ((p.eventCount / totalMsgs) * 100).toFixed(1) : '0';
@@ -567,17 +566,7 @@ export class ExportService {
       doc.moveDown(0.8);
     }
 
-    // 5. Section 3: High-Frequency Vocabulary Keywords
-    if (wordCloud && wordCloud.length > 0) {
-      doc.fillColor('#0f172a').font(fonts.bold).fontSize(12).text('3. Lexical Topic & Keyword Density', 36, doc.y);
-      doc.moveDown(0.3);
-      const topWords = wordCloud.slice(0, 15).map((w: any) => `${w.text} (${w.value})`).join('  •  ');
-      doc.roundedRect(36, doc.y, 523, 28, 4).fillAndStroke('#fdf4ff', '#f5d0fe');
-      doc.fillColor('#86198f').font(fonts.regular).fontSize(8.5).text(topWords, 44, doc.y + 8, { width: 505 });
-      doc.y += 38;
-    }
-
-    // 6. Cryptographic Audit Seal
+    // 5. Cryptographic Audit Seal
     const sha256Seal = crypto
       .createHash('sha256')
       .update(`${dataset.id}_${totalMsgs}_${generatedDateStr}`)

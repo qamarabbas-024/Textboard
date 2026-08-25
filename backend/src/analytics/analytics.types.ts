@@ -2,6 +2,7 @@ export interface MessageAnalytics {
   totalMessages: number;
   totalWords: number;
   totalCharacters: number;
+  lexicalDensity?: number;
   averageMessageLength: {
     characters: number;
     words: number;
@@ -169,6 +170,7 @@ export interface RelationshipPair {
   avgResponseSecsAtoB: number;
   avgResponseSecsBtoA: number;
   balanceRatio: number; // 0.5 is perfectly equal
+  reciprocityScore?: number;
 }
 
 import { AnomalyReport } from './services/anomaly-detector.service';
