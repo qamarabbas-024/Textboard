@@ -257,8 +257,11 @@ export class SearchService {
     if (query.text) {
       const words = query.text.toLowerCase().split(/\s+/);
       for (const w of words) {
-        if (lower.includes(w)) {
-          score += 2.0;
+        if (!w) continue;
+        const matches = (lower.match(new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
+        if (matches > 0) {
+          // BM25 term frequency saturation approximation
+          score += (matches * 2.5) / (matches + 1.2);
           if (lower.startsWith(w)) score += 3.0;
         }
       }
