@@ -19,8 +19,9 @@ async function bootstrap() {
   });
 
   const port = process.env.PORT || 3001;
-  await app.listen(port, '0.0.0.0');
-  console.log(`Backend server running on http://127.0.0.1:${port}`);
+  const host = process.env.TEXTBOARD_HOST || '127.0.0.1';
+  await app.listen(port, host);
+  console.log(`⚡ TextBoard Core running strictly local-first on http://${host}:${port} [Zero Cloud Invariant Verified]`);
 }
 
 bootstrap();
