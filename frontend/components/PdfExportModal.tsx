@@ -304,7 +304,7 @@ export function PdfExportModal({
                   VISUAL STREAM PDF EXPORTER
                 </h2>
                 <p className="text-[11px] text-theme-dim">
-                  {datasetName} • {totalEvents.toLocaleString()} entries
+                  {datasetName} • {totalEvents.toLocaleString()} entries (~{Math.ceil(totalEvents / 35).toLocaleString()} pages)
                 </p>
               </div>
             </div>
