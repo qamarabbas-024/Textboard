@@ -47,28 +47,32 @@ export class BatchedSinkService {
 
     // 2. Perform bulk insertion and dataset updates
     await this.prisma.$transaction(async (tx) => {
-      // A. Bulk insert events
-      await tx.timelineEvent.createMany({
-        data: events.map((e) => ({
-          id: e.id,
-          datasetId: e.datasetId,
-          sourceFileId: e.sourceFileId,
-          entityId: e.entityId,
-          actor: e.actor || e.actorName,
-          actorName: e.actorName || e.actor,
-          timestamp: e.timestamp,
-          rawTimestamp: e.rawTimestamp,
-          sequenceNum: e.sequenceNum,
-          content: e.content,
-          eventType: e.eventType,
-          charLength: e.charLength,
-          wordCount: e.wordCount,
-          hasUrls: e.hasUrls,
-          hasEmojis: e.hasEmojis,
-          hasMedia: e.hasMedia,
-          metadata: e.metadata,
-        })),
-      });
+      // A. Bulk insert events in safe chunks (prevent SQLite variable limit exceeding 999/32766)
+      const chunkSize = 500;
+      for (let i = 0; i < events.length; i += chunkSize) {
+        const chunk = events.slice(i, i + chunkSize);
+        await tx.timelineEvent.createMany({
+          data: chunk.map((e) => ({
+            id: e.id,
+            datasetId: e.datasetId,
+            sourceFileId: e.sourceFileId,
+            entityId: e.entityId,
+            actor: e.actor || e.actorName,
+            actorName: e.actorName || e.actor,
+            timestamp: e.timestamp,
+            rawTimestamp: e.rawTimestamp,
+            sequenceNum: e.sequenceNum,
+            content: e.content,
+            eventType: e.eventType,
+            charLength: e.charLength,
+            wordCount: e.wordCount,
+            hasUrls: e.hasUrls,
+            hasEmojis: e.hasEmojis,
+            hasMedia: e.hasMedia,
+            metadata: e.metadata,
+          })),
+        });
+      }
 
       // B. Update Dataset total count & bounds
       const dataset = await tx.dataset.findUnique({ where: { id: datasetId } });
