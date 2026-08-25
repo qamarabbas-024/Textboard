@@ -104,6 +104,16 @@ export class DiscordStreamParser implements IStreamParser {
         content = content ? `${content} [Attachment: ${attachmentUrls}]` : `[Attachment: ${attachmentUrls}]`;
       }
 
+      if (Array.isArray(msg.embeds) && msg.embeds.length > 0) {
+        const embedSummaries = msg.embeds
+          .map((e: any) => [e.title, e.description].filter(Boolean).join(': '))
+          .filter(Boolean)
+          .join(' | ');
+        if (embedSummaries) {
+          content = content ? `${content} [Embed: ${embedSummaries}]` : `[Embed: ${embedSummaries}]`;
+        }
+      }
+
       const urls = extractUrls(content);
       const emojis = extractEmojis(content);
 
