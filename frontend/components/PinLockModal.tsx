@@ -18,15 +18,19 @@ interface PinLockModalProps {
  * authenticate or protect backend server APIs, database records, or stored data.
  */
 
-// Simple deterministic hash for local browser UI lock convenience
+// Multi-round deterministic hash for local browser UI lock convenience
 function hashPin(pin: string, salt: string): string {
-  let hash = 0;
-  const combined = `${salt}:${pin}:${salt}`;
-  for (let i = 0; i < combined.length; i++) {
-    hash = (hash << 5) - hash + combined.charCodeAt(i);
-    hash |= 0;
+  let h1 = 0xdeadbeef;
+  let h2 = 0x41c6ce57;
+  const str = `${salt}__TEXTBOARD_LOCAL_PIN__${pin}__${salt}`;
+  for (let i = 0; i < str.length; i++) {
+    const ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
   }
-  return hash.toString(16);
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16);
 }
 
 export function PinLockModal({ isLocked, onUnlock, onPinConfigured }: PinLockModalProps) {
