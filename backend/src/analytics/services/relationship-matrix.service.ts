@@ -124,6 +124,7 @@ export class RelationshipMatrixService {
         avgResponseSecsAtoB,
         avgResponseSecsBtoA,
         balanceRatio,
+        reciprocityScore: Number((1 - Math.abs(balanceRatio - 0.5) * 2).toFixed(2)),
       });
     }
 
