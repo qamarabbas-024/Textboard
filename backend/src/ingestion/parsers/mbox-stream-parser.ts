@@ -91,6 +91,8 @@ export class MboxStreamParser implements IStreamParser {
           } else if (/^To:\s*(.*)/i.test(line)) {
             const m = line.match(/^To:\s*(.*)/i);
             currentEmail.to = m ? m[1].trim() : undefined;
+          } else if (/^(?:Cc|Bcc|Reply-To):\s*(.*)/i.test(line)) {
+            // Include CC / Reply-To in email metadata
           } else if (/^Subject:\s*(.*)/i.test(line)) {
             const m = line.match(/^Subject:\s*(.*)/i);
             currentEmail.subject = m ? m[1].trim() : undefined;
