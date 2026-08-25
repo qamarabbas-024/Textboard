@@ -176,6 +176,25 @@ export class DossierGeneratorService {
       </div>
     </section>
 
+    <!-- Activity Waveform SVG Chart -->
+    <section class="card" style="margin-bottom: 1.5rem;">
+      <h2 style="font-size: 0.95rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.75rem; color: var(--text);">
+        📈 Diurnal Circadian Velocity Profile
+      </h2>
+      <div style="background: var(--card); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+        <svg viewBox="0 0 720 120" style="width: 100%; height: auto;">
+          ${analytics.messageAnalytics.byHour.map((h, i) => {
+            const maxVal = Math.max(...analytics.messageAnalytics.byHour.map(x => x.count), 1);
+            const x = 30 + (i / 23) * 660;
+            const barH = (h.count / maxVal) * 80;
+            const y = 95 - barH;
+            return `<rect x="${x - 8}" y="${y}" width="16" height="${barH}" rx="3" fill="#22d3ee" opacity="0.8" />
+                    <text x="${x}" y="112" text-anchor="middle" fill="#64748b" font-size="8" font-family="monospace">${h.hour}:00</text>`;
+          }).join('')}
+        </svg>
+      </div>
+    </section>
+
     <!-- Forensic Anomalies Section -->
     <section class="card" style="margin-bottom: 1.5rem;">
       <h2 style="font-size: 0.95rem; font-weight: 700; text-transform: uppercase; margin-bottom: 1rem; color: var(--text);">
