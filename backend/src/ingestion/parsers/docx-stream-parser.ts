@@ -71,15 +71,18 @@ export class DocxStreamParser implements IStreamParser {
       // Increment timestamp slightly per paragraph to preserve chronological sequence
       const paraTime = new Date(baseDate.getTime() + i * 1000);
 
+      const isHeading = para.length < 80 && !para.endsWith('.') && (para.toUpperCase() === para || /^(chapter|section|part|title|\d+\.)/i.test(para));
+      
       yield {
         timestamp: paraTime,
         actor: context.filename.replace(/\.docx$/i, ''),
         content: para,
-        eventType: 'document_paragraph',
+        eventType: isHeading ? 'document_heading' : 'document_paragraph',
         metadata: {
           filename: context.filename,
           paragraphIndex: i + 1,
           totalParagraphs: paragraphs.length,
+          isHeading,
         },
         urls: extractUrls(para),
         emojis: extractEmojis(para),
