@@ -686,5 +686,38 @@ export class ExportService {
       content: JSON.stringify(exportObj, null, 2),
     };
   }
+
+  /**
+   * Exports normalized dataset as high-performance streaming JSON Lines (JSONL).
+   */
+  async exportDatasetJsonl(datasetId: string): Promise<{ filename: string; content: string }> {
+    const dataset = await this.prisma.dataset.findUnique({ where: { id: datasetId } });
+    if (!dataset) throw new NotFoundException(`Dataset ${datasetId} not found`);
+
+    const events = await this.prisma.timelineEvent.findMany({
+      where: { datasetId },
+      orderBy: { timestamp: 'asc' },
+    });
+
+    const lines = events.map((ev) =>
+      JSON.stringify({
+        id: ev.id,
+        timestamp: ev.timestamp,
+        actor: ev.actor,
+        eventType: ev.eventType,
+        content: ev.content,
+        wordCount: ev.wordCount,
+        charLength: ev.charLength,
+        hasUrls: ev.hasUrls,
+        hasEmojis: ev.hasEmojis,
+      }),
+    );
+
+    const sanitizedName = dataset.name.replace(/[^a-zA-Z0-9_\-]/g, '_');
+    return {
+      filename: `${sanitizedName}_export.jsonl`,
+      content: lines.join('\n'),
+    };
+  }
 }
 
