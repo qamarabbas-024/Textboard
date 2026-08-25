@@ -91,7 +91,7 @@ export default function CorrelationLissajousChart({
 
       {/* Waveform Canvas */}
       <div className="relative w-full overflow-hidden bg-black/40 rounded-xl border border-theme-border/60 py-2">
-        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto overflow-visible">
+        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto overflow-visible" role="img" aria-label="Dual-stream phase synchronicity chart">
           <defs>
             <filter id="waveGlowA" x="-20%" y="-20%" width="140%" height="140%">
               <feGaussianBlur stdDeviation="3" result="blur" />
