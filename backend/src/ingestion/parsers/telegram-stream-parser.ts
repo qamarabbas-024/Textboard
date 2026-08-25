@@ -74,9 +74,17 @@ export class TelegramStreamParser implements IStreamParser {
       } else if (msg.media_type) {
         hasMedia = true;
         mediaTag = ` [${msg.media_type.toUpperCase()}]`;
+      } else if (msg.voice_message || msg.audio) {
+        hasMedia = true;
+        mediaTag = ' [Voice Note]';
       }
 
-      const finalContent = `${textContent}${mediaTag}`.trim();
+      let forwardTag = '';
+      if (msg.forwarded_from) {
+        forwardTag = ` [Forwarded from: ${msg.forwarded_from}]`;
+      }
+
+      const finalContent = `${forwardTag}${textContent}${mediaTag}`.trim();
       const dateVal = msg.date ? parseFlexibleDate(msg.date) || baseDate : baseDate;
       const actorName = msg.from || msg.actor || 'Telegram User';
 
