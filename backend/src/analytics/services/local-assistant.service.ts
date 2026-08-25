@@ -115,11 +115,23 @@ export class LocalAssistantService {
       return this.handleStreaksIntent(dataset, analytics);
     }
 
-    // 7. Intent: Specific Keyword Search
+    // 7. Intent: Media & Attachments
+    if (
+      q.includes('photo') ||
+      q.includes('image') ||
+      q.includes('media') ||
+      q.includes('picture') ||
+      q.includes('attachment') ||
+      q.includes('file')
+    ) {
+      return this.handleSearchIntent(datasetId, '[Photo');
+    }
+
+    // 8. Intent: Specific Keyword Search
     const searchMatch = q.match(/(?:search|find|show messages|look for|where was)\s+(?:about|for)?\s*(.*)/i);
     const searchKeyword = searchMatch ? searchMatch[1].trim() : q;
 
-    if (searchKeyword && searchKeyword.length > 2 && !q.includes('summary') && !q.includes('overview')) {
+    if (searchKeyword && searchKeyword.length > 2 && !q.includes('summary') && !q.includes('overview') && !q.includes('help')) {
       return this.handleSearchIntent(datasetId, searchKeyword);
     }
 
