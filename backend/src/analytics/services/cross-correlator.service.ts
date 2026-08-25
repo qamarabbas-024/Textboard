@@ -187,6 +187,7 @@ export class CrossCorrelatorService {
         overlapPercentage,
         concurrentActiveDays: concurrentDays,
         hourlySynchronicity: parseFloat(hourlySynchronicity.toFixed(2)),
+        confidenceScore: Math.min(1, parseFloat(((concurrentDays / Math.max(1, overlapDays)) * 0.8 + 0.2).toFixed(2))),
       },
       lexicalCorrelation: {
         sharedKeywords: sharedKeywords.slice(0, 30),
