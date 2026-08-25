@@ -81,13 +81,18 @@ export class LogStreamParser implements IStreamParser {
             content = line;
           }
 
+          const isCritical = ['ERROR', 'FATAL', 'CRITICAL', 'SEVERE'].includes(level.toUpperCase());
+          const isWarning = ['WARN', 'WARNING'].includes(level.toUpperCase());
+
           currentRecord = {
             timestamp,
             actor: `${actor} [${level.toUpperCase()}]`,
             content,
-            eventType: `log_${level.toLowerCase()}`,
+            eventType: isCritical ? 'log_error' : isWarning ? 'log_warn' : 'log_info',
             metadata: {
               logLevel: level.toUpperCase(),
+              isCritical,
+              isWarning,
               filename: context.filename,
             },
             urls: extractUrls(content),
