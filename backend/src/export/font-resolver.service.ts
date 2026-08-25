@@ -18,6 +18,11 @@ export class FontResolverService {
    */
   resolveBestFontFamily(): { regularPath: string | null; boldPath: string | null } {
     const candidatePaths = [
+      // Bundled local font assets (Highest Priority)
+      {
+        regular: path.join(__dirname, '..', '..', 'assets', 'fonts', 'DejaVuSans.ttf'),
+        bold: path.join(__dirname, '..', '..', 'assets', 'fonts', 'DejaVuSans.ttf'),
+      },
       // Windows
       {
         regular: 'C:\\Windows\\Fonts\\segoeui.ttf',
