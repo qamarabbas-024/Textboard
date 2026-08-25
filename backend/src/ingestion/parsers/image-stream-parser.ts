@@ -45,6 +45,15 @@ export class ImageStreamParser implements IStreamParser {
     if (fullBuffer.length > 24 && fullBuffer.toString('ascii', 1, 4) === 'PNG') {
       width = fullBuffer.readUInt32BE(16);
       height = fullBuffer.readUInt32BE(20);
+    } else if (fullBuffer.length > 30 && fullBuffer[0] === 0xff && fullBuffer[1] === 0xd8) {
+      // JPEG dimension extraction
+      for (let i = 2; i < fullBuffer.length - 8; i++) {
+        if (fullBuffer[i] === 0xff && (fullBuffer[i + 1] === 0xc0 || fullBuffer[i + 1] === 0xc2)) {
+          height = fullBuffer.readUInt16BE(i + 5);
+          width = fullBuffer.readUInt16BE(i + 7);
+          break;
+        }
+      }
     }
 
     const dimStr = width > 0 && height > 0 ? ` (${width}x${height}px)` : '';
