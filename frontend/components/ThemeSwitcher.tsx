@@ -126,11 +126,13 @@ export function ThemeSwitcher() {
                         setTheme(theme.id);
                         setIsOpen(false);
                       }}
-                      className={`w-full text-left p-2 rounded-xl transition-all flex items-start gap-2.5 ${
+                      className={`w-full text-left p-2 rounded-xl transition-all flex items-start gap-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-400 ${
                         isActive
                           ? 'bg-theme-surface-raised border border-cyan-400/50 shadow-md'
                           : 'hover:bg-theme-surface-raised/60 border border-transparent'
                       }`}
+                      role="option"
+                      aria-selected={isActive}
                     >
                       <div
                         className={`w-4 h-4 rounded-full mt-0.5 flex-shrink-0 bg-gradient-to-br ${theme.gradient} shadow-sm`}
