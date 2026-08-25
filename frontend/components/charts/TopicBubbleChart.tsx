@@ -77,7 +77,7 @@ export default function TopicBubbleChart({
 
       {/* SVG Bubble Cloud */}
       <div className="relative w-full overflow-hidden flex items-center justify-center my-2">
-        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto overflow-visible">
+        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto overflow-visible" role="img" aria-label="Topic cluster bubble matrix">
           <defs>
             <filter id="bubbleGlow" x="-30%" y="-30%" width="160%" height="160%">
               <feGaussianBlur stdDeviation="5" result="blur" />
