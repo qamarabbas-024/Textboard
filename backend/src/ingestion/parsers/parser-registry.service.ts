@@ -79,4 +79,26 @@ export class ParserRegistryService {
   getAllParsers(): IStreamParser[] {
     return [...this.parsers];
   }
+
+  getSupportedFormats(): string[] {
+    return [
+      'WhatsApp (.txt)',
+      'ChatGPT / Claude / Gemini / Copilot (.json, .html, .md)',
+      'Telegram (.json, .html)',
+      'Discord (.json)',
+      'Slack (.json)',
+      'Apple iMessage (.imessage, .json, .csv)',
+      'Signal (.signal, .txt, .json)',
+      'Google Takeout (History, Keep, YouTube)',
+      'DOCX Word Documents (.docx)',
+      'Excel Spreadsheets (.xlsx, .xls)',
+      'CSV / TSV Tabular (.csv, .tsv)',
+      'Mbox Email Archives (.mbox, .eml)',
+      'Git Commit Logs (.gitlog, .log)',
+      'Server & System Logs (.log)',
+      'Forensic Media / Images (.png, .jpg, .jpeg, .webp, .gif)',
+      'Plain Text Files (.txt)',
+      'ZIP Archives (.zip)',
+    ];
+  }
 }
