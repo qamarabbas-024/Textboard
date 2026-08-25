@@ -72,7 +72,7 @@ export default function CircadianRadarChart({
 
       {/* Radar SVG Container */}
       <div className="relative flex items-center justify-center my-2">
-        <svg width={size} height={size} className="overflow-visible">
+        <svg width={size} height={size} className="overflow-visible" role="img" aria-label="24-hour circadian radar distribution chart">
           <defs>
             <radialGradient id="radarRadialGlow" cx="50%" cy="50%" r="50%">
               <stop offset="0%" stopColor="#00f0ff" stopOpacity="0.4" />
