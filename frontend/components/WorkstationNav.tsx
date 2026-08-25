@@ -85,13 +85,15 @@ export function WorkstationNav({
         </div>
 
         {/* Primary Workstation Navigation Tabs */}
-        <nav className="flex items-center gap-1 overflow-x-auto py-1 max-w-full">
+        <nav className="flex items-center gap-1 overflow-x-auto py-1 max-w-full" role="tablist" aria-label="Workstation Viewports">
           {navItems.map((item) => {
             const isActive = currentTab === item.tab;
             return (
               <button
                 key={item.tab}
                 onClick={() => onSelectTab(item.tab)}
+                role="tab"
+                aria-selected={isActive}
                 aria-label={item.label}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-xs tracking-wider transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 cursor-pointer ${
                   isActive
