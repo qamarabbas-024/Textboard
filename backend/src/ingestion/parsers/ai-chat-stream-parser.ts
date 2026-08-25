@@ -36,6 +36,8 @@ export class AiChatStreamParser implements IStreamParser {
         lower.includes('chatgpt') ||
         lower.includes('claude') ||
         lower.includes('gemini') ||
+        lower.includes('copilot') ||
+        lower.includes('deepseek') ||
         lower.includes('openai') ||
         lower.includes('anthropic') ||
         lower.includes('llm') ||
