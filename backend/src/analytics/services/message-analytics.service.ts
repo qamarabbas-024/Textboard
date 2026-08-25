@@ -178,6 +178,7 @@ export class MessageAnalyticsService {
         characters: Math.round(totalCharacters / totalMessages),
         words: Math.round(totalWords / totalMessages),
       },
+      lexicalDensity: Number((totalWords / Math.max(1, totalCharacters)).toFixed(2)),
       firstActivity,
       lastActivity,
       timeSpanDays,
