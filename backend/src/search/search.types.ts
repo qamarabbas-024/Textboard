@@ -10,6 +10,7 @@ export interface ParsedSearchQuery {
   hasMedia?: boolean;
   hasEmojis?: boolean;
   datasetId?: string;
+  filterChips?: Array<{ key: string; value: string; label: string }>;
 }
 
 export interface SearchParams {
