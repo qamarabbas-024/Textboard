@@ -13,6 +13,7 @@ import { SpreadsheetModule } from './analyzers/spreadsheet/spreadsheet.module';
 import { DocumentModule } from './analyzers/document/document.module';
 import { DatasetsModule } from './datasets/datasets.module';
 import { ExportModule } from './export/export.module';
+import { PrivacyModule } from './privacy/privacy.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { ExportModule } from './export/export.module';
     DocumentModule,
     DatasetsModule,
     ExportModule,
+    PrivacyModule,
   ],
   providers: [
     {
