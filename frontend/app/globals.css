@@ -272,3 +272,29 @@ body {
   background: var(--accent);
 }
 
+/* Print Stylesheet for High-Resolution Laser Printing */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt !important;
+  }
+
+  nav, header, button, .no-print, [role="navigation"] {
+    display: none !important;
+  }
+
+  .glass-card-3d, .glass-panel, [role="region"] {
+    background: #ffffff !important;
+    border: 1px solid #cccccc !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    page-break-inside: avoid !important;
+  }
+
+  @page {
+    margin: 1.5cm;
+  }
+}
+
+
