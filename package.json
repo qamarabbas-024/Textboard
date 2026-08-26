@@ -1,6 +1,6 @@
 {
   "name": "textboard",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "The Local-First Visual Intelligence & Communication Stream Analytics Workstation",
   "main": "electron/main.js",
   "author": "Qamar Abbas",
