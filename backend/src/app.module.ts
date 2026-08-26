@@ -14,6 +14,7 @@ import { DocumentModule } from './analyzers/document/document.module';
 import { DatasetsModule } from './datasets/datasets.module';
 import { ExportModule } from './export/export.module';
 import { PrivacyModule } from './privacy/privacy.module';
+import { StorageModule } from './storage/storage.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { PrivacyModule } from './privacy/privacy.module';
     DatasetsModule,
     ExportModule,
     PrivacyModule,
+    StorageModule,
   ],
   providers: [
     {
