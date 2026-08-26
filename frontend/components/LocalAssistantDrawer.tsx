@@ -26,6 +26,7 @@ interface LocalAssistantDrawerProps {
   onClose: () => void;
   datasetId: string;
   datasetName: string;
+  onJumpToMessage?: (messageId: string) => void;
 }
 
 const DEFAULT_SUGGESTIONS = [
