@@ -27,7 +27,7 @@ out/
 tmp/
 temp/
 uploads/
-storage/
+/storage/
 .textboard/
 *.db
 *.db-*
