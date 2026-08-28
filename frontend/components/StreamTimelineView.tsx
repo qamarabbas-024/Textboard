@@ -437,6 +437,14 @@ export function StreamTimelineView({
                       </div>
                     )}
 
+                    {/* OCR Text Match Badge */}
+                    {ev.metadata?.ocrMatched && (
+                      <div className="mb-2 px-2.5 py-1 rounded-md bg-amber-500/15 border border-amber-500/40 text-[10px] text-amber-300 font-mono flex items-center gap-1.5">
+                        <span>🔍</span>
+                        <span>OCR Attachment Match: &ldquo;{searchQuery}&rdquo; detected inside image</span>
+                      </div>
+                    )}
+
                     {/* Message Text Content */}
                     {!isPureMedia && (
                       <div className="text-xs leading-relaxed break-words font-sans selection:bg-cyan-500/30 selection:text-white group relative">
