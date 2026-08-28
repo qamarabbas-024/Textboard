@@ -18,6 +18,17 @@ export interface ConversationThread {
   }>;
 }
 
+export interface ThreadTreeNode {
+  id: string;
+  actor: string | null;
+  timestamp: string;
+  content: string;
+  depth: number;
+  quotedActor?: string;
+  quotedSnippet?: string;
+  children: ThreadTreeNode[];
+}
+
 export interface ThreadReconstructionReport {
   datasetId: string;
   totalThreads: number;
@@ -115,5 +126,42 @@ export class ThreadReconstructorService {
       threads: threads.slice(0, 30),
       computedAt: new Date().toISOString(),
     };
+  }
+
+  /**
+   * Constructs an interactive nested reply quote tree from linear messages.
+   */
+  buildReplyHierarchyTree(events: EventSummaryRow[]): ThreadTreeNode[] {
+    if (!events || events.length === 0) return [];
+
+    const rootNodes: ThreadTreeNode[] = [];
+    const quoteRegex = /^(?:>|“|")\s*(?:\[([^\]]+)\])?\s*(.*?)(?:\n|\r\n|$)/;
+
+    for (let i = 0; i < events.length; i++) {
+      const ev = events[i];
+      const match = ev.content ? ev.content.match(quoteRegex) : null;
+
+      const node: ThreadTreeNode = {
+        id: ev.id,
+        actor: ev.actor,
+        timestamp: new Date(ev.timestamp).toISOString(),
+        content: ev.content || '',
+        depth: 0,
+        quotedActor: match ? match[1] : undefined,
+        quotedSnippet: match ? match[2]?.trim() : undefined,
+        children: [],
+      };
+
+      if (match && rootNodes.length > 0) {
+        // Attach as child to previous root or parent
+        const parent = rootNodes[rootNodes.length - 1];
+        node.depth = parent.depth + 1;
+        parent.children.push(node);
+      } else {
+        rootNodes.push(node);
+      }
+    }
+
+    return rootNodes;
   }
 }
