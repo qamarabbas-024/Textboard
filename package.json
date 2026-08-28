@@ -28,11 +28,13 @@
     "appId": "com.qamarabbas.textboard",
     "productName": "TextBoard",
     "electronVersion": "33.2.1",
+    "forceCodeSigning": false,
     "copyright": "Copyright © 2026 Qamar Abbas",
     "directories": {
       "output": "dist-desktop"
     },
     "win": {
+      "signAndEditExecutable": false,
       "target": [
         "nsis",
         "portable"
