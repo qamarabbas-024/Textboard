@@ -5,19 +5,31 @@ const { spawn } = require('child_process');
 
 let mainWindow = null;
 let backendProcess = null;
+let frontendProcess = null;
 
-function waitForServer(url, timeoutMs = 25000) {
+const FRONTEND_PORT = process.env.TEXTBOARD_FRONTEND_PORT || '3890';
+const BACKEND_PORT = process.env.TEXTBOARD_BACKEND_PORT || '3891';
+
+function checkHealth(url, timeoutMs = 25000) {
   const startTime = Date.now();
   return new Promise((resolve) => {
     const check = () => {
       const req = http.get(url, (res) => {
-        if (res.statusCode >= 200 && res.statusCode < 500) {
-          resolve(true);
-        } else {
-          retry();
-        }
+        let body = '';
+        res.on('data', (d) => (body += d));
+        res.on('end', () => {
+          if (res.statusCode >= 200 && res.statusCode < 500) {
+            resolve(true);
+          } else {
+            retry();
+          }
+        });
       });
       req.on('error', () => retry());
+      req.setTimeout(2000, () => {
+        req.destroy();
+        retry();
+      });
       req.end();
     };
 
@@ -34,16 +46,21 @@ function waitForServer(url, timeoutMs = 25000) {
 }
 
 function startBackendServer() {
-  const backendPath = path.join(__dirname, '..', 'backend', 'dist', 'main.js');
+  const backendDir = path.join(__dirname, '..', 'backend');
+  const isWin = process.platform === 'win32';
+  const npmCmd = isWin ? 'npm.cmd' : 'npm';
+
   try {
-    backendProcess = spawn(process.execPath, [backendPath], {
-      cwd: path.join(__dirname, '..', 'backend'),
+    console.log(`[Electron]: Spawning TextBoard Backend Engine on port ${BACKEND_PORT}...`);
+    backendProcess = spawn(npmCmd, ['run', 'start:prod'], {
+      cwd: backendDir,
       env: {
         ...process.env,
-        PORT: '3001',
+        PORT: BACKEND_PORT,
         NODE_ENV: 'production',
       },
       stdio: 'pipe',
+      shell: true,
     });
 
     backendProcess.stdout?.on('data', (data) => {
@@ -55,11 +72,46 @@ function startBackendServer() {
     });
 
     backendProcess.on('exit', (code, signal) => {
-      console.log(`Backend process exited with code ${code}, signal ${signal}`);
+      console.log(`Backend process exited (code=${code}, signal=${signal})`);
       backendProcess = null;
     });
   } catch (err) {
     console.error('Failed to spawn backend process:', err);
+  }
+}
+
+function startFrontendServer() {
+  const frontendDir = path.join(__dirname, '..', 'frontend');
+  const isWin = process.platform === 'win32';
+  const npmCmd = isWin ? 'npm.cmd' : 'npm';
+
+  try {
+    console.log(`[Electron]: Spawning TextBoard Next.js UI on port ${FRONTEND_PORT}...`);
+    frontendProcess = spawn(npmCmd, ['run', 'start'], {
+      cwd: frontendDir,
+      env: {
+        ...process.env,
+        PORT: FRONTEND_PORT,
+        BACKEND_URL: `http://127.0.0.1:${BACKEND_PORT}`,
+      },
+      stdio: 'pipe',
+      shell: true,
+    });
+
+    frontendProcess.stdout?.on('data', (data) => {
+      console.log(`[Frontend]: ${data}`);
+    });
+
+    frontendProcess.stderr?.on('data', (data) => {
+      console.error(`[Frontend Error]: ${data}`);
+    });
+
+    frontendProcess.on('exit', (code, signal) => {
+      console.log(`Frontend process exited (code=${code}, signal=${signal})`);
+      frontendProcess = null;
+    });
+  } catch (err) {
+    console.error('Failed to spawn frontend process:', err);
   }
 }
 
@@ -81,7 +133,6 @@ async function createWindow() {
     },
   });
 
-  // Handle external links safely in system default browser
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith('http:') || url.startsWith('https:')) {
       shell.openExternal(url);
@@ -89,29 +140,33 @@ async function createWindow() {
     return { action: 'deny' };
   });
 
-  const backendUrl = 'http://127.0.0.1:3001/health';
-  const frontendUrl = process.env.TEXTBOARD_FRONTEND_URL || 'http://localhost:3000';
+  const backendHealthUrl = `http://127.0.0.1:${BACKEND_PORT}/health`;
+  const frontendAppUrl = `http://localhost:${FRONTEND_PORT}`;
 
-  // Check if backend is running, if not spawn it
-  const isBackendUp = await waitForServer(backendUrl, 1500);
+  // Start backend if not already responsive
+  const isBackendUp = await checkHealth(backendHealthUrl, 1500);
   if (!isBackendUp) {
-    console.log('Spawning backend engine locally...');
     startBackendServer();
   }
 
-  // Wait for frontend to be ready
-  const isReady = await waitForServer(frontendUrl, 10000);
-  if (isReady) {
-    mainWindow.loadURL(frontendUrl);
-  } else {
-    // Fallback loading page
+  // Start frontend if not already responsive
+  const isFrontendUp = await checkHealth(frontendAppUrl, 1500);
+  if (!isFrontendUp) {
+    startFrontendServer();
+  }
+
+  // Wait for frontend server to serve pages
+  const isReady = await checkHealth(frontendAppUrl, 25000);
+  if (isReady && mainWindow) {
+    mainWindow.loadURL(frontendAppUrl);
+  } else if (mainWindow) {
     mainWindow.loadURL(`data:text/html,
       <html>
         <head><title>TextBoard Starting...</title></head>
         <body style="background:#090c10;color:#22d3ee;font-family:monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0;">
           <h2 style="letter-spacing:2px;text-transform:uppercase;">⚡ TEXTBOARD WORKSTATION</h2>
-          <p style="color:#94a3b8;font-size:12px;">Starting local analytics engine...</p>
-          <script>setTimeout(() => window.location.href = "${frontendUrl}", 2500);</script>
+          <p style="color:#94a3b8;font-size:12px;">Starting local analytics engine on port ${FRONTEND_PORT}...</p>
+          <script>setTimeout(() => window.location.href = "${frontendAppUrl}", 2000);</script>
         </body>
       </html>
     `);
@@ -122,7 +177,7 @@ async function createWindow() {
   });
 }
 
-// IPC Handlers for desktop integration
+// IPC Handlers
 ipcMain.handle('dialog:openFile', async (event, options) => {
   const result = await dialog.showOpenDialog(mainWindow, {
     properties: ['openFile'],
@@ -146,13 +201,8 @@ ipcMain.handle('dialog:openDirectory', async (event, options) => {
   return result;
 });
 
-ipcMain.handle('app:getVersion', () => {
-  return app.getVersion();
-});
-
-ipcMain.handle('app:getPlatform', () => {
-  return process.platform;
-});
+ipcMain.handle('app:getVersion', () => app.getVersion());
+ipcMain.handle('app:getPlatform', () => process.platform);
 
 app.whenReady().then(() => {
   createWindow();
@@ -166,9 +216,12 @@ app.whenReady().then(() => {
 
 app.on('before-quit', () => {
   if (backendProcess) {
-    console.log('Terminating background backend process...');
-    backendProcess.kill();
+    try { backendProcess.kill(); } catch {}
     backendProcess = null;
+  }
+  if (frontendProcess) {
+    try { frontendProcess.kill(); } catch {}
+    frontendProcess = null;
   }
 });
 
@@ -177,4 +230,3 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
-
