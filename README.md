@@ -185,6 +185,7 @@ npm run build
 - [x] **V4.0**: Local autonomous AI intelligence assistant with multi-intent conversational synthesis.
 - [x] **V4.1**: Google Takeout browser history, YouTube watch metrics, and forensic audit sealing.
 - [x] **V4.2**: Real-time directory watching, local PII anonymizer, Obsidian Markdown Vault generator, and diurnal sentiment heatmap.
+- [x] **V4.3**: Multi-stream chronological dataset merger, cryptographic deduplication, offline OCR text search, and portable `.textboard` bundle vaults.
 
 ---
 
