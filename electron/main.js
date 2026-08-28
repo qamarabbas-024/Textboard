@@ -1,7 +1,16 @@
 const { app, BrowserWindow, shell, ipcMain, dialog } = require('electron');
 const path = require('path');
 const http = require('http');
+const fs = require('fs');
 const { spawn } = require('child_process');
+
+// Prevent global uncaught exception dialog popups
+process.on('uncaughtException', (err) => {
+  console.error('[Electron Uncaught Exception]:', err);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('[Electron Unhandled Rejection]:', reason);
+});
 
 let mainWindow = null;
 let backendProcess = null;
@@ -45,14 +54,24 @@ function checkHealth(url, timeoutMs = 25000) {
   });
 }
 
+function resolveNodeBinary() {
+  // Use system 'node' or Electron's embedded node runtime
+  return 'node';
+}
+
 function startBackendServer() {
+  const backendDistPath = path.join(__dirname, '..', 'backend', 'dist', 'main.js');
   const backendDir = path.join(__dirname, '..', 'backend');
-  const isWin = process.platform === 'win32';
-  const npmCmd = isWin ? 'npm.cmd' : 'npm';
+
+  if (!fs.existsSync(backendDistPath)) {
+    console.warn(`[Backend]: dist/main.js not found at ${backendDistPath}`);
+    return;
+  }
 
   try {
+    const nodeBin = resolveNodeBinary();
     console.log(`[Electron]: Spawning TextBoard Backend Engine on port ${BACKEND_PORT}...`);
-    backendProcess = spawn(npmCmd, ['run', 'start:prod'], {
+    backendProcess = spawn(nodeBin, [backendDistPath], {
       cwd: backendDir,
       env: {
         ...process.env,
@@ -60,7 +79,11 @@ function startBackendServer() {
         NODE_ENV: 'production',
       },
       stdio: 'pipe',
-      shell: true,
+      shell: false,
+    });
+
+    backendProcess.on('error', (err) => {
+      console.error('[Backend Process Spawn Error]:', err.message);
     });
 
     backendProcess.stdout?.on('data', (data) => {
@@ -82,12 +105,17 @@ function startBackendServer() {
 
 function startFrontendServer() {
   const frontendDir = path.join(__dirname, '..', 'frontend');
-  const isWin = process.platform === 'win32';
-  const npmCmd = isWin ? 'npm.cmd' : 'npm';
+  const nextCliPath = path.join(frontendDir, 'node_modules', 'next', 'dist', 'bin', 'next');
+
+  if (!fs.existsSync(nextCliPath)) {
+    console.warn(`[Frontend]: Next CLI not found at ${nextCliPath}`);
+    return;
+  }
 
   try {
+    const nodeBin = resolveNodeBinary();
     console.log(`[Electron]: Spawning TextBoard Next.js UI on port ${FRONTEND_PORT}...`);
-    frontendProcess = spawn(npmCmd, ['run', 'start'], {
+    frontendProcess = spawn(nodeBin, [nextCliPath, 'start', '-p', FRONTEND_PORT], {
       cwd: frontendDir,
       env: {
         ...process.env,
@@ -95,7 +123,11 @@ function startFrontendServer() {
         BACKEND_URL: `http://127.0.0.1:${BACKEND_PORT}`,
       },
       stdio: 'pipe',
-      shell: true,
+      shell: false,
+    });
+
+    frontendProcess.on('error', (err) => {
+      console.error('[Frontend Process Spawn Error]:', err.message);
     });
 
     frontendProcess.stdout?.on('data', (data) => {
