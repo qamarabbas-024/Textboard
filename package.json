@@ -30,6 +30,7 @@
     "electronVersion": "33.2.1",
     "forceCodeSigning": false,
     "copyright": "Copyright © 2026 Qamar Abbas",
+    "compression": "store",
     "directories": {
       "output": "dist-desktop"
     },
@@ -47,6 +48,36 @@
       "createStartMenuShortcut": true,
       "shortcutName": "TextBoard Workstation"
     },
+    "extraResources": [
+      {
+        "from": "backend/dist",
+        "to": "backend/dist"
+      },
+      {
+        "from": "backend/node_modules",
+        "to": "backend/node_modules"
+      },
+      {
+        "from": "backend/prisma",
+        "to": "backend/prisma"
+      },
+      {
+        "from": "backend/package.json",
+        "to": "backend/package.json"
+      },
+      {
+        "from": "frontend/.next/standalone",
+        "to": "frontend/standalone"
+      },
+      {
+        "from": "frontend/.next/static",
+        "to": "frontend/standalone/.next/static"
+      },
+      {
+        "from": "frontend/public",
+        "to": "frontend/standalone/public"
+      }
+    ],
     "files": [
       "electron/**/*",
       "package.json"

@@ -4,7 +4,7 @@ const http = require('http');
 const fs = require('fs');
 const { spawn } = require('child_process');
 
-// Prevent global uncaught exception dialog popups
+// Suppress unhandled crash dialogs
 process.on('uncaughtException', (err) => {
   console.error('[Electron Uncaught Exception]:', err);
 });
@@ -19,7 +19,38 @@ let frontendProcess = null;
 const FRONTEND_PORT = process.env.TEXTBOARD_FRONTEND_PORT || '3890';
 const BACKEND_PORT = process.env.TEXTBOARD_BACKEND_PORT || '3891';
 
-function checkHealth(url, timeoutMs = 25000) {
+function getAppPaths() {
+  const isPackaged = app.isPackaged;
+  const root = isPackaged ? process.resourcesPath : path.join(__dirname, '..');
+  
+  const standaloneServer = path.join(root, 'frontend', 'standalone', 'server.js');
+  const devNextStandalone = path.join(__dirname, '..', 'frontend', '.next', 'standalone', 'server.js');
+  const devNextCli = path.join(__dirname, '..', 'frontend', 'node_modules', 'next', 'dist', 'bin', 'next');
+
+  let frontendServerScript = '';
+  let frontendCwd = '';
+  if (fs.existsSync(standaloneServer)) {
+    frontendServerScript = standaloneServer;
+    frontendCwd = path.join(root, 'frontend', 'standalone');
+  } else if (fs.existsSync(devNextStandalone)) {
+    frontendServerScript = devNextStandalone;
+    frontendCwd = path.join(__dirname, '..', 'frontend', '.next', 'standalone');
+  } else {
+    frontendServerScript = devNextCli;
+    frontendCwd = path.join(__dirname, '..', 'frontend');
+  }
+
+  return {
+    isPackaged,
+    backendDir: path.join(root, 'backend'),
+    backendDist: path.join(root, 'backend', 'dist', 'main.js'),
+    frontendCwd,
+    frontendServerScript,
+    isStandalone: frontendServerScript.endsWith('server.js'),
+  };
+}
+
+function checkHealth(url, timeoutMs = 30000) {
   const startTime = Date.now();
   return new Promise((resolve) => {
     const check = () => {
@@ -54,36 +85,41 @@ function checkHealth(url, timeoutMs = 25000) {
   });
 }
 
-function resolveNodeBinary() {
-  // Use system 'node' or Electron's embedded node runtime
-  return 'node';
+function spawnNodeProcess(scriptPath, args, cwd, customEnv) {
+  const isPackaged = app.isPackaged;
+  const nodeBinary = isPackaged ? process.execPath : 'node';
+
+  const env = {
+    ...process.env,
+    ...(isPackaged ? { ELECTRON_RUN_AS_NODE: '1' } : {}),
+    ...customEnv,
+  };
+
+  return spawn(nodeBinary, [scriptPath, ...args], {
+    cwd,
+    env,
+    stdio: 'pipe',
+    shell: false,
+  });
 }
 
 function startBackendServer() {
-  const backendDistPath = path.join(__dirname, '..', 'backend', 'dist', 'main.js');
-  const backendDir = path.join(__dirname, '..', 'backend');
+  const { backendDir, backendDist } = getAppPaths();
 
-  if (!fs.existsSync(backendDistPath)) {
-    console.warn(`[Backend]: dist/main.js not found at ${backendDistPath}`);
+  if (!fs.existsSync(backendDist)) {
+    console.warn(`[Backend]: dist/main.js not found at ${backendDist}`);
     return;
   }
 
   try {
-    const nodeBin = resolveNodeBinary();
     console.log(`[Electron]: Spawning TextBoard Backend Engine on port ${BACKEND_PORT}...`);
-    backendProcess = spawn(nodeBin, [backendDistPath], {
-      cwd: backendDir,
-      env: {
-        ...process.env,
-        PORT: BACKEND_PORT,
-        NODE_ENV: 'production',
-      },
-      stdio: 'pipe',
-      shell: false,
+    backendProcess = spawnNodeProcess(backendDist, [], backendDir, {
+      PORT: BACKEND_PORT,
+      NODE_ENV: 'production',
     });
 
     backendProcess.on('error', (err) => {
-      console.error('[Backend Process Spawn Error]:', err.message);
+      console.error('[Backend Spawn Error]:', err.message);
     });
 
     backendProcess.stdout?.on('data', (data) => {
@@ -104,30 +140,24 @@ function startBackendServer() {
 }
 
 function startFrontendServer() {
-  const frontendDir = path.join(__dirname, '..', 'frontend');
-  const nextCliPath = path.join(frontendDir, 'node_modules', 'next', 'dist', 'bin', 'next');
+  const { frontendCwd, frontendServerScript, isStandalone } = getAppPaths();
 
-  if (!fs.existsSync(nextCliPath)) {
-    console.warn(`[Frontend]: Next CLI not found at ${nextCliPath}`);
+  if (!fs.existsSync(frontendServerScript)) {
+    console.warn(`[Frontend]: Server script not found at ${frontendServerScript}`);
     return;
   }
 
   try {
-    const nodeBin = resolveNodeBinary();
-    console.log(`[Electron]: Spawning TextBoard Next.js UI on port ${FRONTEND_PORT}...`);
-    frontendProcess = spawn(nodeBin, [nextCliPath, 'start', '-p', FRONTEND_PORT], {
-      cwd: frontendDir,
-      env: {
-        ...process.env,
-        PORT: FRONTEND_PORT,
-        BACKEND_URL: `http://127.0.0.1:${BACKEND_PORT}`,
-      },
-      stdio: 'pipe',
-      shell: false,
+    console.log(`[Electron]: Spawning TextBoard UI on port ${FRONTEND_PORT}...`);
+    const args = isStandalone ? [] : ['start', '-p', FRONTEND_PORT];
+    frontendProcess = spawnNodeProcess(frontendServerScript, args, frontendCwd, {
+      PORT: FRONTEND_PORT,
+      HOSTNAME: '127.0.0.1',
+      BACKEND_URL: `http://127.0.0.1:${BACKEND_PORT}`,
     });
 
     frontendProcess.on('error', (err) => {
-      console.error('[Frontend Process Spawn Error]:', err.message);
+      console.error('[Frontend Spawn Error]:', err.message);
     });
 
     frontendProcess.stdout?.on('data', (data) => {
@@ -188,20 +218,16 @@ async function createWindow() {
   }
 
   // Wait for frontend server to serve pages
-  const isReady = await checkHealth(frontendAppUrl, 25000);
+  const isReady = await checkHealth(frontendAppUrl, 30000);
   if (isReady && mainWindow) {
     mainWindow.loadURL(frontendAppUrl);
   } else if (mainWindow) {
-    mainWindow.loadURL(`data:text/html,
-      <html>
-        <head><title>TextBoard Starting...</title></head>
-        <body style="background:#090c10;color:#22d3ee;font-family:monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0;">
-          <h2 style="letter-spacing:2px;text-transform:uppercase;">⚡ TEXTBOARD WORKSTATION</h2>
-          <p style="color:#94a3b8;font-size:12px;">Starting local analytics engine on port ${FRONTEND_PORT}...</p>
-          <script>setTimeout(() => window.location.href = "${frontendAppUrl}", 2000);</script>
-        </body>
-      </html>
-    `);
+    // Retry load after waiting
+    setTimeout(() => {
+      if (mainWindow) {
+        mainWindow.loadURL(frontendAppUrl);
+      }
+    }, 2500);
   }
 
   mainWindow.on('closed', () => {
