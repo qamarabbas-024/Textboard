@@ -163,10 +163,10 @@
   --accent-secondary: #818cf8;
   --accent-glow: 0 0 24px rgba(56, 189, 248, 0.35);
   --accent-glow-lg: 0 0 40px rgba(56, 189, 248, 0.2);
-  --stat-highlight: #34d399;
+  --stat-highlight: #38bdf8;
   --btn-primary-bg: #38bdf8;
   --btn-primary-text: #0f172a;
-  --btn-primary-hover: #60cbf9;
+  --btn-primary-hover: #7dd3fc;
   --card-bg: rgba(30, 41, 59, 0.85);
   --card-border: rgba(56, 189, 248, 0.2);
   --input-bg: rgba(15, 23, 42, 0.9);
@@ -178,6 +178,72 @@
   --chart-quaternary: #f472b6;
   --chart-grid: rgba(56, 189, 248, 0.08);
   --radius: 0.75rem;
+}
+
+/* 6. Cyberpunk Neon (Hyper Magenta & Neon Cyan) */
+[data-theme="cyberpunk"] {
+  --bg-base: #05050f;
+  --bg-surface: #0f0a1c;
+  --bg-surface-raised: #1a102f;
+  --bg-surface-active: #2b154d;
+  --border-subtle: rgba(236, 72, 153, 0.2);
+  --border-highlight: #ec4899;
+  --border-secondary: #06b6d4;
+  --text-main: #fdf4ff;
+  --text-muted: #d8b4fe;
+  --text-dim: #701a75;
+  --accent: #ec4899;
+  --accent-secondary: #06b6d4;
+  --accent-glow: 0 0 28px rgba(236, 72, 153, 0.5);
+  --accent-glow-lg: 0 0 45px rgba(236, 72, 153, 0.3);
+  --stat-highlight: #06b6d4;
+  --btn-primary-bg: #ec4899;
+  --btn-primary-text: #ffffff;
+  --btn-primary-hover: #f472b6;
+  --card-bg: rgba(15, 10, 28, 0.88);
+  --card-border: rgba(236, 72, 153, 0.25);
+  --input-bg: rgba(5, 5, 15, 0.92);
+  --input-border: rgba(236, 72, 153, 0.35);
+  --font-family: var(--font-mono), monospace;
+  --chart-primary: #ec4899;
+  --chart-secondary: #06b6d4;
+  --chart-tertiary: #facc15;
+  --chart-quaternary: #a855f7;
+  --chart-grid: rgba(236, 72, 153, 0.1);
+  --radius: 0.5rem;
+}
+
+/* 7. Solarized Amber Terminal (Phosphor Gold & Deep Charcoal) */
+[data-theme="amber"] {
+  --bg-base: #0e0d0b;
+  --bg-surface: #191611;
+  --bg-surface-raised: #28231a;
+  --bg-surface-active: #383021;
+  --border-subtle: rgba(245, 158, 11, 0.2);
+  --border-highlight: #f59e0b;
+  --border-secondary: #d97706;
+  --text-main: #fef3c7;
+  --text-muted: #fde68a;
+  --text-dim: #78350f;
+  --accent: #f59e0b;
+  --accent-secondary: #fbbf24;
+  --accent-glow: 0 0 28px rgba(245, 158, 11, 0.45);
+  --accent-glow-lg: 0 0 45px rgba(245, 158, 11, 0.25);
+  --stat-highlight: #fbbf24;
+  --btn-primary-bg: #f59e0b;
+  --btn-primary-text: #0e0d0b;
+  --btn-primary-hover: #fcd34d;
+  --card-bg: rgba(25, 22, 17, 0.88);
+  --card-border: rgba(245, 158, 11, 0.25);
+  --input-bg: rgba(14, 13, 11, 0.92);
+  --input-border: rgba(245, 158, 11, 0.35);
+  --font-family: var(--font-mono), monospace;
+  --chart-primary: #f59e0b;
+  --chart-secondary: #fbbf24;
+  --chart-tertiary: #34d399;
+  --chart-quaternary: #ef4444;
+  --chart-grid: rgba(245, 158, 11, 0.1);
+  --radius: 0.5rem;
 }
 
 body {

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export type AppTheme = 'cyberpunk' | 'tokyo' | 'matrix' | 'nebula' | 'diamond';
+export type AppTheme = 'cyberpunk' | 'tokyo' | 'matrix' | 'nebula' | 'diamond' | 'amber';
 
 export const THEMES: Array<{
   id: AppTheme;
@@ -58,6 +58,15 @@ export const THEMES: Array<{
     icon: '💎',
     gradient: 'from-sky-400 to-blue-600',
     dotColor: '#38bdf8',
+  },
+  {
+    id: 'amber',
+    label: 'Solarized Amber',
+    badge: 'RETRO',
+    desc: 'Phosphor Amber Gold CRT terminal aesthetic',
+    icon: '📟',
+    gradient: 'from-amber-400 to-yellow-600',
+    dotColor: '#f59e0b',
   },
 ];
 
