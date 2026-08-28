@@ -27,6 +27,7 @@ import { GoogleTakeoutStreamParser } from './parsers/google-takeout-stream-parse
 import { ImageStreamParser } from './parsers/image-stream-parser';
 import { OcrExtractorService } from './parsers/ocr-extractor.service';
 import { DirectoryWatcherService } from './directory-watcher.service';
+import { IngestionEventsGateway } from './events.gateway';
 import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
@@ -41,6 +42,7 @@ import { PrismaModule } from '../prisma/prisma.module';
     ParserRegistryService,
     DirectoryWatcherService,
     OcrExtractorService,
+    IngestionEventsGateway,
     TxtStreamParser,
     CsvStreamParser,
     JsonStreamParser,
@@ -67,6 +69,7 @@ import { PrismaModule } from '../prisma/prisma.module';
     ParserRegistryService,
     DirectoryWatcherService,
     OcrExtractorService,
+    IngestionEventsGateway,
     TxtStreamParser,
     CsvStreamParser,
     JsonStreamParser,
