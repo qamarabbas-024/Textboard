@@ -136,6 +136,19 @@ export class SearchService {
         }
       }
 
+      // Check for OCR text match in image attachments
+      let ocrMatched = false;
+      if (metadata && (metadata.ocrText || metadata.originalFilename)) {
+        const ocrPayload = `${metadata.ocrText || ''} ${metadata.originalFilename || ''}`.toLowerCase();
+        for (const term of (parsed.exactPhrases.concat(parsed.text.split(/\s+/).filter(Boolean)))) {
+          if (ocrPayload.includes(term.toLowerCase())) {
+            ocrMatched = true;
+            combinedScore += 15.0;
+            break;
+          }
+        }
+      }
+
       return {
         id: ev.id,
         datasetId: ev.datasetId,
@@ -148,8 +161,11 @@ export class SearchService {
         hasUrls: ev.hasUrls,
         hasEmojis: ev.hasEmojis,
         hasMedia: ev.hasMedia,
-        metadata,
-        highlight,
+        metadata: {
+          ...metadata,
+          ocrMatched,
+        },
+        highlight: ocrMatched && !highlight.includes('<mark') ? `[OCR Match] ${highlight}` : highlight,
         score: combinedScore,
         semanticScore,
       };
