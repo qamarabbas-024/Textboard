@@ -7,6 +7,7 @@ import { EmojiRendererService } from './emoji-renderer.service';
 import { DossierGeneratorService } from './dossier-generator.service';
 import { MarkdownVaultService } from './markdown-vault.service';
 import { ObsidianVaultService } from './obsidian-vault.service';
+import { PortableVaultService } from './portable-vault.service';
 import { DatasetsModule } from '../datasets/datasets.module';
 import { AnalyticsModule } from '../analytics/analytics.module';
 import { PrismaModule } from '../prisma/prisma.module';
@@ -22,6 +23,7 @@ import { PrismaModule } from '../prisma/prisma.module';
     DossierGeneratorService,
     MarkdownVaultService,
     ObsidianVaultService,
+    PortableVaultService,
   ],
   exports: [
     ExportService,
@@ -31,6 +33,7 @@ import { PrismaModule } from '../prisma/prisma.module';
     DossierGeneratorService,
     MarkdownVaultService,
     ObsidianVaultService,
+    PortableVaultService,
   ],
 })
 export class ExportModule {}
