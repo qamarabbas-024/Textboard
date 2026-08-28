@@ -34,6 +34,7 @@
     "directories": {
       "output": "dist-desktop"
     },
+    "artifactName": "TextBoard-Setup-${version}.${ext}",
     "win": {
       "signAndEditExecutable": false,
       "target": [
@@ -48,38 +49,18 @@
       "createStartMenuShortcut": true,
       "shortcutName": "TextBoard Workstation"
     },
-    "extraResources": [
-      {
-        "from": "backend/dist",
-        "to": "backend/dist"
-      },
-      {
-        "from": "backend/node_modules",
-        "to": "backend/node_modules"
-      },
-      {
-        "from": "backend/prisma",
-        "to": "backend/prisma"
-      },
-      {
-        "from": "backend/package.json",
-        "to": "backend/package.json"
-      },
-      {
-        "from": "frontend/.next/standalone",
-        "to": "frontend/standalone"
-      },
-      {
-        "from": "frontend/.next/static",
-        "to": "frontend/standalone/.next/static"
-      },
-      {
-        "from": "frontend/public",
-        "to": "frontend/standalone/public"
-      }
+    "asar": true,
+    "asarUnpack": [
+      "**/*.node",
+      "**/*.dll"
     ],
     "files": [
       "electron/**/*",
+      "backend/dist/**/*",
+      "backend/node_modules/**/*",
+      "backend/prisma/**/*",
+      "backend/package.json",
+      "frontend/.next/standalone/**/*",
       "package.json"
     ]
   }

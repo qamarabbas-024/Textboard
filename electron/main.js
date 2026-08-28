@@ -21,23 +21,19 @@ const BACKEND_PORT = process.env.TEXTBOARD_BACKEND_PORT || '3891';
 
 function getAppPaths() {
   const isPackaged = app.isPackaged;
-  const root = isPackaged ? process.resourcesPath : path.join(__dirname, '..');
+  const root = path.join(__dirname, '..');
   
-  const standaloneServer = path.join(root, 'frontend', 'standalone', 'server.js');
-  const devNextStandalone = path.join(__dirname, '..', 'frontend', '.next', 'standalone', 'server.js');
-  const devNextCli = path.join(__dirname, '..', 'frontend', 'node_modules', 'next', 'dist', 'bin', 'next');
+  const standaloneServer = path.join(root, 'frontend', '.next', 'standalone', 'server.js');
+  const devNextCli = path.join(root, 'frontend', 'node_modules', 'next', 'dist', 'bin', 'next');
 
   let frontendServerScript = '';
   let frontendCwd = '';
   if (fs.existsSync(standaloneServer)) {
     frontendServerScript = standaloneServer;
-    frontendCwd = path.join(root, 'frontend', 'standalone');
-  } else if (fs.existsSync(devNextStandalone)) {
-    frontendServerScript = devNextStandalone;
-    frontendCwd = path.join(__dirname, '..', 'frontend', '.next', 'standalone');
+    frontendCwd = path.join(root, 'frontend', '.next', 'standalone');
   } else {
     frontendServerScript = devNextCli;
-    frontendCwd = path.join(__dirname, '..', 'frontend');
+    frontendCwd = path.join(root, 'frontend');
   }
 
   return {
