@@ -79,6 +79,8 @@ export function PdfExportModal({
 
   const [includeCoverPage, setIncludeCoverPage] = useState(true);
   const [includeBookmarks, setIncludeBookmarks] = useState(true);
+  const [includeCircadianHeatmap, setIncludeCircadianHeatmap] = useState(true);
+  const [includeAnomalyLog, setIncludeAnomalyLog] = useState(true);
   const [useRange, setUseRange] = useState(Boolean(selectedRange?.start && selectedRange?.end));
   const [actorFilter, setActorFilter] = useState<string>('');
   const [primaryActor, setPrimaryActor] = useState<string>('');
