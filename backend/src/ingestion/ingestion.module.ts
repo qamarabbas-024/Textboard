@@ -25,6 +25,7 @@ import { MboxStreamParser } from './parsers/mbox-stream-parser';
 import { TelegramStreamParser } from './parsers/telegram-stream-parser';
 import { GoogleTakeoutStreamParser } from './parsers/google-takeout-stream-parser';
 import { ImageStreamParser } from './parsers/image-stream-parser';
+import { OcrExtractorService } from './parsers/ocr-extractor.service';
 import { DirectoryWatcherService } from './directory-watcher.service';
 import { PrismaModule } from '../prisma/prisma.module';
 
@@ -39,6 +40,7 @@ import { PrismaModule } from '../prisma/prisma.module';
     BatchedSinkService,
     ParserRegistryService,
     DirectoryWatcherService,
+    OcrExtractorService,
     TxtStreamParser,
     CsvStreamParser,
     JsonStreamParser,
@@ -64,6 +66,7 @@ import { PrismaModule } from '../prisma/prisma.module';
     FilesService,
     ParserRegistryService,
     DirectoryWatcherService,
+    OcrExtractorService,
     TxtStreamParser,
     CsvStreamParser,
     JsonStreamParser,
