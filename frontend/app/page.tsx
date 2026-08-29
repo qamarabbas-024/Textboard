@@ -18,6 +18,7 @@ import { PinLockModal } from '../components/PinLockModal';
 import { MediaGalleryModal } from '../components/MediaGalleryModal';
 import { LocalAssistantDrawer } from '../components/LocalAssistantDrawer';
 import { SpatialUniverseView } from '../components/SpatialUniverseView';
+import { GeoMapView } from '../components/GeoMapView';
 import BackgroundEffect from '../components/BackgroundEffect';
 
 interface DatasetItem {
@@ -296,6 +297,12 @@ export default function WorkstationPage() {
 
         {currentTab === 'CORRELATE' && (
           <CrossCorrelatorView datasets={datasets} />
+        )}
+
+        {currentTab === 'GEOMAP' && selectedDatasetId && (
+          <GeoMapView
+            datasetId={selectedDatasetId}
+          />
         )}
 
         {currentTab === 'SPATIAL' && selectedDatasetId && (

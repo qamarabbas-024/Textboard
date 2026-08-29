@@ -23,6 +23,7 @@ export type NavTab =
   | 'ANOMALIES'
   | 'TOPICS'
   | 'CORRELATE'
+  | 'GEOMAP'
   | 'SPATIAL';
 
 interface WorkstationNavProps {
@@ -61,6 +62,7 @@ export function WorkstationNav({
     { tab: 'ANOMALIES', label: 'ANOMALIES', icon: <AlertCircleIcon className="w-3.5 h-3.5" /> },
     { tab: 'TOPICS', label: 'TOPICS', icon: <LayersIcon className="w-3.5 h-3.5" /> },
     { tab: 'CORRELATE', label: 'CORRELATE', icon: <GitCompareIcon className="w-3.5 h-3.5" /> },
+    { tab: 'GEOMAP', label: 'GEOMAP', icon: <span className="text-xs">🧭</span> },
     { tab: 'SPATIAL', label: '3D SPATIAL', icon: <span className="text-xs">🌌</span> },
   ];
 
