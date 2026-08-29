@@ -154,6 +154,14 @@ export class AnalyticsController {
   }
 
   /**
+   * Get geographic pinpoint locations, clusters, and movement routes.
+   */
+  @Get(':datasetId/geo')
+  async getGeoIntelligence(@Param('datasetId') datasetId: string) {
+    return this.analyticsEngine.getGeoIntelligence(datasetId);
+  }
+
+  /**
    * Invalidate cache and force recompute all analytics.
    */
   @Post(':datasetId/refresh')

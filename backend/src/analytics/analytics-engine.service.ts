@@ -11,6 +11,7 @@ import { RelationshipMatrixService } from './services/relationship-matrix.servic
 import { AnomalyDetectorService, AnomalyReport } from './services/anomaly-detector.service';
 import { ClusteringEngineService, TopicClusteringReport } from './services/clustering-engine.service';
 import { ThreadReconstructorService, ThreadReconstructionReport } from './services/thread-reconstructor.service';
+import { GeoIntelligenceService } from './services/geo-intelligence.service';
 import { FullDatasetAnalytics, OnThisDayMemory, RelationshipPair } from './analytics.types';
 
 @Injectable()
@@ -31,6 +32,7 @@ export class AnalyticsEngineService {
     private readonly anomalyDetector: AnomalyDetectorService,
     private readonly clusteringEngine: ClusteringEngineService,
     private readonly threadReconstructor: ThreadReconstructorService,
+    private readonly geoIntelligence: GeoIntelligenceService,
   ) {}
 
   /**
@@ -286,5 +288,61 @@ export class AnalyticsEngineService {
     if (highlightsToCreate.length > 0) {
       await this.prisma.highlight.createMany({ data: highlightsToCreate }).catch(() => {});
     }
+  }
+
+  /**
+   * Retrieves geographic pinpoint locations, clusters, and movement trajectories.
+   */
+  async getGeoIntelligence(datasetId: string) {
+    const events = await this.prisma.timelineEvent.findMany({
+      where: {
+        datasetId,
+        OR: [
+          { content: { contains: 'maps.google' } },
+          { content: { contains: 'google.com/maps' } },
+          { content: { contains: 'maps.apple' } },
+          { content: { contains: 'Location:' } },
+          { content: { contains: 'GPS:' } },
+          { metadata: { contains: '"location"' } },
+        ],
+      },
+      select: {
+        id: true,
+        actor: true,
+        timestamp: true,
+        content: true,
+        metadata: true,
+      },
+      orderBy: { timestamp: 'asc' },
+    });
+
+    const pins = [];
+    for (const ev of events) {
+      let meta: any = null;
+      if (ev.metadata) {
+        try {
+          meta = JSON.parse(ev.metadata);
+        } catch {}
+      }
+      const pin = this.geoIntelligence.extractLocationFromMessage(
+        ev.id,
+        ev.actor || 'Participant',
+        ev.timestamp,
+        ev.content,
+        meta,
+      );
+      if (pin) pins.push(pin);
+    }
+
+    const clusters = this.geoIntelligence.clusterLocationPins(pins, 5);
+    const routes = this.geoIntelligence.buildRouteSegments(pins);
+
+    return {
+      datasetId,
+      totalPins: pins.length,
+      pins,
+      clusters,
+      routes,
+    };
   }
 }

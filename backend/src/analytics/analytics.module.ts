@@ -16,6 +16,7 @@ import { ClusteringEngineService } from './services/clustering-engine.service';
 import { ThreadReconstructorService } from './services/thread-reconstructor.service';
 import { LocalAssistantService } from './services/local-assistant.service';
 import { AudioForensicsService } from './services/audio-forensics.service';
+import { GeoIntelligenceService } from './services/geo-intelligence.service';
 
 @Module({
   imports: [PrismaModule, RedisModule],
@@ -35,6 +36,7 @@ import { AudioForensicsService } from './services/audio-forensics.service';
     ThreadReconstructorService,
     LocalAssistantService,
     AudioForensicsService,
+    GeoIntelligenceService,
   ],
   exports: [
     AnalyticsEngineService,
@@ -51,6 +53,7 @@ import { AudioForensicsService } from './services/audio-forensics.service';
     ThreadReconstructorService,
     LocalAssistantService,
     AudioForensicsService,
+    GeoIntelligenceService,
   ],
 })
 export class AnalyticsModule {}
