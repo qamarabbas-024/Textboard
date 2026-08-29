@@ -15,6 +15,7 @@ import { CrossCorrelatorService } from './services/cross-correlator.service';
 import { ClusteringEngineService } from './services/clustering-engine.service';
 import { ThreadReconstructorService } from './services/thread-reconstructor.service';
 import { LocalAssistantService } from './services/local-assistant.service';
+import { AudioForensicsService } from './services/audio-forensics.service';
 
 @Module({
   imports: [PrismaModule, RedisModule],
@@ -33,6 +34,7 @@ import { LocalAssistantService } from './services/local-assistant.service';
     ClusteringEngineService,
     ThreadReconstructorService,
     LocalAssistantService,
+    AudioForensicsService,
   ],
   exports: [
     AnalyticsEngineService,
@@ -48,6 +50,7 @@ import { LocalAssistantService } from './services/local-assistant.service';
     ClusteringEngineService,
     ThreadReconstructorService,
     LocalAssistantService,
+    AudioForensicsService,
   ],
 })
 export class AnalyticsModule {}
