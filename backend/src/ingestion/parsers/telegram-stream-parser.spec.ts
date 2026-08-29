@@ -61,4 +61,34 @@ describe('TelegramStreamParser', () => {
     expect(records[1].content).toContain('[Photo: photos/photo_102@24-08-2026_10-05-00.jpg]');
     expect(records[1].hasMedia).toBe(true);
   });
+
+  it('should parse Telegram HTML exports with message author, date, and text', async () => {
+    const tgHtml = `
+      <div class="message default clearfix" id="message501">
+        <div class="body">
+          <div class="from_name">Alice Developer</div>
+          <div class="pull_right date details" title="24.08.2026 14:30:00">14:30</div>
+          <div class="text">Deployed the forensic parser to production.<br>Working flawlessly!</div>
+        </div>
+      </div>
+    `;
+
+    const htmlContext: ParserContext = {
+      jobId: 'job_tg_html',
+      datasetId: 'ds_tg_html',
+      filename: 'messages.html',
+    };
+
+    const stream = Readable.from([Buffer.from(tgHtml)]);
+    const records: any[] = [];
+    for await (const rec of parser.parseStream(stream, htmlContext)) {
+      records.push(rec);
+    }
+
+    expect(records.length).toBe(1);
+    expect(records[0].actor).toBe('Alice Developer');
+    expect(records[0].content).toContain('Deployed the forensic parser to production.\nWorking flawlessly!');
+    expect(records[0].metadata.telegramMessageId).toBe('501');
+    expect(records[0].metadata.sourceFormat).toBe('telegram-html');
+  });
 });
