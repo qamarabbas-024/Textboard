@@ -9,13 +9,17 @@ export const EMOJI_REGEX = /(?:\p{Extended_Pictographic}|\p{Emoji_Presentation}|
 export const URL_REGEX = /\bhttps?:\/\/[^\s<>"{}|\\^`[\]]+|\bwww\.[^\s<>"{}|\\^`[\]]+/gi;
 
 /**
- * Extracts unique URLs from text content.
+ * Extracts unique URLs from text content, stripping trailing punctuation.
  */
 export function extractUrls(text: string): string[] {
   if (!text) return [];
   const matches = text.match(URL_REGEX);
   if (!matches) return [];
-  return Array.from(new Set(matches));
+  return Array.from(
+    new Set(
+      matches.map((url) => url.replace(/[),.!?:;]+$/, '')).filter(Boolean),
+    ),
+  );
 }
 
 /**
