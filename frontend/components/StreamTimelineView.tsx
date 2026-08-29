@@ -1,8 +1,7 @@
-'use client';
-
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { AnimatedCounter } from './AnimatedCounter';
+import { VoiceNotePlayer } from './VoiceNotePlayer';
 
 export interface TimelineEventItem {
   id: string;
@@ -435,6 +434,15 @@ export function StreamTimelineView({
                           )}
                         </div>
                       </div>
+                    )}
+
+                    {/* Interactive Voice Note Audio Player with Waveform Equalizer */}
+                    {media.type === 'audio' && (
+                      <VoiceNotePlayer
+                        filename={media.filename || 'voice_note.opus'}
+                        durationSeconds={ev.metadata?.audioDuration || 18}
+                        seed={ev.id}
+                      />
                     )}
 
                     {/* OCR Text Match Badge */}
