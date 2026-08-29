@@ -44,10 +44,17 @@
     },
     "nsis": {
       "oneClick": false,
+      "perMachine": false,
       "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
+      "createDesktopShortcut": "always",
       "createStartMenuShortcut": true,
-      "shortcutName": "TextBoard Workstation"
+      "shortcutName": "TextBoard",
+      "uninstallDisplayName": "TextBoard Workstation",
+      "deleteAppDataOnUninstall": true,
+      "runAfterFinish": true
+    },
+    "portable": {
+      "artifactName": "TextBoard-Portable-${version}.${ext}"
     },
     "asar": true,
     "asarUnpack": [

@@ -109,10 +109,19 @@ function startBackendServer() {
   }
 
   try {
-    console.log(`[Electron]: Spawning TextBoard Backend Engine on port ${BACKEND_PORT}...`);
+    const userDataDir = app.getPath('userData');
+    const dbDir = path.join(userDataDir, 'database');
+    if (!fs.existsSync(dbDir)) {
+      fs.mkdirSync(dbDir, { recursive: true });
+    }
+    const dbPath = path.join(dbDir, 'textboard_local.db');
+    const databaseUrl = `file:${dbPath.replace(/\\/g, '/')}`;
+
+    console.log(`[Electron]: Spawning TextBoard Backend Engine on port ${BACKEND_PORT} (DB: ${databaseUrl})...`);
     backendProcess = spawnNodeProcess(backendDist, [], backendDir, {
       PORT: BACKEND_PORT,
       NODE_ENV: 'production',
+      DATABASE_URL: databaseUrl,
       CORS_ORIGIN: `http://localhost:${FRONTEND_PORT},http://127.0.0.1:${FRONTEND_PORT},http://localhost:3000,http://127.0.0.1:3000`,
     });
 
