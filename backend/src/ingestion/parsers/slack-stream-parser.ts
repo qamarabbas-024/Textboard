@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as readline from 'readline';
 import { IStreamParser, ParsedRecord, ParserContext } from '../types';
+import { extractUrls, extractEmojis } from './parser-utils';
 
 @Injectable()
 export class SlackStreamParser implements IStreamParser {
@@ -94,20 +95,34 @@ export class SlackStreamParser implements IStreamParser {
     cleanText = cleanText.replace(/<(https?:\/\/[^>]+)>/g, '$1');
     cleanText = cleanText.replace(/<@([A-Z0-9]+)>/g, '@$1');
 
+    if (msg.files && msg.files.length > 0) {
+      const fileNames = msg.files.map((f: any) => f.name || f.title || f.mimetype || 'file').join(', ');
+      cleanText += ` [Files: ${fileNames}]`;
+    }
+
+    if (msg.reactions && msg.reactions.length > 0) {
+      const reactionStr = msg.reactions.map((r: any) => `:${r.name}: (${r.count || 1})`).join(' ');
+      cleanText += ` [Reactions: ${reactionStr}]`;
+    }
+
     const actor = msg.user_profile?.display_name || msg.user_profile?.real_name || msg.username || msg.user || 'Slack User';
 
     return {
       timestamp,
       rawTimestamp: String(msg.ts || ''),
       actor,
-      content: cleanText,
-      eventType: 'message',
+      content: cleanText.trim() || '[Empty Message]',
+      eventType: msg.subtype === 'channel_join' ? 'system' : 'message',
       hasMedia: Boolean(msg.files && msg.files.length > 0),
       metadata: {
         platform: 'slack',
         threadTs: msg.thread_ts,
         isThreadReply: Boolean(msg.thread_ts && msg.thread_ts !== msg.ts),
+        replyCount: msg.reply_count,
+        subtype: msg.subtype,
       },
+      urls: extractUrls(cleanText),
+      emojis: extractEmojis(cleanText),
     };
   }
 }
