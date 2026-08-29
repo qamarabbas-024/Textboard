@@ -59,16 +59,23 @@ export function HomeView({
   return (
     <div className="space-y-8 animate-fadeIn font-mono">
       {/* 1. Hero 3D Command Deck Banner */}
-      <section className="glass-card-3d p-8 rounded-3xl relative overflow-hidden">
+      <section className="glass-card-3d p-8 rounded-3xl relative overflow-hidden group border border-theme-border/80 shadow-2xl">
+        {/* Subtle 3D Ambient Mesh Glow Background */}
+        <div className="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none group-hover:bg-cyan-500/15 transition-all duration-700" />
+        <div className="absolute -left-16 -bottom-16 w-80 h-80 rounded-full bg-purple-500/10 blur-3xl pointer-events-none group-hover:bg-purple-500/15 transition-all duration-700" />
+
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
-              <span className="text-xs font-bold uppercase tracking-widest text-cyan-400">
+          <div className="space-y-3 max-w-2xl">
+            <div className="flex items-center gap-2.5">
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-500 shadow-[0_0_12px_#00f0ff]" />
+              </span>
+              <span className="text-[11px] font-extrabold uppercase tracking-widest text-cyan-400 bg-cyan-950/60 px-2.5 py-0.5 rounded-full border border-cyan-400/30 shadow-inner">
                 LOCAL-FIRST VISUAL INTELLIGENCE WORKSTATION
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-snug">
               High-Throughput Analytics &amp; Forensic Stream Engine
             </h1>
             <p className="text-xs sm:text-sm text-theme-muted font-sans leading-relaxed">
@@ -76,13 +83,14 @@ export function HomeView({
             </p>
           </div>
 
-          {/* Quick Action Matrix */}
-          <div className="flex flex-wrap items-center gap-2.5">
+          {/* Quick Action Matrix (3D Buttons) */}
+          <div className="flex flex-wrap items-center gap-3">
             <Button
               variant="primary"
               size="sm"
               onClick={() => onNavigateTo('DATA')}
               leftIcon={<DatabaseIcon className="w-4 h-4" />}
+              className="btn-3d-primary font-bold shadow-lg"
             >
               Import Stream
             </Button>
@@ -91,6 +99,7 @@ export function HomeView({
               size="sm"
               onClick={() => onNavigateTo('EXPLORE')}
               leftIcon={<ActivityIcon className="w-4 h-4" />}
+              className="glass-card-3d hover:border-cyan-400/60 font-semibold"
             >
               Timeline Scrubber
             </Button>
@@ -99,6 +108,7 @@ export function HomeView({
               size="sm"
               onClick={() => onNavigateTo('ANOMALIES')}
               leftIcon={<AlertCircleIcon className="w-4 h-4" />}
+              className="glass-card-3d hover:border-rose-400/60 font-semibold"
             >
               Forensic Radar
             </Button>
@@ -106,62 +116,74 @@ export function HomeView({
         </div>
       </section>
 
-      {/* 2. Telemetry HUD Cards */}
+      {/* 2. Telemetry HUD Cards (Elevated 3D Stat Layers) */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-5 rounded-2xl glass-card-3d relative overflow-hidden group">
+        <div className="p-5 rounded-2xl glass-card-3d relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
           <div className="flex items-center justify-between mb-3 text-theme-muted">
             <span className="text-xs tracking-wider uppercase font-bold">DATASETS MOUNTED</span>
-            <DatabaseIcon className="w-4 h-4 text-cyan-400" />
+            <div className="p-2 rounded-lg bg-cyan-500/10 border border-cyan-400/20 shadow-inner">
+              <DatabaseIcon className="w-4 h-4 text-cyan-400" />
+            </div>
           </div>
-          <div className="text-3xl font-black text-white">
+          <div className="text-3xl font-black text-white tracking-tight drop-shadow">
             {datasets.length}
           </div>
-          <div className="mt-2 text-[11px] text-theme-dim">
+          <div className="mt-2 text-[11px] text-theme-dim flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
             Local SQLite WAL Partition
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl glass-card-3d relative overflow-hidden group">
+        <div className="p-5 rounded-2xl glass-card-3d relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
           <div className="flex items-center justify-between mb-3 text-theme-muted">
             <span className="text-xs tracking-wider uppercase font-bold">NORMALIZED RECORDS</span>
-            <TerminalIcon className="w-4 h-4 text-emerald-400" />
+            <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-400/20 shadow-inner">
+              <TerminalIcon className="w-4 h-4 text-emerald-400" />
+            </div>
           </div>
-          <div className="text-3xl font-black text-emerald-300">
+          <div className="text-3xl font-black text-emerald-300 tracking-tight drop-shadow">
             {totalRecordsCount.toLocaleString()}
           </div>
-          <div className="mt-2 text-[11px] text-theme-dim">
+          <div className="mt-2 text-[11px] text-theme-dim flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
             Streamed in constant O(1) memory
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl glass-card-3d relative overflow-hidden group">
+        <div className="p-5 rounded-2xl glass-card-3d relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
           <div className="flex items-center justify-between mb-3 text-theme-muted">
             <span className="text-xs tracking-wider uppercase font-bold">IDENTIFIED ACTORS</span>
-            <UsersIcon className="w-4 h-4 text-purple-400" />
+            <div className="p-2 rounded-lg bg-purple-500/10 border border-purple-400/20 shadow-inner">
+              <UsersIcon className="w-4 h-4 text-purple-400" />
+            </div>
           </div>
-          <div className="text-3xl font-black text-purple-300">
+          <div className="text-3xl font-black text-purple-300 tracking-tight drop-shadow">
             {totalParticipantsCount.toLocaleString()}
           </div>
-          <div className="mt-2 text-[11px] text-theme-dim">
-            Distinct resolved communication identities
+          <div className="mt-2 text-[11px] text-theme-dim flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+            Distinct resolved identities
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl glass-card-3d relative overflow-hidden group">
+        <div className="p-5 rounded-2xl glass-card-3d relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
           <div className="flex items-center justify-between mb-3 text-theme-muted">
             <span className="text-xs tracking-wider uppercase font-bold">ACTIVE STREAM FOCUS</span>
-            <ActivityIcon className="w-4 h-4 text-amber-400" />
+            <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-400/20 shadow-inner">
+              <ActivityIcon className="w-4 h-4 text-amber-400" />
+            </div>
           </div>
-          <div className="text-sm font-bold text-white truncate">
+          <div className="text-sm font-bold text-white truncate drop-shadow">
             {activeDataset ? activeDataset.name : 'No Stream Mounted'}
           </div>
-          <div className="mt-2 text-[11px] text-cyan-400 truncate font-bold">
+          <div className="mt-2 text-[11px] text-cyan-400 truncate font-bold flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
             {activeDataset ? `${activeDataset.totalEvents.toLocaleString()} records` : 'Import a file to start'}
           </div>
         </div>
       </section>
 
-      {/* 3. Workstation Navigation Launchpad Hub */}
+      {/* 3. Workstation Navigation Launchpad Hub (3D Interactive Tiles) */}
       <section className="glass-card-3d p-6 rounded-2xl space-y-4">
         <div className="flex items-center gap-2 border-b border-theme-border/50 pb-3">
           <LayersIcon className="w-4 h-4 text-cyan-400" />
@@ -182,9 +204,9 @@ export function HomeView({
             <button
               key={mod.tab}
               onClick={() => onNavigateTo(mod.tab)}
-              className="p-4 rounded-xl bg-black/40 border border-theme-border/60 hover:border-cyan-400/50 hover:bg-theme-surface-active/60 transition-all text-left group cursor-pointer"
+              className="p-4 rounded-xl glass-card-3d-interactive text-left group cursor-pointer"
             >
-              <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">
+              <div className="text-2xl mb-2 group-hover:scale-110 group-hover:-translate-y-1 transition-transform">
                 {mod.icon}
               </div>
               <div className="text-xs font-bold text-white group-hover:text-cyan-300">
