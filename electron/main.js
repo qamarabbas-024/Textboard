@@ -46,7 +46,7 @@ function getAppPaths() {
   };
 }
 
-function checkHealth(url, timeoutMs = 30000) {
+function checkHealth(url, timeoutMs = 25000) {
   const startTime = Date.now();
   return new Promise((resolve) => {
     const check = () => {
@@ -62,7 +62,7 @@ function checkHealth(url, timeoutMs = 30000) {
         });
       });
       req.on('error', () => retry());
-      req.setTimeout(2000, () => {
+      req.setTimeout(1500, () => {
         req.destroy();
         retry();
       });
@@ -73,7 +73,7 @@ function checkHealth(url, timeoutMs = 30000) {
       if (Date.now() - startTime >= timeoutMs) {
         resolve(false);
       } else {
-        setTimeout(check, 600);
+        setTimeout(check, 200);
       }
     };
 
@@ -100,6 +100,7 @@ function spawnNodeProcess(scriptPath, args, cwd, customEnv) {
 }
 
 function startBackendServer() {
+  if (backendProcess) return;
   const { backendDir, backendDist } = getAppPaths();
 
   if (!fs.existsSync(backendDist)) {
@@ -137,6 +138,7 @@ function startBackendServer() {
 }
 
 function startFrontendServer() {
+  if (frontendProcess) return;
   const { frontendCwd, frontendServerScript, isStandalone } = getAppPaths();
 
   if (!fs.existsSync(frontendServerScript)) {
@@ -181,10 +183,11 @@ async function createWindow() {
     height: 920,
     minWidth: 1024,
     minHeight: 700,
-    backgroundColor: '#090c10',
+    backgroundColor: '#04060c',
     title: 'TextBoard — Visual Intelligence & Forensic Analytics Workstation',
     titleBarStyle: 'default',
     autoHideMenuBar: true,
+    show: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -200,32 +203,86 @@ async function createWindow() {
     return { action: 'deny' };
   });
 
-  const backendHealthUrl = `http://127.0.0.1:${BACKEND_PORT}/health`;
-  const frontendAppUrl = `http://localhost:${FRONTEND_PORT}`;
+  // Display instant loading card immediately with 0 delay
+  mainWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <style>
+          body {
+            margin: 0;
+            background-color: #04060c;
+            color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+          }
+          .card {
+            background: rgba(10, 15, 29, 0.9);
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            padding: 36px 52px;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.85), 0 0 35px rgba(0,240,255,0.18), inset 0 1px 1px rgba(255,255,255,0.15);
+          }
+          .title {
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, #00f0ff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+          }
+          .subtitle {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 24px;
+            letter-spacing: 0.5px;
+          }
+          .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(0, 240, 255, 0.15);
+            border-top-color: #00f0ff;
+            border-radius: 50%;
+            animation: spin 0.75s linear infinite;
+            margin: 0 auto;
+          }
+          @keyframes spin { to { transform: rotate(360deg); } }
+        </style>
+      </head>
+      <body>
+        <div class="card">
+          <div class="title">TEXTBOARD</div>
+          <div class="subtitle">INITIALIZING FORENSIC WORKSTATION...</div>
+          <div class="spinner"></div>
+        </div>
+      </body>
+    </html>
+  `)}`);
 
-  // Start backend if not already responsive
-  const isBackendUp = await checkHealth(backendHealthUrl, 1500);
-  if (!isBackendUp) {
-    startBackendServer();
-  }
+  const frontendAppUrl = `http://127.0.0.1:${FRONTEND_PORT}`;
 
-  // Start frontend if not already responsive
-  const isFrontendUp = await checkHealth(frontendAppUrl, 1500);
-  if (!isFrontendUp) {
-    startFrontendServer();
-  }
+  // Start backend & frontend concurrently
+  startBackendServer();
+  startFrontendServer();
 
-  // Wait for frontend server to serve pages
-  const isReady = await checkHealth(frontendAppUrl, 30000);
+  // Poll 127.0.0.1 every 200ms and load as soon as ready
+  const isReady = await checkHealth(frontendAppUrl, 25000);
   if (isReady && mainWindow) {
     mainWindow.loadURL(frontendAppUrl);
   } else if (mainWindow) {
-    // Retry load after waiting
     setTimeout(() => {
       if (mainWindow) {
         mainWindow.loadURL(frontendAppUrl);
       }
-    }, 2500);
+    }, 1500);
   }
 
   mainWindow.on('closed', () => {
