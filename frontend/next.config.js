@@ -2,7 +2,7 @@
 const nextConfig = {
   output: 'standalone',
   async rewrites() {
-    const backendUrl = process.env.BACKEND_URL || 'http://127.0.0.1:3001';
+    const backendUrl = process.env.BACKEND_URL || 'http://127.0.0.1:3891';
     return [
       {
         source: '/api/:path*',

@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const isProduction = process.env.NODE_ENV === 'production';
-  const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:3000,http://127.0.0.1:3000,http://localhost:39280,http://127.0.0.1:39280';
+  const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:3890,http://127.0.0.1:3890,http://localhost:3000,http://127.0.0.1:3000';
 
   const app = await NestFactory.create(AppModule);
 

@@ -112,6 +112,7 @@ function startBackendServer() {
     backendProcess = spawnNodeProcess(backendDist, [], backendDir, {
       PORT: BACKEND_PORT,
       NODE_ENV: 'production',
+      CORS_ORIGIN: `http://localhost:${FRONTEND_PORT},http://127.0.0.1:${FRONTEND_PORT},http://localhost:3000,http://127.0.0.1:3000`,
     });
 
     backendProcess.on('error', (err) => {
@@ -150,6 +151,7 @@ function startFrontendServer() {
       PORT: FRONTEND_PORT,
       HOSTNAME: '127.0.0.1',
       BACKEND_URL: `http://127.0.0.1:${BACKEND_PORT}`,
+      NEXT_PUBLIC_API_URL: `http://127.0.0.1:${BACKEND_PORT}`,
     });
 
     frontendProcess.on('error', (err) => {
