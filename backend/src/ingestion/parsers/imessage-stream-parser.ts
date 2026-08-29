@@ -92,18 +92,47 @@ export class ImessageStreamParser implements IStreamParser {
             }
           }
 
+          let content = item.text || item.content || item.body || '';
+
+          // Handle Apple Tapback reactions (associated_message_type: 2000-2005, 3000-3005)
+          if (item.associated_message_type) {
+            const tapbacks: Record<number, string> = {
+              2000: '❤️ Loved',
+              2001: '👍 Liked',
+              2002: '👎 Disliked',
+              2003: '😂 Laughed at',
+              2004: '‼️ Emphasized',
+              2005: '❓ Questioned',
+              3000: 'Removed ❤️ from',
+              3001: 'Removed 👍 from',
+              3002: 'Removed 👎 from',
+              3003: 'Removed 😂 from',
+              3004: 'Removed ‼️ from',
+              3005: 'Removed ❓ from',
+            };
+            const reactionName = tapbacks[item.associated_message_type] || 'Reacted to';
+            content = `[Tapback: ${reactionName} "${item.associated_message_guid || 'message'}"]`;
+          }
+
+          if (item.attachments && item.attachments.length > 0) {
+            const attNames = item.attachments.map((a: any) => a.filename || a.transfer_name || 'media').join(', ');
+            content += ` [Attachments: ${attNames}]`;
+          }
+
           recordsCount++;
           yield {
             timestamp: isNaN(timestamp.getTime()) ? new Date() : timestamp,
             rawTimestamp: String(item.date || ''),
-            actor: item.sender || item.handle || item.from || 'Me',
-            content: item.text || item.content || item.body || '',
-            eventType: 'message',
+            actor: item.is_from_me ? 'Me' : (item.sender || item.handle || item.from || 'Contact'),
+            content: content.trim() || '[Empty Message]',
+            eventType: item.associated_message_type ? 'reaction' : 'message',
             hasMedia: Boolean(item.attachments && item.attachments.length > 0),
             metadata: {
               platform: 'imessage',
               isFromMe: Boolean(item.is_from_me),
               service: item.service_name || 'iMessage',
+              guid: item.guid,
+              associatedMessageType: item.associated_message_type,
             },
           };
         }
