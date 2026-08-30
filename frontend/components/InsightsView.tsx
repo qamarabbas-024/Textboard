@@ -10,6 +10,7 @@ import { Button } from './ui/Button';
 import ActivityVelocityChart, { DataPoint } from './charts/ActivityVelocityChart';
 import CircadianRadarChart from './charts/CircadianRadarChart';
 import ParticipantDonutChart, { ParticipantShare } from './charts/ParticipantDonutChart';
+import { CircadianRadarView } from './CircadianRadarView';
 
 interface DatasetItem {
   id: string;
@@ -177,7 +178,15 @@ export function InsightsView({
         height={220}
       />
 
-      {/* 2. Dual Diagram Row: 24h Circadian Polar Radar + Participant Volume Donut */}
+      {/* 2. Full 7x24 Diurnal Hour-of-Week Matrix & Polar Clock */}
+      <CircadianRadarView
+        activityData={{
+          hourlyActivity: hourlyDistribution,
+          totalMessages: velocityPoints.reduce((acc, p) => acc + p.value, 0),
+        }}
+      />
+
+      {/* 3. Dual Diagram Row: 24h Circadian Polar Radar + Participant Volume Donut */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <CircadianRadarChart
           hourlyDistribution={hourlyDistribution}
