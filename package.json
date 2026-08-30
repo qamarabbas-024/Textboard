@@ -9,8 +9,8 @@
     "start": "electron .",
     "electron:dev": "electron .",
     "electron:pack": "electron-builder --dir",
-    "electron:dist": "electron-builder",
-    "build:all": "npm run build --prefix backend && npm run build --prefix frontend",
+    "electron:dist": "node scripts/prepare-standalone.js && electron-builder",
+    "build:all": "npm run build --prefix backend && npm run build --prefix frontend && node scripts/prepare-standalone.js",
     "build:exe": "npm run build:all && electron-builder",
     "build:portable": "npm run build:all && electron-builder --win portable",
     "dev:backend": "cd backend && npm run start:dev",
@@ -63,12 +63,26 @@
     ],
     "files": [
       "electron/**/*",
-      "backend/dist/**/*",
-      "backend/node_modules/**/*",
-      "backend/prisma/**/*",
-      "backend/package.json",
-      "frontend/.next/standalone/**/*",
       "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "backend",
+        "to": "backend",
+        "filter": [
+          "dist/**/*",
+          "node_modules/**/*",
+          "prisma/**/*",
+          "package.json"
+        ]
+      },
+      {
+        "from": "frontend/.next/standalone",
+        "to": "frontend",
+        "filter": [
+          "**/*"
+        ]
+      }
     ]
   }
 }

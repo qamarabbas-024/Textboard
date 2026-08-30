@@ -21,28 +21,35 @@ const BACKEND_PORT = process.env.TEXTBOARD_BACKEND_PORT || '3891';
 
 function getAppPaths() {
   const isPackaged = app.isPackaged;
-  const root = path.join(__dirname, '..');
-  
-  const standaloneServer = path.join(root, 'frontend', '.next', 'standalone', 'server.js');
-  const devNextCli = path.join(root, 'frontend', 'node_modules', 'next', 'dist', 'bin', 'next');
+  const root = isPackaged ? process.resourcesPath : path.join(__dirname, '..');
 
-  let frontendServerScript = '';
-  let frontendCwd = '';
-  if (fs.existsSync(standaloneServer)) {
-    frontendServerScript = standaloneServer;
-    frontendCwd = path.join(root, 'frontend', '.next', 'standalone');
-  } else {
-    frontendServerScript = devNextCli;
-    frontendCwd = path.join(root, 'frontend');
-  }
+  const standaloneServer = isPackaged
+    ? path.join(process.resourcesPath, 'frontend', 'server.js')
+    : (fs.existsSync(path.join(root, 'frontend', '.next', 'standalone', 'server.js'))
+        ? path.join(root, 'frontend', '.next', 'standalone', 'server.js')
+        : path.join(root, 'frontend', 'node_modules', 'next', 'dist', 'bin', 'next'));
+
+  const backendDist = isPackaged
+    ? path.join(process.resourcesPath, 'backend', 'dist', 'main.js')
+    : path.join(root, 'backend', 'dist', 'main.js');
+
+  const backendDir = isPackaged
+    ? path.join(process.resourcesPath, 'backend')
+    : path.join(root, 'backend');
+
+  const frontendCwd = isPackaged
+    ? path.join(process.resourcesPath, 'frontend')
+    : (fs.existsSync(path.join(root, 'frontend', '.next', 'standalone'))
+        ? path.join(root, 'frontend', '.next', 'standalone')
+        : path.join(root, 'frontend'));
 
   return {
     isPackaged,
-    backendDir: path.join(root, 'backend'),
-    backendDist: path.join(root, 'backend', 'dist', 'main.js'),
+    backendDir,
+    backendDist,
     frontendCwd,
-    frontendServerScript,
-    isStandalone: frontendServerScript.endsWith('server.js'),
+    frontendServerScript: standaloneServer,
+    isStandalone: true,
   };
 }
 
