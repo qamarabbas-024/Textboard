@@ -18,6 +18,7 @@ import { LocalAssistantService } from './services/local-assistant.service';
 import { AudioForensicsService } from './services/audio-forensics.service';
 import { GeoIntelligenceService } from './services/geo-intelligence.service';
 import { EmotionRadarService } from './services/emotion-radar.service';
+import { BehavioralProfilerService } from './services/behavioral-profiler.service';
 
 @Module({
   imports: [PrismaModule, RedisModule],
@@ -39,6 +40,7 @@ import { EmotionRadarService } from './services/emotion-radar.service';
     AudioForensicsService,
     GeoIntelligenceService,
     EmotionRadarService,
+    BehavioralProfilerService,
   ],
   exports: [
     AnalyticsEngineService,
@@ -57,6 +59,7 @@ import { EmotionRadarService } from './services/emotion-radar.service';
     AudioForensicsService,
     GeoIntelligenceService,
     EmotionRadarService,
+    BehavioralProfilerService,
   ],
 })
 export class AnalyticsModule {}
