@@ -17,6 +17,7 @@ import { ThreadReconstructorService } from './services/thread-reconstructor.serv
 import { LocalAssistantService } from './services/local-assistant.service';
 import { AudioForensicsService } from './services/audio-forensics.service';
 import { GeoIntelligenceService } from './services/geo-intelligence.service';
+import { EmotionRadarService } from './services/emotion-radar.service';
 
 @Module({
   imports: [PrismaModule, RedisModule],
@@ -37,6 +38,7 @@ import { GeoIntelligenceService } from './services/geo-intelligence.service';
     LocalAssistantService,
     AudioForensicsService,
     GeoIntelligenceService,
+    EmotionRadarService,
   ],
   exports: [
     AnalyticsEngineService,
@@ -54,6 +56,7 @@ import { GeoIntelligenceService } from './services/geo-intelligence.service';
     LocalAssistantService,
     AudioForensicsService,
     GeoIntelligenceService,
+    EmotionRadarService,
   ],
 })
 export class AnalyticsModule {}
