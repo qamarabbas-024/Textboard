@@ -21,6 +21,7 @@ import { SpatialUniverseView } from '../components/SpatialUniverseView';
 import { GeoMapView } from '../components/GeoMapView';
 import { MobileBottomNav } from '../components/MobileBottomNav';
 import { MobileServerModal } from '../components/MobileServerModal';
+import { KeyboardShortcutsModal } from '../components/KeyboardShortcutsModal';
 import { safeFetch } from '../lib/api-client';
 import BackgroundEffect from '../components/BackgroundEffect';
 
@@ -45,6 +46,7 @@ export default function WorkstationPage() {
   const [isMediaGalleryOpen, setIsMediaGalleryOpen] = useState(false);
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const [isMobileServerOpen, setIsMobileServerOpen] = useState(false);
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const [insights, setInsights] = useState<any[]>([]);
   const [isBootComplete, setIsBootComplete] = useState(false);
@@ -142,10 +144,17 @@ export default function WorkstationPage() {
         setIsMediaGalleryOpen(false);
         setIsAssistantOpen(false);
         setIsProcessingModalOpen(false);
+        setIsShortcutsOpen(false);
         return;
       }
 
-      if (!isInput && !isCommandPaletteOpen && !isPdfExportModalOpen && !isMediaGalleryOpen && !isAssistantOpen && !isProcessingModalOpen) {
+      if (e.key === '?' && !isInput) {
+        e.preventDefault();
+        setIsShortcutsOpen((prev) => !prev);
+        return;
+      }
+
+      if (!isInput && !isCommandPaletteOpen && !isPdfExportModalOpen && !isMediaGalleryOpen && !isAssistantOpen && !isProcessingModalOpen && !isShortcutsOpen) {
         if (e.key === '1') setCurrentTab('HOME');
         else if (e.key === '2') setCurrentTab('EXPLORE');
         else if (e.key === '3') setCurrentTab('DATA');
@@ -173,7 +182,7 @@ export default function WorkstationPage() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isCommandPaletteOpen, isPdfExportModalOpen, isMediaGalleryOpen, isAssistantOpen, isProcessingModalOpen, selectedDatasetId]);
+  }, [isCommandPaletteOpen, isPdfExportModalOpen, isMediaGalleryOpen, isAssistantOpen, isProcessingModalOpen, isShortcutsOpen, selectedDatasetId]);
 
   const handleStartIngestionJob = (job: IngestionJobState) => {
     setActiveJob(job);
@@ -399,6 +408,12 @@ export default function WorkstationPage() {
         isOpen={isMobileServerOpen}
         onClose={() => setIsMobileServerOpen(false)}
         onRefresh={fetchDatasets}
+      />
+
+      {/* 10. Global Keyboard Shortcuts & Accessibility Modal */}
+      <KeyboardShortcutsModal
+        isOpen={isShortcutsOpen}
+        onClose={() => setIsShortcutsOpen(false)}
       />
     </div>
   );
