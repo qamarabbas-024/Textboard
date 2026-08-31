@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { Button } from './ui/Button';
+import { VisualPdfStudioModal } from './VisualPdfStudioModal';
 
 export type ToolCategory = 'PDF' | 'CONVERT' | 'AUDIO' | 'SECURITY';
 
@@ -15,6 +16,7 @@ export function UniversalDocumentStudio({
   onOpenPdfExport,
 }: UniversalDocumentStudioProps) {
   const [activeCategory, setActiveCategory] = useState<ToolCategory>('PDF');
+  const [isVisualStudioOpen, setIsVisualStudioOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [conversionInput, setConversionInput] = useState<string>('');
   const [conversionOutput, setConversionOutput] = useState<string>('');
@@ -207,23 +209,25 @@ export function UniversalDocumentStudio({
 
             <div className="glass-card-3d p-4 rounded-2xl border border-white/[0.08] hover:border-cyan-400/40 transition-all space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-2xl">🔒</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">
-                  Airgap
+                <span className="text-2xl">🔄</span>
+                <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold border border-amber-500/20">
+                  Interactive
                 </span>
               </div>
               <div>
-                <h4 className="text-sm font-bold text-white">Watermark &amp; Confidentiality</h4>
+                <h4 className="text-sm font-bold text-white">Visual Page Organizer &amp; Sign</h4>
                 <p className="text-xs text-neutral-400 mt-1">
-                  Apply diagonal security watermarks across all generated evidence documents.
+                  Rotate 90°, reorder pages, delete appendix sections, and apply digital examiner signatures.
                 </p>
               </div>
-              <input
-                type="text"
-                value={watermarkText}
-                onChange={(e) => setWatermarkText(e.target.value)}
-                className="w-full bg-black/50 border border-white/[0.1] rounded-xl px-2.5 py-1 text-xs text-cyan-300 font-mono focus:border-cyan-400 outline-none"
-              />
+              <Button
+                variant="primary"
+                size="xs"
+                onClick={() => setIsVisualStudioOpen(true)}
+                className="w-full btn-3d-primary font-bold"
+              >
+                Launch Visual Studio →
+              </Button>
             </div>
           </div>
         )}
@@ -340,6 +344,14 @@ export function UniversalDocumentStudio({
           </div>
         )}
       </section>
+
+      {/* Visual PDF Page Organizer & Signature Modal */}
+      {isVisualStudioOpen && (
+        <VisualPdfStudioModal
+          isOpen={isVisualStudioOpen}
+          onClose={() => setIsVisualStudioOpen(false)}
+        />
+      )}
     </div>
   );
 }
