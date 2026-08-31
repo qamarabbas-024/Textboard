@@ -3,6 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { Button } from './ui/Button';
 import { VisualPdfStudioModal } from './VisualPdfStudioModal';
+import { AudioSpeechStudio } from './AudioSpeechStudio';
 
 export type ToolCategory = 'PDF' | 'CONVERT' | 'AUDIO' | 'SECURITY';
 
@@ -154,6 +155,16 @@ export function UniversalDocumentStudio({
               }`}
             >
               ⚖️ Bates &amp; Redact
+            </button>
+            <button
+              onClick={() => setActiveCategory('AUDIO')}
+              className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
+                activeCategory === 'AUDIO'
+                  ? 'bg-blue-500/20 text-blue-300 border border-blue-400/40 shadow-sm'
+                  : 'text-neutral-400 hover:text-white'
+              }`}
+            >
+              🎙️ Audio STT
             </button>
           </div>
         </div>
@@ -341,6 +352,18 @@ export function UniversalDocumentStudio({
                 ⚖️ Launch Bates Studio Modal
               </Button>
             </div>
+          </div>
+        )}
+
+        {/* Category 4: Audio Speech-to-Text Studio */}
+        {activeCategory === 'AUDIO' && (
+          <div className="pt-5">
+            <AudioSpeechStudio
+              onInsertTranscription={(text) => {
+                setConversionInput((prev) => (prev ? prev + '\n\n' + text : text));
+                setStatusMessage('✓ Inserted voice transcription into conversion input.');
+              }}
+            />
           </div>
         )}
       </section>
