@@ -48,6 +48,7 @@ export function AnomalyView({ datasetId, datasetName, onExploreDate }: AnomalyVi
   const [isLoading, setIsLoading] = useState(false);
   const [selectedType, setSelectedType] = useState<string>('ALL');
   const [selectedSeverity, setSelectedSeverity] = useState<string>('ALL');
+  const [minZScore, setMinZScore] = useState<number>(2.0);
 
   const fetchAnomalies = async () => {
     if (!datasetId) return;
@@ -74,7 +75,9 @@ export function AnomalyView({ datasetId, datasetName, onExploreDate }: AnomalyVi
   const filtered = anomalies.filter((a) => {
     const typeMatch = selectedType === 'ALL' || a.type === selectedType;
     const sevMatch = selectedSeverity === 'ALL' || a.severity === selectedSeverity;
-    return typeMatch && sevMatch;
+    const zScore = a.metrics?.value || (a.metrics?.ratio ? (a.metrics.ratio - 1) * 2 : 2.5);
+    const zMatch = zScore >= minZScore;
+    return typeMatch && sevMatch && zMatch;
   });
 
   const types = [
@@ -179,28 +182,44 @@ export function AnomalyView({ datasetId, datasetName, onExploreDate }: AnomalyVi
           })}
         </div>
 
-        <div className="flex items-center gap-1.5 shrink-0">
-          <span className="text-[11px] text-theme-dim mr-1">SEVERITY:</span>
-          {['ALL', 'CRITICAL', 'WARNING', 'NOTE'].map((sev) => {
-            const isActive = selectedSeverity === sev;
-            return (
-              <button
-                key={sev}
-                onClick={() => setSelectedSeverity(sev)}
-                className={`px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-wider transition-all cursor-pointer ${
-                  isActive
-                    ? sev === 'CRITICAL'
-                      ? 'bg-rose-500/25 text-rose-300 border border-rose-500/50 shadow-sm'
-                      : sev === 'WARNING'
-                      ? 'bg-amber-500/25 text-amber-300 border border-amber-500/50 shadow-sm'
-                      : 'bg-cyan-500/25 text-cyan-300 border border-cyan-400/50 shadow-sm'
-                    : 'bg-theme-surface text-theme-muted hover:text-white border border-theme-border/60'
-                }`}
-              >
-                {sev}
-              </button>
-            );
-          })}
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2 px-3 py-1 rounded-xl bg-black/40 border border-white/[0.08]">
+            <span className="text-[10px] text-neutral-400">THRESHOLD:</span>
+            <input
+              type="range"
+              min="1.5"
+              max="4.5"
+              step="0.5"
+              value={minZScore}
+              onChange={(e) => setMinZScore(parseFloat(e.target.value))}
+              className="w-16 accent-cyan-400 cursor-pointer"
+            />
+            <span className="text-[10px] font-bold text-cyan-300">+{minZScore}σ</span>
+          </div>
+
+          <div className="flex items-center gap-1.5">
+            <span className="text-[11px] text-theme-dim mr-1">SEVERITY:</span>
+            {['ALL', 'CRITICAL', 'WARNING', 'NOTE'].map((sev) => {
+              const isActive = selectedSeverity === sev;
+              return (
+                <button
+                  key={sev}
+                  onClick={() => setSelectedSeverity(sev)}
+                  className={`px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-wider transition-all cursor-pointer ${
+                    isActive
+                      ? sev === 'CRITICAL'
+                        ? 'bg-rose-500/25 text-rose-300 border border-rose-500/50 shadow-sm'
+                        : sev === 'WARNING'
+                        ? 'bg-amber-500/25 text-amber-300 border border-amber-500/50 shadow-sm'
+                        : 'bg-cyan-500/25 text-cyan-300 border border-cyan-400/50 shadow-sm'
+                      : 'bg-theme-surface text-theme-muted hover:text-white border border-theme-border/60'
+                  }`}
+                >
+                  {sev}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -243,6 +262,15 @@ export function AnomalyView({ datasetId, datasetName, onExploreDate }: AnomalyVi
                     {anomaly.description}
                   </p>
 
+                  {/* Actor and Metadata tags */}
+                  {anomaly.actor && (
+                    <div className="flex items-center gap-2 pt-1">
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-purple-500/15 border border-purple-500/30 text-purple-300 font-mono">
+                        👤 Actor: {anomaly.actor}
+                      </span>
+                    </div>
+                  )}
+
                   {/* Snippet / Context */}
                   {anomaly.sampleSnippet && (
                     <div className="p-2.5 rounded-xl bg-black/60 border border-theme-border/60 text-xs text-theme-text font-mono italic">
@@ -255,10 +283,10 @@ export function AnomalyView({ datasetId, datasetName, onExploreDate }: AnomalyVi
                 <div className="flex sm:flex-col items-end justify-between sm:justify-center gap-3 shrink-0">
                   <div className="text-right">
                     <div className="text-sm font-bold text-cyan-300 font-mono">
-                      {anomaly.metrics.ratio.toFixed(1)}x
+                      {anomaly.metrics.ratio ? `${anomaly.metrics.ratio.toFixed(1)}x` : `+${anomaly.metrics.value}σ`}
                     </div>
                     <div className="text-[10px] text-theme-dim font-mono uppercase">
-                      Baseline Ratio
+                      Deviation
                     </div>
                   </div>
 
