@@ -282,6 +282,37 @@ export function LocalAssistantDrawer({
             )}
           </div>
 
+          {/* Quick Prompt Templates */}
+          <div className="px-3 py-2 border-t border-slate-800/80 bg-slate-950/60 flex items-center gap-1.5 overflow-x-auto">
+            {[
+              '👑 Top Speakers',
+              '🌙 Nocturnal Score',
+              '🚨 Anomalies',
+              '🗺️ Coordinates',
+              '⚡ Velocity Surge',
+              '💬 Topics',
+            ].map((template, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => {
+                  const promptMap: Record<string, string> = {
+                    '👑 Top Speakers': 'Who sent the most messages and what is their volume share?',
+                    '🌙 Nocturnal Score': 'Who is active late at night between 23:00 and 06:00?',
+                    '🚨 Anomalies': 'List all communication anomalies and velocity bursts',
+                    '🗺️ Coordinates': 'Find all location coordinates and map links in this chat',
+                    '⚡ Velocity Surge': 'When was the highest message volume surge in this chat?',
+                    '💬 Topics': 'What are the main conversational topics and common keyphrases?',
+                  };
+                  handleAsk(promptMap[template] || template);
+                }}
+                className="px-2 py-1 rounded-lg bg-slate-900 border border-slate-800 hover:border-cyan-500/40 text-[10px] text-cyan-300 whitespace-nowrap transition-colors cursor-pointer"
+              >
+                {template}
+              </button>
+            ))}
+          </div>
+
           {/* Input Bar */}
           <div className="p-3 border-t border-slate-800 bg-slate-900/50">
             <form

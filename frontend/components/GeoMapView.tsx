@@ -71,20 +71,23 @@ export function GeoMapView({ datasetId, apiUrl = '' }: GeoMapViewProps) {
     };
   }, [datasetId, apiUrl]);
 
+  const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
+
   // Route playback simulation loop
   useEffect(() => {
     if (!isSimulatingRoute || !data?.pins?.length) return;
 
+    const intervalMs = Math.max(300, Math.round(1800 / playbackSpeed));
     const timer = setInterval(() => {
       setSimulationIndex((prev) => {
         const next = (prev + 1) % data.pins.length;
         setSelectedPin(data.pins[next]);
         return next;
       });
-    }, 1800);
+    }, intervalMs);
 
     return () => clearInterval(timer);
-  }, [isSimulatingRoute, data]);
+  }, [isSimulatingRoute, data, playbackSpeed]);
 
   const filteredPins = useMemo(() => {
     if (!data?.pins) return [];
@@ -181,9 +184,28 @@ export function GeoMapView({ datasetId, apiUrl = '' }: GeoMapViewProps) {
             </select>
           )}
 
+          {/* Speed Multiplier */}
+          {isSimulatingRoute && (
+            <div className="flex items-center gap-1 bg-black/40 border border-white/[0.08] rounded-lg p-0.5 text-[10px]">
+              {[1, 2, 5].map((spd) => (
+                <button
+                  key={spd}
+                  onClick={() => setPlaybackSpeed(spd)}
+                  className={`px-2 py-0.5 rounded font-bold transition-all ${
+                    playbackSpeed === spd
+                      ? 'bg-cyan-500/30 text-cyan-300 border border-cyan-400/40'
+                      : 'text-neutral-400 hover:text-white'
+                  }`}
+                >
+                  {spd}x
+                </button>
+              ))}
+            </div>
+          )}
+
           <button
             onClick={() => setIsSimulatingRoute(!isSimulatingRoute)}
-            className={`px-3 py-1.5 rounded-lg border text-xs font-bold font-mono flex items-center gap-1.5 transition-all ${
+            className={`px-3 py-1.5 rounded-lg border text-xs font-bold font-mono flex items-center gap-1.5 transition-all cursor-pointer ${
               isSimulatingRoute
                 ? 'bg-rose-500/20 border-rose-500/40 text-rose-300'
                 : 'bg-cyan-500/20 border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/30'

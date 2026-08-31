@@ -39,6 +39,11 @@ export function SpatialUniverseView({ datasetId, datasetName }: SpatialUniverseV
   const [selectedNode, setSelectedNode] = useState<SpatialNode | null>(null);
   const [isAutoOrbit, setIsAutoOrbit] = useState(true);
   const [nodeLimit, setNodeLimit] = useState(800);
+  const [isolatedActor, setIsolatedActor] = useState<string>('ALL');
+
+  const uniqueActors = useMemo(() => {
+    return Array.from(new Set(nodes.map((n) => n.actor))).filter(Boolean);
+  }, [nodes]);
 
   // Camera & Rotation State
   const cameraRef = useRef({
@@ -235,8 +240,10 @@ export function SpatialUniverseView({ datasetId, datasetName }: SpatialUniverseV
         const baseRadius = Math.max(2, Math.min(10, 4 * item.scale));
         const radius = isHovered || isSelected ? baseRadius * 2 : baseRadius;
 
+        const isDimmed = isolatedActor !== 'ALL' && item.node.actor !== isolatedActor;
+
         // Glow Aura
-        if (isHovered || isSelected) {
+        if ((isHovered || isSelected) && !isDimmed) {
           const grad = ctx.createRadialGradient(item.px, item.py, 0, item.px, item.py, radius * 3);
           grad.addColorStop(0, item.node.color);
           grad.addColorStop(1, 'rgba(0,0,0,0)');
@@ -247,13 +254,17 @@ export function SpatialUniverseView({ datasetId, datasetName }: SpatialUniverseV
         }
 
         // Particle Core
-        ctx.fillStyle = isHovered ? '#ffffff' : item.node.color;
+        ctx.fillStyle = isDimmed
+          ? 'rgba(75, 85, 99, 0.25)'
+          : isHovered
+          ? '#ffffff'
+          : item.node.color;
         ctx.beginPath();
-        ctx.arc(item.px, item.py, radius, 0, Math.PI * 2);
+        ctx.arc(item.px, item.py, isDimmed ? baseRadius * 0.7 : radius, 0, Math.PI * 2);
         ctx.fill();
 
         // Optional actor label on large scale
-        if (item.scale > 1.2 || isHovered || isSelected) {
+        if (!isDimmed && (item.scale > 1.2 || isHovered || isSelected)) {
           ctx.font = '10px monospace';
           ctx.fillStyle = isHovered ? '#ffffff' : 'rgba(255,255,255,0.7)';
           ctx.fillText(item.node.actor, item.px + radius + 4, item.py + 3);
@@ -269,7 +280,7 @@ export function SpatialUniverseView({ datasetId, datasetName }: SpatialUniverseV
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [nodes, isAutoOrbit, hoveredNode, selectedNode]);
+  }, [nodes, isAutoOrbit, hoveredNode, selectedNode, isolatedActor]);
 
   // Helper 3D Projection Calculation
   const project3D = (
@@ -420,6 +431,22 @@ export function SpatialUniverseView({ datasetId, datasetName }: SpatialUniverseV
           >
             ↺ RESET VIEW
           </button>
+
+          {/* Actor Isolation Picker */}
+          {uniqueActors.length > 0 && (
+            <select
+              value={isolatedActor}
+              onChange={(e) => setIsolatedActor(e.target.value)}
+              className="px-2.5 py-1.5 rounded-xl bg-slate-950 border border-purple-500/40 text-[11px] text-purple-300 outline-none cursor-pointer"
+            >
+              <option value="ALL">🌐 All Actors ({uniqueActors.length})</option>
+              {uniqueActors.map((actor) => (
+                <option key={actor} value={actor}>
+                  👤 {actor}
+                </option>
+              ))}
+            </select>
+          )}
 
           <select
             value={nodeLimit}

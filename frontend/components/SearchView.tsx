@@ -80,6 +80,27 @@ export function SearchView({
     setQuery((prev) => (prev ? `${prev} ${token}` : token));
   };
 
+  const exportCsv = () => {
+    if (results.length === 0) return;
+    const headers = ['Timestamp', 'Actor', 'Content', 'Sentiment', 'Source'];
+    const rows = results.map((r) => [
+      `"${r.timestamp}"`,
+      `"${(r.actor || 'System').replace(/"/g, '""')}"`,
+      `"${(r.content || '').replace(/"/g, '""')}"`,
+      `"${r.sentiment || 'NEUTRAL'}"`,
+      `"${r.sourceType || 'ARCHIVE'}"`,
+    ]);
+    const csvContent = [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `textboard_search_${Date.now()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="space-y-6 animate-fadeIn font-mono">
       {/* Search Input Bar */}
@@ -89,7 +110,7 @@ export function SearchView({
             <SearchIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-theme-dim" />
             <input
               type="text"
-              placeholder='Search messages... e.g. "budget" person:Ali after:2025-01-01 emoji:🎉 has:urls'
+              placeholder='Search messages... e.g. "budget" AND person:Ali NOT draft'
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -99,24 +120,25 @@ export function SearchView({
 
           <select
             value={datasetFilter}
-            onChange={(e) => setDatasetFilter(e.target.value)}
-            className="w-full sm:w-auto bg-theme-base border border-theme-border rounded-lg px-3 py-2.5 text-xs text-theme-text focus:outline-none focus:border-theme-accent focus:ring-1 focus:ring-theme-accent"
+            onChange={(e) => {
+              setDatasetFilter(e.target.value);
+              onSelectDataset(e.target.value);
+            }}
+            className="w-full sm:w-56 bg-theme-base border border-theme-border rounded-lg px-3 py-2.5 text-xs text-theme-text focus:outline-none focus:border-theme-accent"
           >
-            <option value="">ALL DATASETS</option>
+            <option value="">All Streams</option>
             {datasets.map((d) => (
               <option key={d.id} value={d.id}>
-                {d.name}
+                {d.name} ({d.totalEvents.toLocaleString()} records)
               </option>
             ))}
           </select>
 
           <Button
             variant="primary"
-            size="md"
             onClick={() => executeSearch(1)}
             isLoading={isLoading}
             leftIcon={<SearchIcon className="w-4 h-4" />}
-            className="w-full sm:w-auto"
           >
             SEARCH
           </Button>
@@ -149,11 +171,29 @@ export function SearchView({
             </Button>
           </div>
 
-          {/* Quick Syntax Chips */}
+          {/* Quick Syntax Chips & Boolean Operators */}
           <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
             <span className="text-theme-dim flex items-center gap-1">
               <FilterIcon className="w-3 h-3" /> SYNTAX:
             </span>
+            <button
+              onClick={() => insertToken('AND')}
+              className="px-1.5 py-0.5 rounded bg-cyan-950/40 text-cyan-300 border border-cyan-500/30 text-[10px] font-bold cursor-pointer"
+            >
+              AND
+            </button>
+            <button
+              onClick={() => insertToken('OR')}
+              className="px-1.5 py-0.5 rounded bg-purple-950/40 text-purple-300 border border-purple-500/30 text-[10px] font-bold cursor-pointer"
+            >
+              OR
+            </button>
+            <button
+              onClick={() => insertToken('NOT')}
+              className="px-1.5 py-0.5 rounded bg-rose-950/40 text-rose-300 border border-rose-500/30 text-[10px] font-bold cursor-pointer"
+            >
+              NOT
+            </button>
             <button
               onClick={() => insertToken('person:Ali')}
               className="px-2 py-0.5 rounded bg-theme-base hover:bg-theme-raised text-theme-muted hover:text-theme-text border border-theme-border transition-colors cursor-pointer"
@@ -165,12 +205,6 @@ export function SearchView({
               className="px-2 py-0.5 rounded bg-theme-base hover:bg-theme-raised text-theme-muted hover:text-theme-text border border-theme-border transition-colors cursor-pointer"
             >
               after:YYYY-MM-DD
-            </button>
-            <button
-              onClick={() => insertToken('emoji:😂')}
-              className="px-2 py-0.5 rounded bg-theme-base hover:bg-theme-raised text-theme-muted hover:text-theme-text border border-theme-border transition-colors cursor-pointer"
-            >
-              emoji:Emoji
             </button>
           </div>
         </div>
@@ -188,11 +222,22 @@ export function SearchView({
             </span>
           )}
         </div>
-        {results.length > 0 && (
-          <span>
-            PAGE <strong className="text-theme-accent">{page}</strong> (Showing {results.length} records)
-          </span>
-        )}
+        
+        <div className="flex items-center gap-3">
+          {results.length > 0 && (
+            <button
+              onClick={exportCsv}
+              className="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20 text-xs font-bold transition-all cursor-pointer"
+            >
+              📥 EXPORT CSV
+            </button>
+          )}
+          {results.length > 0 && (
+            <span>
+              PAGE <strong className="text-theme-accent">{page}</strong> (Showing {results.length} records)
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Results List */}
