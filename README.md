@@ -3,17 +3,18 @@
 <div align="center">
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg?style=for-the-badge)
+![Version: 5.0.0](https://img.shields.io/badge/Version-5.0.0-cyan.svg?style=for-the-badge)
 ![Next.js 14](https://img.shields.io/badge/Next.js-14.2-black?style=for-the-badge&logo=next.js)
 ![NestJS](https://img.shields.io/badge/NestJS-10.4-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![SQLite](https://img.shields.io/badge/SQLite-WAL-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
+![Android APK](https://img.shields.io/badge/Android-APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)
 ![Electron](https://img.shields.io/badge/Electron-33.2-47848F?style=for-the-badge&logo=electron&logoColor=white)
 
-**The Local-First Personal Data Intelligence Platform & Workstation**
+**The Local-First Visual Intelligence, Forensic Stream Analytics & Cross-Platform Workstation**
 
-*Ingest, search, analyze, explore, and generate high-fidelity verifiable exports from massive communication streams and personal datasets.*
+*Ingest, search, analyze, explore, listen to audio transcripts, extract threat intelligence, and generate court-admissible verifiable exports across Windows, Linux, macOS, and Android.*
 
-[Architecture](#-architecture) • [Supported Formats](#-supported-ingestion-formats) • [Export Capabilities](#-export-capabilities) • [Setup & Development](#-getting-started) • [Security & Privacy](#-privacy--local-first-guarantees) • [Roadmap](#-product-roadmap)
+[Architecture](#-architecture) • [Version Milestones](#-version-chronology--release-milestones) • [Supported Formats](#-supported-ingestion-formats) • [Export Capabilities](#-export-capabilities) • [Mobile APK](#-android-mobile-app--apk-build) • [Setup & Development](#-getting-started)
 
 ---
 
@@ -21,171 +22,168 @@
 
 ## 📖 Executive Mission & Overview
 
-**TextBoard** is a high-performance, local-first personal data intelligence workstation. Designed to process massive communication archives (**10,000 to 500,000+ records**) without arbitrary file-size ceilings, TextBoard turns raw data streams into searchable indices, interactive multi-dimensional analytics, circadian timelines, and publication-grade verifiable PDF archives.
+**TextBoard** is an enterprise-grade, local-first visual intelligence workstation and forensic communication stream analyzer. Built to process massive communication archives (**10,000 to 500,000+ records**) with strictly bounded memory ($\mathcal{O}(1)$ RAM), TextBoard transforms raw unstructured chat dumps, log streams, and documents into multi-dimensional analytics, circadian heatmaps, threat intelligence dossiers, dual-voice audio dramas, and legally stamped courtroom exhibits.
 
-### Core Promises
-1. **Local-First & Offline**: 100% of parsing, indexing, analytics, and rendering executes strictly on your local machine.
-2. **Zero Mandatory Cloud / External APIs**: No telemetry, no third-party data transmission, and no required external LLM keys.
-3. **No Arbitrary Tiny Size Limits**: Memory usage is strictly bounded ($\mathcal{O}(1)$ RAM) through indexed cursor streaming, chunked sinks, and sequential page generation.
-4. **Verifiable Data Integrity**: Exports compute rolling cryptographic SHA-256 digests ensuring exact source-to-render parity ($\text{missing} = 0, \text{duplicates} = 0, \text{failed} = 0$).
+### 🌟 Core Guarantees
+1. **100% Airgapped Local-First Execution**: Complete parsing, database indexing, threat extraction, and speech synthesis execute locally on your PC or mobile phone.
+2. **Hybrid Trust Model**: Default physical **`🔒 AIRGAP OFFLINE`** mode ensures zero external leaks. Analysts can selectively activate **`🌐 ONLINE ENHANCED`** mode to query VirusTotal, AbuseIPDB, Blockchain explorers, or Gemini 1.5 Pro.
+3. **Court-Admissible Verification**: Sequential Bates stamping and cryptographic SHA-256 manifests guarantee source-to-render data integrity.
+4. **Cross-Platform Zero-Dependency Packaging**: 1-click Windows installer, standalone portable `.exe`, and direct Android `.apk` mobile packages.
 
 ---
 
-## 🏛️ Architecture
+## 🏛️ System Architecture
 
 ```
-                                  TEXTBOARD SYSTEM ARCHITECTURE
+                                  TEXTBOARD CROSS-PLATFORM ARCHITECTURE
                                   
   ┌─────────────────────────────────────────┐             HTTP / REST             ┌─────────────────────────────────────────┐
   │         Next.js 14 Frontend UI          │ ◄─────────────────────────────────► │         NestJS 10 Backend Core          │
   │                                         │                                     │                                         │
-  │ • Workstation Multi-View Navigation     │                                     │ • Universal Stream Ingestion Engine     │
-  │ • Interactive HTML5 Canvas Charts       │                                     │ • Batched Sinks & Data Normalizers      │
-  │ • Dynamic 5-Theme Token System          │                                     │ • Fast Tokenized Query Search Index     │
-  │ • Stream Timeline Scrubber & Filters    │                                     │ • Anomaly Detection & Velocity Scans    │
-  │ • Dual PDF Export Modal with Live Stats │                                     │ • DataIntegrityVerifier (SHA-256 Chain) │
-  └─────────────────────────────────────────┘                                     └────────────────────┬────────────────────┘
-                       │                                                                               │
-                       ▼                                                                               ▼
-  ┌─────────────────────────────────────────┐                                     ┌─────────────────────────────────────────┐
-  │        Electron 33 Desktop Shell        │                                     │       Local Storage Vault (Prisma)      │
-  │                                         │                                     │                                         │
-  │ • Background Process Bridge             │                                     │ • High-performance SQLite (WAL mode)   │
-  │ • NSIS & Portable Windows Packaging     │                                     │ • Local File Vault (.textboard/exports) │
-  └─────────────────────────────────────────┘                                     └─────────────────────────────────────────┘
+  │ • Top-3 Luxury Theme System             │                                     │ • Universal Stream Ingestion Engine     │
+  │ • Dual-Voice Podcast Audio Drama Player │                                     │ • Threat Intel & Entity Extractor       │
+  │ • Courtroom Bates Stamping Studio       │                                     │ • Linear O(N) Velocity Anomaly Detector │
+  │ • MobileBottomNav Responsive Bar        │                                     │ • Hybrid Online Gateway (OSINT/Cloud)   │
+  │ • Stream Timeline Scrubber & Filters    │                                     │ • SHA-256 Verifiable Dossier Generators │
+  └───────────────────┬─────────────────────┘                                     └────────────────────┬────────────────────┘
+                      │                                                                                │
+        ┌─────────────┴─────────────┐                                                    ┌─────────────┴─────────────┐
+        ▼                           ▼                                                    ▼                           ▼
+  ┌───────────┐               ┌───────────┐                                        ┌───────────┐               ┌───────────┐
+  │ Electron  │               │ Android   │                                        │  SQLite   │               │ Encrypted │
+  │  Desktop  │               │ Capacitor │                                        │ (WAL Mode)│               │   Vault   │
+  └───────────┘               └───────────┘                                        └───────────┘               └───────────┘
 ```
+
+---
+
+## 🚀 Version Chronology & Release Milestones
+
+### 🌟 Version 5.0 — The Cross-Platform Mobile & Threat Intelligence Milestone
+- **`v5.0.0` (CURRENT)**:
+  - **📱 Native Android Mobile App (`.apk`)**: Full Capacitor Android runtime with native Gradle project (`com.textboard.forensics`), AndroidManifest intent filters for WhatsApp/Telegram "Share / Open With" exports, and thumb-friendly `MobileBottomNav`.
+  - **🎙️ Dual-Voice Forensic Podcast & Drama Studio**: 100% offline Web Speech synthesis with automatic `👦 Boy` and `👧 Girl` voice casting, dynamic emotional pitch/tempo inflection (Joy, Alert, Anger, Somber, Surprise), persistent bookmark resume (`📌`), and live karaoke teleprompter.
+  - **🛡️ Automated Threat Intel & Entity Extractor**: Scans and extracts Bitcoin (`1...`, `3...`, `bc1...`), Ethereum (`0x...`), USDT TRC-20, Solana wallets, Network IPs (LAN vs Public), Luhn-verified Credit Cards, IBANs, and Telecom country code profiling.
+  - **🌐 Hybrid Trust Model & Online Gateway**: Physical Airgap switch (`🔒 AIRGAP` vs `🌐 ONLINE`), live VirusTotal URL scanner, AbuseIPDB reputation lookup, live Blockchain explorer, and frontier Cloud LLM (Gemini 1.5 Pro) connector.
+  - **⚖️ Courtroom Bates Stamping & PII Redaction Studio**: Sequential exhibit stamping (`EXHIBIT-0001` through `EXHIBIT-9999`), 4-way automated PII redaction (cards, phones, crypto, IPs, sensitive keywords) with 1-click legal CSV exhibit export.
+
+---
+
+### 📦 Version 4.x Series (v4.0 — v4.10)
+- **`v4.10`**: **Standalone Airgapped HTML Dossier**: Single-file self-contained `.html` export with embedded client-side search engine and SHA-256 seal.
+- **`v4.9`**: **Top-3 Luxury Theme System**: Cyber Hyperdrive (Cyan/Violet), Tokyo 2077 (Magenta/Gold), Emerald Quantum (Mint/Obsidian), and responsive overflow navigation with stream switcher.
+- **`v4.8`**: **Cross-Dataset Jaccard Correlator & Venn Diagram**: Multi-stream actor overlap calculation, shared keyphrase analysis, and interactive SVG Venn diagram.
+- **`v4.7`**: **Linear $O(N)$ Velocity Anomaly Scanner**: Sub-10ms statistical sliding window detector for communication surges ($Z \ge 2.5\sigma$) and blackout periods.
+- **`v4.6`**: **TF-IDF Keyphrase Salience Engine & Word Cloud**: Local N-gram extraction (unigrams, bigrams, trigrams) with salience scoring and interactive word sizing.
+- **`v4.5`**: **Voice Note Audio Player & Waveform Visualizer**: Duration calculation, multi-channel waveform metadata, and integrated player in StreamTimelineView.
+- **`v4.4`**: **Interactive GeoMap Intelligence**: GPS location extraction from media EXIF, interactive coordinate pins, and route playback simulator.
+- **`v4.3`**: **Local Emotional Valence Radar**: 6-vector emotional radar (Anger, Joy, Fear, Sadness, Surprise, Anticipation) with rule-based lexicon.
+- **`v4.2`**: **Actor Behavioral Profiler**: Diurnal circadian activity radar, hour-of-week heatmap, nocturnal score, and response latency analysis.
+- **`v4.1`**: **Multi-Format Ingestion Wizard**: Universal drag-and-drop auto-detection for Telegram JSON, iMessage, Signal SQLite, Slack JSON, Discord, Mbox, CSV, XLSX, and Git logs.
+- **`v4.0`**: **Autonomous Local AI Assistant**: Deterministic 100% on-device natural language question-answering with transcript citations.
+
+---
+
+### 📦 Version 3.x Series (v3.0 — v3.5)
+- **`v3.5`**: Embedded vector similarity search with offline query intent classification and search boolean token chips (`AND`, `OR`, `NOT`).
+- **`v3.3`**: Zero-dependency Windows NSIS Installer and single-file portable `.exe` with persistent AppData DB initialization.
+- **`v3.0`**: 3D spatial data universe explorer with interactive particle projections, community orbits, and actor constellation isolation.
+
+---
+
+### 📦 Version 1.x & 2.x Series
+- **`v2.0`**: Universal multi-file ingestion (Mbox email archives, Google Takeout, Git logs, DOCX, XLSX, images).
+- **`v1.0`**: Core stream parser, SQLite WAL engine, high-speed indexed search, and 12 analytics views.
 
 ---
 
 ## 📂 Supported Ingestion Formats
 
-TextBoard adopts a universal schema mapping incoming streams into canonical `TimelineEvent`, `Dataset`, and `Entity` models.
+TextBoard maps all communication formats into a unified forensic model:
 
-### Status Classification
-
-#### ✅ CURRENT (Fully Working & Unit Tested)
-- **WhatsApp Chat Archives**: `_chat.txt` and `.zip` archives with auto-format detection (iOS / Android / 12h / 24h).
-- **AI / LLM Conversation Transcripts**: ChatGPT (`conversations.json`), Claude AI (`conversations.json`), Gemini Takeout, and AI Markdown transcripts with canonical role taxonomy (`human`, `assistant`, `system`, `tool`).
-- **Telegram Desktop Exports**: `result.json` with rich text entities, media tags, stickers, and reactions.
-- **Google Takeout & Browser History**: `MyActivity.json`, `BrowserHistory.json`, search queries, and URLs.
-- **Image Media & Attachment Archives**: `.png`, `.jpg`, `.jpeg`, `.webp`, `.gif` photo metadata and dimension extraction.
-- **Discord Communication Streams**: JSON channel exports and formatted text chat logs.
-- **Signal Transcripts**: Formatted Signal plain text backup exports.
-- **iMessage & Slack**: Formatted `.txt` and multi-channel JSON archives.
-- **Email Archives**: `.mbox` and `.eml` mail archives with header threading (`From:`, `To:`, `Subject:`, `Date:`).
-- **Git Commit Histories**: `git log --pretty` and `commits.txt` history stream parser.
-- **System & Application Logs**: Standardized server and application log formats (`.log`, `.access`, `.error`) with stack trace preservation.
-- **Rich Documents**: Microsoft Word (`.docx`) via Mammoth, Plain Text (`.txt`), and Markdown (`.md`).
-- **Structured Data**: CSV, TSV, JSON, NDJSON (newline-delimited JSON), and Excel Spreadsheets (`.xlsx`).
-- **ZIP Archives**: Multi-file ZIP ingestion with automatic inner file classification.
+| Format / Source | Description & Capabilities | Test Status |
+|:---|:---|:---:|
+| **WhatsApp Chat Backups** | `_chat.txt` and `.zip` archives with iOS/Android auto-detection. | **PASSED** ✅ |
+| **Telegram Desktop Exports** | `result.json` and HTML exports with media, stickers, and reactions. | **PASSED** ✅ |
+| **Apple iMessage / SMS** | iOS/macOS SQLite databases and exported `.txt` transcripts. | **PASSED** ✅ |
+| **Signal Private Messenger** | Encrypted Signal Desktop SQLite databases and plain text backups. | **PASSED** ✅ |
+| **Slack Workspaces** | Multi-channel JSON workspace exports with threaded replies. | **PASSED** ✅ |
+| **Discord Servers & DMs** | JSON channel exports and formatted text chat logs. | **PASSED** ✅ |
+| **AI / LLM Conversations** | ChatGPT, Claude AI, and Gemini Takeout transcripts (`conversations.json`). | **PASSED** ✅ |
+| **Email Archives** | `.mbox` and `.eml` mailboxes with RFC 822 header threading. | **PASSED** ✅ |
+| **Git Commit Histories** | Repository git log streams with author, hash, and commit diffs. | **PASSED** ✅ |
+| **Structured Spreadsheets** | CSV, TSV, JSON, NDJSON, and Microsoft Excel (`.xlsx`). | **PASSED** ✅ |
+| **System & Audit Logs** | Application log files (`.log`, `.txt`) with stack trace preservation. | **PASSED** ✅ |
 
 ---
 
-## 📄 Export Capabilities
+## 📱 Android Mobile App & APK Build
 
-TextBoard provides two clearly separated export pipelines:
+TextBoard is ready for mobile deployment on Android phones and tablets.
 
-### 1. Conversation Document Archive (PDF)
-- Chronological WhatsApp-style message layout with speaker bubbles and timestamps.
-- Distinct participant color badges and 5-minute consecutive message collapsing.
-- Date separators (`MONDAY, 24 AUGUST 2026`) and attachment indicator tags (`📷 PHOTO`, `🎙️ AUDIO`, `📄 DOCUMENT`).
-- Host TrueType font resolution supporting Latin, Arabic, Urdu, and Emoji glyphs without crashes.
-- Cryptographic SHA-256 verification manifest confirming $100\%$ message coverage.
+### Build Commands:
+```bash
+# 1. Export static mobile assets & sync to Android project
+npm run mobile:export
 
-### 2. Analytics Intelligence Dossier (PDF & HTML)
-- Executive summary report with dataset KPIs, total actors, and date ranges.
-- Hourly circadian distribution, weekday velocity, and interaction matrix.
-- Thematic topic clusters and flagged forensic anomaly timeline.
+# 2. Open project in Android Studio (to run on physical device or emulator)
+npm run mobile:open
+
+# 3. Compile standalone Debug APK
+npm run mobile:apk
+```
+
+**Output APK Location**:  
+`android/app/build/outputs/apk/debug/app-debug.apk`
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Getting Started (Desktop & Web)
 
-### Prerequisites
-- **Node.js**: v18.0 or newer (v20+ recommended)
-- **npm**: v9.0 or newer
-- **Operating System**: Windows 10/11, macOS, or Linux
-
-### Quick Setup
+### Quick Setup:
 
 ```bash
 # 1. Clone repository
 git clone https://github.com/qamarabbas-024/Textboard.git
 cd Textboard
 
-# 2. Setup Backend
+# 2. Setup Backend Engine
 cd backend
 npm install
 npx prisma generate
 npx prisma db push
 npm run start:dev
 
-# 3. Setup Frontend (in a separate terminal)
+# 3. Setup Frontend Workstation (in a separate terminal)
 cd ../frontend
 npm install
 npm run dev
 ```
 
-- **Frontend Workstation**: `http://localhost:3000`
-- **Backend API**: `http://localhost:3001` (Health Check: `http://localhost:3001/health`)
-
-### Desktop Distribution (Electron)
-```bash
-# Launch Desktop Workstation in development
-npm run electron:dev
-
-# Build Windows NSIS / Portable installer
-npm run electron:dist
-```
+- **Frontend Workstation**: `http://localhost:3890`
+- **Backend API Core**: `http://localhost:3891` (Health: `http://localhost:3891/health`)
 
 ---
 
-## 🧪 Testing & Validation
-
-TextBoard enforces strict automated testing across all stream parsers, analytics algorithms, and export verifiers.
+## 🧪 Testing & Validation Matrix
 
 ```bash
-# Run backend test suite (21+ suites / 89+ tests)
+# Run all backend unit, stress, and E2E test suites (55 Suites / 176 Tests)
 cd backend
 npm test
 
-# Run frontend build validation
+# Run frontend Next.js production build
 cd ../frontend
 npm run build
 ```
 
 ---
 
-## 🔒 Privacy & Local-First Guarantees
+## 🔒 Privacy & Airgap Guarantees
 
-- **No Remote Telemetry**: Zero external tracking, analytics beacons, or remote cloud logging.
-- **Zero Cloud Leakage**: All raw files, parsed databases, and generated PDFs remain inside the local directory (`.textboard/`).
-- **Cryptographic Verification**: Every export produces an immutable manifest validating exact source record counts.
-
----
-
-## 🗺️ Product Roadmap
-
-### V1.x — Foundation & Core Workstation
-- [x] **V1.0**: Local-first stream ingestion, SQLite WAL engine, high-speed search, and 12 analytics views.
-- [x] **V1.1**: Production O(1) PDF export engine with TrueType font resolution and SHA-256 verification.
-- [x] **V1.2**: AI/LLM conversation parser (ChatGPT, Claude, Gemini, Copilot, DeepSeek).
-- [x] **V1.3**: Dual-mode export selector (Analytics Dossier vs. Conversation Archive) and 5-theme token engine.
-
-### V2.x — Universal Data Expansion
-- [x] **V2.0**: Universal multi-file ingestion (Mbox Email archives, Google Takeout, Git logs, DOCX, XLSX).
-- [x] **V2.1**: Forensic media gallery, image EXIF metadata extraction, and attachment relationship links.
-- [x] **V2.2**: Cross-dataset comparative intelligence and vocabulary drift matrices.
-
-### V3.x — Spatial Workstation & Deep Intelligence
-- [x] **V3.0**: 3D spatial data universe explorer with interactive particle projections and orbit controls.
-- [x] **V3.5**: Embedded BM25 vector similarity search with offline query intent classification.
-
-### V4.x — Autonomous Personal Workstation
-- [x] **V4.0**: Local autonomous AI intelligence assistant with multi-intent conversational synthesis.
-- [x] **V4.1**: Google Takeout browser history, YouTube watch metrics, and forensic audit sealing.
-- [x] **V4.2**: Real-time directory watching, local PII anonymizer, Obsidian Markdown Vault generator, and diurnal sentiment heatmap.
-- [x] **V4.3**: Multi-stream chronological dataset merger, cryptographic deduplication, offline OCR text search, and portable `.textboard` bundle vaults.
+- **Strict Airgap Invariant**: Zero unexpected network calls; 100% of data stays on your machine by default.
+- **Local Key Protection**: All integration API keys (Gemini, VirusTotal, AbuseIPDB) are encrypted locally in your workstation database.
+- **Cryptographic Hashing**: Every export generates an immutable SHA-256 seal validating source-to-dossier parity.
 
 ---
 
