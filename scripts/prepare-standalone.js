@@ -22,24 +22,21 @@ const root = path.join(__dirname, '..');
 const frontendDir = path.join(root, 'frontend');
 const standaloneDir = path.join(frontendDir, '.next', 'standalone');
 
-console.log('[Build]: Preparing Next.js standalone assets for desktop packaging...');
+console.log('⚡ [Build]: Syncing standalone frontend assets for desktop packaging...');
 
-// 1. Copy .next/static to .next/standalone/.next/static
+// 1. Sync Frontend Standalone Static Assets
 const staticSrc = path.join(frontendDir, '.next', 'static');
 const staticDest = path.join(standaloneDir, '.next', 'static');
 if (fs.existsSync(staticSrc)) {
   copyRecursiveSync(staticSrc, staticDest);
-  console.log('✓ Copied .next/static to standalone bundle.');
-} else {
-  console.warn('⚠ .next/static not found at', staticSrc);
+  console.log('✓ Injected .next/static into frontend standalone.');
 }
 
-// 2. Copy public/ to .next/standalone/public
 const publicSrc = path.join(frontendDir, 'public');
 const publicDest = path.join(standaloneDir, 'public');
 if (fs.existsSync(publicSrc)) {
   copyRecursiveSync(publicSrc, publicDest);
-  console.log('✓ Copied public assets to standalone bundle.');
+  console.log('✓ Injected public assets into frontend standalone.');
 }
 
-console.log('[Build]: Standalone bundle preparation complete.');
+console.log('🚀 [Build]: Assets successfully synced.');

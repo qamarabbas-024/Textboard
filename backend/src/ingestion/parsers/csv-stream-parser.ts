@@ -59,7 +59,7 @@ export class CsvStreamParser implements IStreamParser {
 
         // Auto-detect actor and date columns
         actorColIndex = headers.findIndex((h) =>
-          /^(name|actor|sender|student|student_name|user|author|person|employee|from)$/i.test(h),
+          /^(name|actor|sender|student|student_name|user|author|person|employee|from|investigator|agent|analyst|speaker|caller|officer)$/i.test(h),
         );
         dateColIndex = headers.findIndex((h) =>
           /^(date|timestamp|time|datetime|created_at|term|period|year|month)$/i.test(h),

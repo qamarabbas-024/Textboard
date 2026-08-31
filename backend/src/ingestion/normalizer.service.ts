@@ -19,13 +19,15 @@ export class NormalizationService {
         const content = record.content || '';
         const charLength = content.length;
 
-        // Word count
-        const words = content
+        // Multilingual Word Count (handles Latin, Arabic, Urdu, Cyrillic, Hindi + CJK Ideographs)
+        const cjkMatches = content.match(/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/gu) || [];
+        const nonCjkText = content.replace(/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/gu, ' ');
+        const nonCjkWords = nonCjkText
           .trim()
           .replace(/[^\p{L}\p{N}\s]/gu, ' ')
           .split(/\s+/)
           .filter((w) => w.length > 0);
-        const wordCount = words.length;
+        const wordCount = nonCjkWords.length + cjkMatches.length;
 
         // Emoji & URL extraction
         const emojis = content.match(EMOJI_REGEX) || [];

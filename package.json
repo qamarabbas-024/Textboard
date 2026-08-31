@@ -30,7 +30,7 @@
     "electronVersion": "33.2.1",
     "forceCodeSigning": false,
     "copyright": "Copyright © 2026 Qamar Abbas",
-    "compression": "store",
+    "compression": "maximum",
     "directories": {
       "output": "dist-desktop"
     },
@@ -71,9 +71,19 @@
         "to": "backend",
         "filter": [
           "dist/**/*",
-          "node_modules/**/*",
           "prisma/**/*",
-          "package.json"
+          "package.json",
+          "node_modules/**/*",
+          "!node_modules/@prisma/engines*/**/*",
+          "!node_modules/typescript/**/*",
+          "!node_modules/jest*/**/*",
+          "!node_modules/ts-jest*/**/*",
+          "!node_modules/@types/**/*",
+          "!node_modules/@nestjs/cli/**/*",
+          "!node_modules/@nestjs/schematics/**/*",
+          "!node_modules/@nestjs/testing/**/*",
+          "!node_modules/prettier*/**/*",
+          "!node_modules/eslint*/**/*"
         ]
       },
       {

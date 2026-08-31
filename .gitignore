@@ -10,6 +10,7 @@ coverage/
 # Production & Build outputs
 dist/
 dist-desktop/
+desktop-bundle/
 build/
 .next/
 out/
