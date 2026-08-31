@@ -14,6 +14,7 @@ import {
   GitCompareIcon,
 } from './Icons';
 import { OnThisDayView } from './OnThisDayView';
+import { UniversalDocumentStudio } from './UniversalDocumentStudio';
 import { Button } from './ui/Button';
 
 interface DatasetSummary {
@@ -218,7 +219,13 @@ export function HomeView({
         </div>
       </section>
 
-      {/* 4. Verifiable Insights Carousel */}
+      {/* 4. Universal Document & PDF Studio Toolbox */}
+      <UniversalDocumentStudio
+        onOpenBatesModal={() => onNavigateTo('EXPLORE')}
+        onOpenPdfExport={() => onNavigateTo('DATA')}
+      />
+
+      {/* 5. Verifiable Insights Carousel */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
