@@ -15,6 +15,10 @@ build/
 .next/
 out/
 *.tsbuildinfo
+.gradle/
+android/.gradle/
+android/build/
+android/app/build/
 
 # Environment Variables
 .env

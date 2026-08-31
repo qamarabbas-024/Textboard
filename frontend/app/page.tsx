@@ -19,6 +19,7 @@ import { MediaGalleryModal } from '../components/MediaGalleryModal';
 import { LocalAssistantDrawer } from '../components/LocalAssistantDrawer';
 import { SpatialUniverseView } from '../components/SpatialUniverseView';
 import { GeoMapView } from '../components/GeoMapView';
+import { MobileBottomNav } from '../components/MobileBottomNav';
 import BackgroundEffect from '../components/BackgroundEffect';
 
 interface DatasetItem {
@@ -385,6 +386,9 @@ export default function WorkstationPage() {
           datasetName={activeDataset.name}
         />
       )}
+
+      {/* 8. Native Android & Mobile Responsive Bottom Navigation */}
+      <MobileBottomNav currentTab={currentTab} onSelectTab={setCurrentTab} />
     </div>
   );
 }

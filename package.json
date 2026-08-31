@@ -13,6 +13,9 @@
     "build:all": "npm run build --prefix backend && npm run build --prefix frontend && node scripts/prepare-standalone.js",
     "build:exe": "npm run build:all && electron-builder",
     "build:portable": "npm run build:all && electron-builder --win portable",
+    "mobile:export": "set BUILD_TARGET=mobile&& npm run build --prefix frontend && npx cap sync android",
+    "mobile:open": "npx cap open android",
+    "mobile:apk": "set BUILD_TARGET=mobile&& npm run build --prefix frontend && npx cap sync android && cd android && gradlew.bat assembleDebug",
     "dev:backend": "cd backend && npm run start:dev",
     "dev:frontend": "cd frontend && npm run dev"
   },
@@ -20,6 +23,9 @@
     "adm-zip": "^0.6.0"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/cli": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
     "@types/adm-zip": "^0.5.8",
     "electron": "33.2.1",
     "electron-builder": "^25.1.8"
@@ -96,4 +102,3 @@
     ]
   }
 }
-
