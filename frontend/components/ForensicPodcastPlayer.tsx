@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { safeFetch } from '../lib/api-client';
 import { Button } from './ui/Button';
 
 interface TimelineMessage {
@@ -72,7 +73,7 @@ export function ForensicPodcastPlayer({
   useEffect(() => {
     if (!initialMessages?.length && datasetId) {
       setIsLoading(true);
-      fetch(`/api/v1/datasets/${datasetId}/events?limit=500`)
+      safeFetch(`/api/v1/datasets/${datasetId}/events?limit=500`)
         .then((res) => (res.ok ? res.json() : []))
         .then((data) => {
           const events = Array.isArray(data) ? data : data.events || [];

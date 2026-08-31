@@ -20,6 +20,8 @@ import { LocalAssistantDrawer } from '../components/LocalAssistantDrawer';
 import { SpatialUniverseView } from '../components/SpatialUniverseView';
 import { GeoMapView } from '../components/GeoMapView';
 import { MobileBottomNav } from '../components/MobileBottomNav';
+import { MobileServerModal } from '../components/MobileServerModal';
+import { safeFetch } from '../lib/api-client';
 import BackgroundEffect from '../components/BackgroundEffect';
 
 interface DatasetItem {
@@ -42,6 +44,7 @@ export default function WorkstationPage() {
   const [isPdfExportModalOpen, setIsPdfExportModalOpen] = useState(false);
   const [isMediaGalleryOpen, setIsMediaGalleryOpen] = useState(false);
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
+  const [isMobileServerOpen, setIsMobileServerOpen] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const [insights, setInsights] = useState<any[]>([]);
   const [isBootComplete, setIsBootComplete] = useState(false);
@@ -49,7 +52,7 @@ export default function WorkstationPage() {
   // Fetch registered datasets
   const fetchDatasets = async () => {
     try {
-      const res = await fetch('/api/v1/datasets');
+      const res = await safeFetch('/api/v1/datasets');
       if (res.ok) {
         const data = await res.json();
         const items = Array.isArray(data) ? data : data.datasets || [];
@@ -76,7 +79,7 @@ export default function WorkstationPage() {
     const targetId = selectedDatasetId || (datasets[0]?.id);
     if (!targetId) return;
 
-    fetch(`/api/v1/analytics/${targetId}/insights`)
+    safeFetch(`/api/v1/analytics/${targetId}/insights`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data && data.insights) {
@@ -223,6 +226,7 @@ export default function WorkstationPage() {
         onOpenProcessingModal={() => setIsProcessingModalOpen(true)}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         onOpenAssistant={() => setIsAssistantOpen(true)}
+        onOpenMobileServer={() => setIsMobileServerOpen(true)}
       />
 
       {/* 2. Main Workstation Viewport */}
@@ -389,6 +393,13 @@ export default function WorkstationPage() {
 
       {/* 8. Native Android & Mobile Responsive Bottom Navigation */}
       <MobileBottomNav currentTab={currentTab} onSelectTab={setCurrentTab} />
+
+      {/* 9. Mobile Remote Workstation Server Bridge Modal */}
+      <MobileServerModal
+        isOpen={isMobileServerOpen}
+        onClose={() => setIsMobileServerOpen(false)}
+        onRefresh={fetchDatasets}
+      />
     </div>
   );
 }

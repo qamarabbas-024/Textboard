@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { safeFetch } from '../lib/api-client';
 import { Button } from './ui/Button';
 
 interface CryptoHit {
@@ -58,7 +59,7 @@ export function EntityIntelligenceView({ datasetId }: EntityIntelligenceViewProp
   useEffect(() => {
     if (!datasetId) return;
     setIsLoading(true);
-    fetch(`/api/v1/analytics/${datasetId}/entities`)
+    safeFetch(`/api/v1/analytics/${datasetId}/entities`)
       .then((res) => (res.ok ? res.json() : null))
       .then((report) => setData(report))
       .catch((err) => console.error('Failed to load entity intelligence:', err))

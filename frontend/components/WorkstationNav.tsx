@@ -51,6 +51,7 @@ interface WorkstationNavProps {
   onOpenProcessingModal?: () => void;
   onOpenCommandPalette?: () => void;
   onOpenAssistant?: () => void;
+  onOpenMobileServer?: () => void;
 }
 
 export function WorkstationNav({
@@ -65,6 +66,7 @@ export function WorkstationNav({
   onOpenProcessingModal,
   onOpenCommandPalette,
   onOpenAssistant,
+  onOpenMobileServer,
 }: WorkstationNavProps) {
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [isNetworkModalOpen, setIsNetworkModalOpen] = useState(false);
@@ -109,7 +111,7 @@ export function WorkstationNav({
               ⚡
             </div>
             <span className="text-sm font-black tracking-wider text-white uppercase flex items-center gap-1.5">
-              TEXTBOARD <span className="text-cyan-400 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/40">3.3</span>
+              TEXTBOARD <span className="text-cyan-400 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/40">5.0</span>
             </span>
           </div>
 
@@ -259,6 +261,18 @@ export function WorkstationNav({
             <span>{isOnline ? '🌐' : '🔒'}</span>
             <span className="hidden lg:inline">{isOnline ? 'ONLINE' : 'AIRGAP'}</span>
           </button>
+
+          {/* Mobile Workstation Host IP / Standalone Switcher */}
+          {onOpenMobileServer && (
+            <button
+              onClick={onOpenMobileServer}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-white/[0.1] bg-black/40 text-xs font-bold text-neutral-300 hover:text-white hover:border-cyan-400/40 transition-all cursor-pointer"
+              title="Configure Workstation Host IP or Standalone Mode"
+            >
+              <span>📱</span>
+              <span className="hidden sm:inline">PC SYNC</span>
+            </button>
+          )}
 
           <ThemeSwitcher />
 

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { safeFetch } from '../lib/api-client';
 import {
   SparklesIcon,
   MessageSquareIcon,
@@ -65,8 +66,8 @@ export function TopicClusterView({ datasetId, datasetName, onExploreDate }: Topi
     setIsLoading(true);
     try {
       const [topicsRes, threadsRes] = await Promise.all([
-        fetch(`/api/v1/analytics/${datasetId}/topics`),
-        fetch(`/api/v1/analytics/${datasetId}/threads`),
+        safeFetch(`/api/v1/analytics/${datasetId}/topics`),
+        safeFetch(`/api/v1/analytics/${datasetId}/threads`),
       ]);
 
       if (topicsRes.ok) {
@@ -113,7 +114,7 @@ export function TopicClusterView({ datasetId, datasetName, onExploreDate }: Topi
                 SEMANTIC TOPIC CLUSTERING &amp; THREAD RECONSTRUCTION
               </h2>
               <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/40">
-                V3.0 ENGINE
+                V5.0 ENGINE
               </span>
             </div>
             <p className="text-xs text-theme-muted mt-0.5">

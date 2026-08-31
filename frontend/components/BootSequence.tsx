@@ -125,7 +125,7 @@ export function BootSequence({ onComplete, forceShow = false }: BootSequenceProp
               <span className="text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-bold">
                 {progressPercent}%
               </span>
-              <span className="text-[11px] text-neutral-500 hidden sm:inline font-bold">v2.0.0</span>
+              <span className="text-[11px] text-cyan-400 hidden sm:inline font-bold">v5.0.0</span>
             </div>
           </div>
 

@@ -19,6 +19,7 @@ import { OnThisDayView } from './OnThisDayView';
 import { ForensicPodcastPlayer } from './ForensicPodcastPlayer';
 import { EntityIntelligenceView } from './EntityIntelligenceView';
 import { BatesStampingModal } from './BatesStampingModal';
+import { safeFetch } from '../lib/api-client';
 import { Button } from './ui/Button';
 
 export type ExploreSubTab = 'timeline' | 'podcast' | 'entities' | 'network' | 'people' | 'activity' | 'emoji' | 'topics' | 'links';
@@ -57,7 +58,7 @@ export function ExploreView({
   useEffect(() => {
     if (!activeDataset) return;
     setIsLoading(true);
-    fetch(`/api/v1/analytics/${activeDataset.id}`)
+    safeFetch(`/api/v1/analytics/${activeDataset.id}`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => setAnalytics(data))
       .catch((err) => console.error('Failed to load analytics:', err))
