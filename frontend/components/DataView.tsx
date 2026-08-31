@@ -9,6 +9,8 @@ import {
 } from './Icons';
 import { IngestionJobState } from './ProcessingModal';
 import { PdfExportModal } from './PdfExportModal';
+import { BatesStampingModal } from './BatesStampingModal';
+import { UniversalDocumentStudio } from './UniversalDocumentStudio';
 import { Button } from './ui/Button';
 
 interface DatasetItem {
@@ -39,6 +41,7 @@ export function DataView({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [localPathInput, setLocalPathInput] = useState('');
   const [exportingDataset, setExportingDataset] = useState<DatasetItem | null>(null);
+  const [isBatesOpen, setIsBatesOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (file: File) => {
@@ -245,7 +248,13 @@ export function DataView({
         </form>
       </section>
 
-      {/* 2. Registered Datasets Table */}
+      {/* 2. Universal Document & PDF Studio */}
+      <UniversalDocumentStudio
+        onOpenBatesModal={() => setIsBatesOpen(true)}
+        onOpenPdfExport={() => setExportingDataset(datasets[0] || null)}
+      />
+
+      {/* 3. Registered Datasets Table */}
       <section className="p-6 rounded-xl border border-theme-border bg-theme-surface font-mono shadow-xs">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
@@ -350,6 +359,16 @@ export function DataView({
           datasetId={exportingDataset.id}
           datasetName={exportingDataset.name}
           totalEvents={exportingDataset.totalEvents}
+        />
+      )}
+
+      {/* Courtroom Bates Stamping & PII Redaction Studio Modal */}
+      {isBatesOpen && (
+        <BatesStampingModal
+          isOpen={isBatesOpen}
+          onClose={() => setIsBatesOpen(false)}
+          datasetId={datasets[0]?.id || 'ds_mobile_demo_001'}
+          datasetName={datasets[0]?.name || 'Forensic Case Alpha'}
         />
       )}
     </div>
