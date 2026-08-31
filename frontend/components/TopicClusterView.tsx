@@ -10,6 +10,7 @@ import {
 } from './Icons';
 import { Button } from './ui/Button';
 import TopicBubbleChart, { TopicBubble } from './charts/TopicBubbleChart';
+import { WordCloudView } from './WordCloudView';
 
 interface TopicCluster {
   id: string;
@@ -52,7 +53,7 @@ interface TopicClusterViewProps {
 }
 
 export function TopicClusterView({ datasetId, datasetName, onExploreDate }: TopicClusterViewProps) {
-  const [activeTab, setActiveTab] = useState<'TOPICS' | 'THREADS'>('TOPICS');
+  const [activeTab, setActiveTab] = useState<'TOPICS' | 'THREADS' | 'WORDCLOUD'>('TOPICS');
   const [clusters, setClusters] = useState<TopicCluster[]>([]);
   const [threads, setThreads] = useState<ConversationThread[]>([]);
   const [selectedClusterId, setSelectedClusterId] = useState<string | null>(null);
@@ -131,6 +132,16 @@ export function TopicClusterView({ datasetId, datasetName, onExploreDate }: Topi
                 }`}
               >
                 THEMATIC CLUSTERS
+              </button>
+              <button
+                onClick={() => setActiveTab('WORDCLOUD')}
+                className={`px-3 py-1.5 rounded-lg font-bold tracking-wider transition-all cursor-pointer ${
+                  activeTab === 'WORDCLOUD'
+                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 shadow-sm'
+                    : 'text-theme-muted hover:text-white'
+                }`}
+              >
+                WORD CLOUD
               </button>
               <button
                 onClick={() => setActiveTab('THREADS')}
@@ -381,6 +392,11 @@ export function TopicClusterView({ datasetId, datasetName, onExploreDate }: Topi
             })
           )}
         </div>
+      )}
+
+      {/* 3. Interactive Forensic Word Cloud Tab */}
+      {activeTab === 'WORDCLOUD' && (
+        <WordCloudView />
       )}
     </div>
   );
