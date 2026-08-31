@@ -9,6 +9,8 @@ import {
 import { AnalyticsEngineService } from './analytics-engine.service';
 import { CrossCorrelatorService } from './services/cross-correlator.service';
 import { LocalAssistantService } from './services/local-assistant.service';
+import { EntityIntelligenceService } from './services/entity-intelligence.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Controller('api/v1/analytics')
 export class AnalyticsController {
@@ -16,6 +18,8 @@ export class AnalyticsController {
     private readonly analyticsEngine: AnalyticsEngineService,
     private readonly crossCorrelator: CrossCorrelatorService,
     private readonly assistantService: LocalAssistantService,
+    private readonly entityIntelligence: EntityIntelligenceService,
+    private readonly prisma: PrismaService,
   ) {}
 
   /**
@@ -159,6 +163,20 @@ export class AnalyticsController {
   @Get(':datasetId/geo')
   async getGeoIntelligence(@Param('datasetId') datasetId: string) {
     return this.analyticsEngine.getGeoIntelligence(datasetId);
+  }
+
+  /**
+   * Get extracted forensic entities: crypto wallets, IPs, financial accounts, and telecom prefixes.
+   */
+  @Get(':datasetId/entities')
+  async getEntityIntelligence(@Param('datasetId') datasetId: string) {
+    const events = await this.prisma.timelineEvent.findMany({
+      where: { datasetId },
+      select: { id: true, actor: true, content: true, timestamp: true },
+      take: 10000,
+    });
+
+    return this.entityIntelligence.scanDatasetEntities(events);
   }
 
   /**

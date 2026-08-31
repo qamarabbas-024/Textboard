@@ -19,6 +19,10 @@ import { AudioForensicsService } from './services/audio-forensics.service';
 import { GeoIntelligenceService } from './services/geo-intelligence.service';
 import { EmotionRadarService } from './services/emotion-radar.service';
 import { BehavioralProfilerService } from './services/behavioral-profiler.service';
+import { KeyphraseExtractorService } from './services/keyphrase-extractor.service';
+import { VelocityAnomalyService } from './services/velocity-anomaly.service';
+import { CrossDatasetComparatorService } from './services/cross-dataset-comparator.service';
+import { EntityIntelligenceService } from './services/entity-intelligence.service';
 
 @Module({
   imports: [PrismaModule, RedisModule],
@@ -41,6 +45,10 @@ import { BehavioralProfilerService } from './services/behavioral-profiler.servic
     GeoIntelligenceService,
     EmotionRadarService,
     BehavioralProfilerService,
+    KeyphraseExtractorService,
+    VelocityAnomalyService,
+    CrossDatasetComparatorService,
+    EntityIntelligenceService,
   ],
   exports: [
     AnalyticsEngineService,
@@ -52,6 +60,7 @@ import { BehavioralProfilerService } from './services/behavioral-profiler.servic
     OnThisDayService,
     RelationshipMatrixService,
     AnomalyDetectorService,
+    EntityIntelligenceService,
     CrossCorrelatorService,
     ClusteringEngineService,
     ThreadReconstructorService,
@@ -60,6 +69,9 @@ import { BehavioralProfilerService } from './services/behavioral-profiler.servic
     GeoIntelligenceService,
     EmotionRadarService,
     BehavioralProfilerService,
+    KeyphraseExtractorService,
+    VelocityAnomalyService,
+    CrossDatasetComparatorService,
   ],
 })
 export class AnalyticsModule {}
