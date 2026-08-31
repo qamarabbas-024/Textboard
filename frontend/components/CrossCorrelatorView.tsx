@@ -9,6 +9,7 @@ import {
 } from './Icons';
 import { Button } from './ui/Button';
 import CorrelationLissajousChart from './charts/CorrelationLissajousChart';
+import { CrossDatasetVennView } from './CrossDatasetVennView';
 
 interface DatasetItem {
   id: string;
@@ -141,7 +142,17 @@ export default function CrossCorrelatorView({ datasets }: CrossCorrelatorViewPro
         </div>
       </section>
 
-      {/* 1. Dual-Stream Lissajous & Synchronicity Waveform Chart */}
+      {/* 1. Interactive Cross-Dataset Venn Diagram & Identity Overlap */}
+      <CrossDatasetVennView
+        datasetAName={dsA?.name || 'Stream A'}
+        datasetBName={dsB?.name || 'Stream B'}
+        actorsA={participants.map((p: any) => p.actorA || p.name).filter(Boolean)}
+        actorsB={participants.map((p: any) => p.actorB || p.name).filter(Boolean)}
+        sharedActors={participants.filter((p: any) => p.overlapScore > 0.5 || p.isShared).map((p: any) => p.name || p.actorA || p.actorB)}
+        jaccardSimilarity={temporal?.overlapPercentage ? temporal.overlapPercentage / 100 : 0.45}
+      />
+
+      {/* 2. Dual-Stream Lissajous & Synchronicity Waveform Chart */}
       <CorrelationLissajousChart
         streamAName={dsA?.name || 'Stream A'}
         streamBName={dsB?.name || 'Stream B'}
