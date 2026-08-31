@@ -16,9 +16,11 @@ import { ActivityHeatmap } from './ActivityHeatmap';
 import { PdfExportModal } from './PdfExportModal';
 import { RelationshipMatrix } from './RelationshipMatrix';
 import { OnThisDayView } from './OnThisDayView';
+import { ForensicPodcastPlayer } from './ForensicPodcastPlayer';
+import { EntityIntelligenceView } from './EntityIntelligenceView';
 import { Button } from './ui/Button';
 
-export type ExploreSubTab = 'timeline' | 'network' | 'people' | 'activity' | 'emoji' | 'topics' | 'links';
+export type ExploreSubTab = 'timeline' | 'podcast' | 'entities' | 'network' | 'people' | 'activity' | 'emoji' | 'topics' | 'links';
 
 interface DatasetItem {
   id: string;
@@ -70,6 +72,8 @@ export function ExploreView({
 
   const subTabs: Array<{ id: ExploreSubTab; label: string; icon: React.ReactNode }> = [
     { id: 'timeline', label: 'TIMELINE', icon: <ClockIcon className="w-4 h-4" /> },
+    { id: 'podcast', label: '🎙️ PODCAST / TTS', icon: <span className="text-sm">🎙️</span> },
+    { id: 'entities', label: '🛡️ THREAT INTEL', icon: <span className="text-sm">🛡️</span> },
     { id: 'network', label: 'NETWORK', icon: <UsersIcon className="w-4 h-4" /> },
     { id: 'people', label: 'PEOPLE', icon: <UsersIcon className="w-4 h-4" /> },
     { id: 'activity', label: 'ACTIVITY', icon: <ActivityIcon className="w-4 h-4" /> },
@@ -178,6 +182,21 @@ export function ExploreView({
               selectedRange={selectedRange}
             />
           </div>
+        </section>
+      )}
+
+      {subTab === 'podcast' && (
+        <section className="space-y-4">
+          <ForensicPodcastPlayer
+            datasetId={activeDataset.id}
+            datasetName={activeDataset.name}
+          />
+        </section>
+      )}
+
+      {subTab === 'entities' && (
+        <section className="space-y-4">
+          <EntityIntelligenceView datasetId={activeDataset.id} />
         </section>
       )}
 
