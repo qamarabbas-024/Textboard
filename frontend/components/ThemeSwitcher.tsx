@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export type AppTheme = 'cyberpunk' | 'tokyo' | 'matrix' | 'nebula' | 'diamond' | 'amber';
+export type AppTheme = 'cyberpunk' | 'tokyo' | 'matrix';
 
 export const THEMES: Array<{
   id: AppTheme;
@@ -17,7 +17,7 @@ export const THEMES: Array<{
   {
     id: 'cyberpunk',
     label: 'Cyber Hyperdrive',
-    badge: 'NEON',
+    badge: 'CYAN / VIOLET',
     desc: 'Electric Cyan & Hyper Violet with void deep abyss',
     icon: '⚡',
     gradient: 'from-cyan-400 to-purple-600',
@@ -26,8 +26,8 @@ export const THEMES: Array<{
   {
     id: 'tokyo',
     label: 'Tokyo Syndicate',
-    badge: '2077',
-    desc: 'Hot Neon Magenta & Cyber Gold with carbon darks',
+    badge: 'MAGENTA / GOLD',
+    desc: 'Hot Neon Magenta & Cyber Gold with carbon pitch darks',
     icon: '🌆',
     gradient: 'from-rose-500 to-amber-400',
     dotColor: '#ff0055',
@@ -35,38 +35,11 @@ export const THEMES: Array<{
   {
     id: 'matrix',
     label: 'Emerald Quantum',
-    badge: 'HOLO',
+    badge: 'HOLO / MINT',
     desc: 'Bioluminescent Mint & Emerald hologram matrix',
     icon: '🟢',
     gradient: 'from-emerald-400 to-lime-300',
     dotColor: '#00ff88',
-  },
-  {
-    id: 'nebula',
-    label: 'Nebula Sunset',
-    badge: 'COSMIC',
-    desc: 'Cosmic Indigo & Sunset Coral vaporwave glass',
-    icon: '🌌',
-    gradient: 'from-rose-400 via-purple-500 to-indigo-600',
-    dotColor: '#ff6b6b',
-  },
-  {
-    id: 'diamond',
-    label: 'Executive Diamond',
-    badge: 'LUXURY',
-    desc: 'Crisp Frosted Titanium & Royal Sapphire Blue',
-    icon: '💎',
-    gradient: 'from-sky-400 to-blue-600',
-    dotColor: '#38bdf8',
-  },
-  {
-    id: 'amber',
-    label: 'Solarized Amber',
-    badge: 'RETRO',
-    desc: 'Phosphor Amber Gold CRT terminal aesthetic',
-    icon: '📟',
-    gradient: 'from-amber-400 to-yellow-600',
-    dotColor: '#f59e0b',
   },
 ];
 

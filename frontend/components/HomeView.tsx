@@ -307,21 +307,42 @@ export function HomeView({
         </div>
 
         {datasets.length === 0 ? (
-          <div className="p-12 rounded-2xl glass-card-3d text-center space-y-4">
-            <DatabaseIcon className="w-10 h-10 text-theme-dim mx-auto animate-pulse" />
-            <div className="space-y-1">
-              <h3 className="text-sm font-bold text-white">No Communication Streams Ingested</h3>
-              <p className="text-xs text-theme-muted font-sans">
-                Drag and drop a WhatsApp export (.zip/.txt), Discord JSON, or CSV into the Data tab to start.
+          <div
+            onClick={() => onNavigateTo('DATA')}
+            className="p-12 rounded-3xl glass-card-3d text-center space-y-5 border-2 border-dashed border-cyan-500/30 hover:border-cyan-400/60 hover:bg-cyan-500/[0.03] transition-all cursor-pointer group"
+          >
+            <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-400/30 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform shadow-[0_0_25px_rgba(0,240,255,0.15)]">
+              <DatabaseIcon className="w-8 h-8 text-cyan-400 animate-pulse" />
+            </div>
+            <div className="space-y-2 max-w-md mx-auto">
+              <h3 className="text-base font-bold text-white tracking-tight">No Communication Streams Ingested</h3>
+              <p className="text-xs text-theme-muted font-sans leading-relaxed">
+                Click here or drag-and-drop raw exports into the Data tab to begin automated ingestion and offline timeline intelligence.
               </p>
             </div>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => onNavigateTo('DATA')}
-            >
-              Go to Data Ingestion
-            </Button>
+
+            {/* Supported Formats Pill Strip */}
+            <div className="flex flex-wrap justify-center gap-2 pt-2">
+              {['WhatsApp .ZIP/.TXT', 'Telegram JSON/HTML', 'Signal Backups', 'Apple iMessage', 'Slack Workspace', 'CSV / Excel', 'PDF Forensics'].map((fmt) => (
+                <span key={fmt} className="text-[10px] px-2.5 py-1 rounded-lg bg-black/40 border border-white/[0.08] text-neutral-300 font-mono">
+                  {fmt}
+                </span>
+              ))}
+            </div>
+
+            <div className="pt-2">
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onNavigateTo('DATA');
+                }}
+                className="btn-3d-primary font-bold shadow-lg"
+              >
+                Open Data Ingestion Wizard →
+              </Button>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
