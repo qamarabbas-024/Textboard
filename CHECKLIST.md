@@ -43,6 +43,7 @@ TextBoard is a local-first, privacy-grade communication forensics and timeline i
 - [x] **Interactive Word Cloud**: Dynamic keyword sizing, N-gram toggles, and TF-IDF inspector cards.
 - [x] **Velocity Anomaly Detector**: Statistical surge detection ($Z \ge 2.5\sigma$) and sudden communication blackout alerts.
 - [x] **Automated Threat Intel & Entity Extractor**: Bitcoin, Ethereum, USDT TRC-20, Solana wallet addresses, IP addresses (Private vs Public), Luhn-validated Credit Cards, IBAN accounts, and Telecom country code profiling.
+- [x] **Courtroom Bates Stamping & PII Redaction Studio**: Sequential exhibit stamping (`EXHIBIT-0001` through `EXHIBIT-9999`), automated PII redaction filters for credit cards, phone numbers, crypto addresses, and custom keyword masking with CSV exhibit export.
 - [x] **Hybrid Trust Model & Online Gateway**: Physical `Airgap Mode (Offline)` vs `Online Enhanced Mode` switch, live VirusTotal URL scanner, AbuseIPDB reputation, live Blockchain explorer, and frontier Cloud LLM (Gemini 1.5 Pro / GPT-4o) integration.
 - [x] **Geospatial Map View**: SVG projection, GPS pin extraction from maps links/EXIF, route playback simulator.
 - [x] **Cross-Dataset Correlator & Venn View**: Jaccard actor overlap, shared keyphrases, and interactive SVG Venn diagram.
@@ -67,11 +68,12 @@ TextBoard is a local-first, privacy-grade communication forensics and timeline i
 
 ---
 
-### 📦 5. Desktop Packaging & Portability
+### 📦 5. Desktop & Mobile Packaging
 - [x] **Fast Windows Installer (`TextBoard-Setup-3.3.0.exe`)**: 2-second installation with Desktop and Start Menu shortcuts.
 - [x] **Zero-Install Portable (`TextBoard-Portable-3.3.0.exe`)**: Standalone binary ready for USB or any PC.
 - [x] **Zero-Dependency DB**: Auto-initializes SQLite database in `%APPDATA%\TextBoard\database\textboard_local.db`.
 - [x] **Optimized Download Size**: Stripped 650MB+ of dev bloat with maximum LZMA compression.
+- [x] **Native Android Mobile App & APK Build Target (`com.textboard.forensics`)**: Capacitor Android runtime, native Gradle project, AndroidManifest intent filters for WhatsApp/Telegram chat exports, and thumb-friendly `MobileBottomNav` responsive deck.
 
 ---
 

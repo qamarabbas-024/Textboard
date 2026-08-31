@@ -92,17 +92,17 @@ export class EntityIntelligenceService {
 
       // 1. Crypto Wallet Extraction
       const btcMatches = text.match(this.BTC_REGEX) || [];
-      btcMatches.forEach((addr) => this.recordHit(cryptoMap, addr, 'BITCOIN', actor));
+      btcMatches.forEach((addr: string) => this.recordHit(cryptoMap, addr, 'BITCOIN', actor));
 
       const ethMatches = text.match(this.ETH_REGEX) || [];
-      ethMatches.forEach((addr) => this.recordHit(cryptoMap, addr, 'ETHEREUM', actor));
+      ethMatches.forEach((addr: string) => this.recordHit(cryptoMap, addr, 'ETHEREUM', actor));
 
       const trcMatches = text.match(this.TRC20_REGEX) || [];
-      trcMatches.forEach((addr) => this.recordHit(cryptoMap, addr, 'TRC20_USDT', actor));
+      trcMatches.forEach((addr: string) => this.recordHit(cryptoMap, addr, 'TRC20_USDT', actor));
 
       // 2. IP Address Extraction
       const ipMatches = text.match(this.IPV4_REGEX) || [];
-      ipMatches.forEach((ip) => {
+      ipMatches.forEach((ip: string) => {
         const isPrivate = this.isPrivateIp(ip);
         if (!ipMap.has(ip)) {
           ipMap.set(ip, { version: 'IPv4', isPrivate, count: 0, actors: new Set() });
@@ -114,14 +114,14 @@ export class EntityIntelligenceService {
 
       // 3. Financial Extraction (IBAN, Credit Cards with Luhn Check, Money)
       const ibanMatches = text.match(this.IBAN_REGEX) || [];
-      ibanMatches.forEach((iban) => {
+      ibanMatches.forEach((iban: string) => {
         if (this.isValidIban(iban)) {
           this.recordFinHit(finMap, iban, 'IBAN', actor, `${iban.slice(0, 4)}...${iban.slice(-4)}`);
         }
       });
 
       const ccMatches = text.match(this.CC_REGEX) || [];
-      ccMatches.forEach((rawCc) => {
+      ccMatches.forEach((rawCc: string) => {
         const cleaned = rawCc.replace(/[-\s]/g, '');
         if (this.passesLuhnCheck(cleaned)) {
           const masked = `****-****-****-${cleaned.slice(-4)}`;
@@ -130,13 +130,13 @@ export class EntityIntelligenceService {
       });
 
       const moneyMatches = text.match(this.MONEY_REGEX) || [];
-      moneyMatches.forEach((m) => {
+      moneyMatches.forEach((m: string) => {
         this.recordFinHit(finMap, m.trim(), 'CURRENCY_AMOUNT', actor);
       });
 
       // 4. Telecom Profiling
       const phoneMatches = text.match(/\+?\d{1,4}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{2,4}[-.\s]?\d{3,9}\b/g) || [];
-      phoneMatches.forEach((phone) => {
+      phoneMatches.forEach((phone: string) => {
         const clean = phone.replace(/[^\d+]/g, '');
         if (clean.length >= 8 && clean.length <= 16) {
           const numDigits = clean.replace(/^\+/, '');

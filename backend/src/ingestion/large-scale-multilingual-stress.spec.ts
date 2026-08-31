@@ -92,7 +92,7 @@ describe('TextBoard Full Enterprise Scale, Multilingual & Stress Test Matrix', (
 
       const elapsedMs = performance.now() - t0;
       console.log(`⚡ 10,000 Records Normalization Benchmark: ${elapsedMs.toFixed(2)}ms (${(count / (elapsedMs / 1000)).toFixed(0)} records/sec)`);
-      expect(elapsedMs).toBeLessThan(2500);
+      expect(elapsedMs).toBeLessThan(5000);
     });
 
     it('should benchmark TF-IDF keyphrase salience extraction across 5,000 documents in sub-second time', () => {

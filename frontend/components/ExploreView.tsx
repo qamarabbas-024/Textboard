@@ -18,6 +18,7 @@ import { RelationshipMatrix } from './RelationshipMatrix';
 import { OnThisDayView } from './OnThisDayView';
 import { ForensicPodcastPlayer } from './ForensicPodcastPlayer';
 import { EntityIntelligenceView } from './EntityIntelligenceView';
+import { BatesStampingModal } from './BatesStampingModal';
 import { Button } from './ui/Button';
 
 export type ExploreSubTab = 'timeline' | 'podcast' | 'entities' | 'network' | 'people' | 'activity' | 'emoji' | 'topics' | 'links';
@@ -44,6 +45,7 @@ export function ExploreView({
   const [analytics, setAnalytics] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const [isBatesOpen, setIsBatesOpen] = useState(false);
   const [scrubbedDate, setScrubbedDate] = useState<string | null>(null);
   const [selectedRange, setSelectedRange] = useState<{ start: string | null; end: string | null }>({
     start: null,
@@ -133,6 +135,14 @@ export function ExploreView({
           </div>
 
           <div className="flex items-center gap-1.5 shrink-0">
+            <Button
+              variant="secondary"
+              size="xs"
+              onClick={() => setIsBatesOpen(true)}
+              title="Legal Bates Stamping & PII Redaction Studio"
+            >
+              ⚖️ BATES
+            </Button>
             <Button
               variant="secondary"
               size="xs"
@@ -431,6 +441,16 @@ export function ExploreView({
           datasetId={activeDataset.id}
           datasetName={activeDataset.name}
           totalEvents={activeDataset.totalEvents}
+        />
+      )}
+
+      {/* Legal Bates Stamping & PII Redaction Modal */}
+      {isBatesOpen && (
+        <BatesStampingModal
+          isOpen={isBatesOpen}
+          onClose={() => setIsBatesOpen(false)}
+          datasetId={activeDataset.id}
+          datasetName={activeDataset.name}
         />
       )}
     </div>
