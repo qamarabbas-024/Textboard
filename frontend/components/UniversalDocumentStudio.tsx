@@ -6,8 +6,19 @@ import { VisualPdfStudioModal } from './VisualPdfStudioModal';
 import { AudioSpeechStudio } from './AudioSpeechStudio';
 import { ImageOcrStudio } from './ImageOcrStudio';
 import { AgencyBrandingStudio } from './AgencyBrandingStudio';
+import { TimelineStoryboardStudio } from './TimelineStoryboardStudio';
+import { NetworkLinkGraphStudio } from './NetworkLinkGraphStudio';
+import { ExecutiveBriefingModal } from './ExecutiveBriefingModal';
 
-export type ToolCategory = 'PDF' | 'CONVERT' | 'AUDIO' | 'SECURITY' | 'OCR' | 'BRANDING';
+export type ToolCategory =
+  | 'PDF'
+  | 'CONVERT'
+  | 'AUDIO'
+  | 'SECURITY'
+  | 'OCR'
+  | 'BRANDING'
+  | 'STORYBOARD'
+  | 'GRAPH';
 
 interface UniversalDocumentStudioProps {
   onOpenBatesModal?: () => void;
@@ -20,6 +31,7 @@ export function UniversalDocumentStudio({
 }: UniversalDocumentStudioProps) {
   const [activeCategory, setActiveCategory] = useState<ToolCategory>('PDF');
   const [isVisualStudioOpen, setIsVisualStudioOpen] = useState(false);
+  const [isBriefingOpen, setIsBriefingOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [conversionInput, setConversionInput] = useState<string>('');
   const [conversionOutput, setConversionOutput] = useState<string>('');
@@ -187,6 +199,32 @@ export function UniversalDocumentStudio({
               }`}
             >
               🏛️ Branding
+            </button>
+            <button
+              onClick={() => setActiveCategory('STORYBOARD')}
+              className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
+                activeCategory === 'STORYBOARD'
+                  ? 'bg-purple-500/20 text-purple-300 border border-purple-400/40 shadow-sm'
+                  : 'text-neutral-400 hover:text-white'
+              }`}
+            >
+              🎬 Storyboard
+            </button>
+            <button
+              onClick={() => setActiveCategory('GRAPH')}
+              className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
+                activeCategory === 'GRAPH'
+                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 shadow-sm'
+                  : 'text-neutral-400 hover:text-white'
+              }`}
+            >
+              🕸️ Link Graph
+            </button>
+            <button
+              onClick={() => setIsBriefingOpen(true)}
+              className="px-3 py-1.5 rounded-xl font-bold transition-all bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 border border-amber-400/30 cursor-pointer shadow-sm"
+            >
+              📑 Executive Brief
             </button>
           </div>
         </div>
@@ -407,6 +445,20 @@ export function UniversalDocumentStudio({
             <AgencyBrandingStudio />
           </div>
         )}
+
+        {/* Category 7: Multi-Actor Timeline Storyboard */}
+        {activeCategory === 'STORYBOARD' && (
+          <div className="pt-5">
+            <TimelineStoryboardStudio />
+          </div>
+        )}
+
+        {/* Category 8: Force-Directed Entity Link Graph */}
+        {activeCategory === 'GRAPH' && (
+          <div className="pt-5">
+            <NetworkLinkGraphStudio />
+          </div>
+        )}
       </section>
 
       {/* Visual PDF Page Organizer & Signature Modal */}
@@ -414,6 +466,14 @@ export function UniversalDocumentStudio({
         <VisualPdfStudioModal
           isOpen={isVisualStudioOpen}
           onClose={() => setIsVisualStudioOpen(false)}
+        />
+      )}
+
+      {/* Automated Executive Courtroom Briefing Modal */}
+      {isBriefingOpen && (
+        <ExecutiveBriefingModal
+          isOpen={isBriefingOpen}
+          onClose={() => setIsBriefingOpen(false)}
         />
       )}
     </div>
