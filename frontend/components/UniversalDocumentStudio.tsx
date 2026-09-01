@@ -4,8 +4,10 @@ import React, { useState, useRef } from 'react';
 import { Button } from './ui/Button';
 import { VisualPdfStudioModal } from './VisualPdfStudioModal';
 import { AudioSpeechStudio } from './AudioSpeechStudio';
+import { ImageOcrStudio } from './ImageOcrStudio';
+import { AgencyBrandingStudio } from './AgencyBrandingStudio';
 
-export type ToolCategory = 'PDF' | 'CONVERT' | 'AUDIO' | 'SECURITY';
+export type ToolCategory = 'PDF' | 'CONVERT' | 'AUDIO' | 'SECURITY' | 'OCR' | 'BRANDING';
 
 interface UniversalDocumentStudioProps {
   onOpenBatesModal?: () => void;
@@ -165,6 +167,26 @@ export function UniversalDocumentStudio({
               }`}
             >
               🎙️ Audio STT
+            </button>
+            <button
+              onClick={() => setActiveCategory('OCR')}
+              className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
+                activeCategory === 'OCR'
+                  ? 'bg-amber-500/20 text-amber-300 border border-amber-400/40 shadow-sm'
+                  : 'text-neutral-400 hover:text-white'
+              }`}
+            >
+              🔍 Image OCR
+            </button>
+            <button
+              onClick={() => setActiveCategory('BRANDING')}
+              className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
+                activeCategory === 'BRANDING'
+                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 shadow-sm'
+                  : 'text-neutral-400 hover:text-white'
+              }`}
+            >
+              🏛️ Branding
             </button>
           </div>
         </div>
@@ -364,6 +386,25 @@ export function UniversalDocumentStudio({
                 setStatusMessage('✓ Inserted voice transcription into conversion input.');
               }}
             />
+          </div>
+        )}
+
+        {/* Category 5: Image Optical Character Recognition Studio */}
+        {activeCategory === 'OCR' && (
+          <div className="pt-5">
+            <ImageOcrStudio
+              onInsertOcrText={(text) => {
+                setConversionInput((prev) => (prev ? prev + '\n\n' + text : text));
+                setStatusMessage('✓ Inserted OCR extracted text into conversion input.');
+              }}
+            />
+          </div>
+        )}
+
+        {/* Category 6: Agency & Law Firm Whitelabel Branding */}
+        {activeCategory === 'BRANDING' && (
+          <div className="pt-5">
+            <AgencyBrandingStudio />
           </div>
         )}
       </section>
